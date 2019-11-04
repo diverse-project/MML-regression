@@ -105,12 +105,9 @@ public class MmlParsingJavaTestBorisBastienFileInput {
 				csvSplit+="X = df[df.columns.difference(["+items+"])]\n";
 				csvSplit+="y = df[columns = [df.columns["+formuleItem.getColumn()+"]]]\n";
 			}else if(xformule instanceof AllVariables) {
-				//TODO retourne probablement "." A gérer
-				//items = ((AllVariables) xformule).getAll();
 				csvSplit+="X = df.drop(columns = [df.columns[-1]])\n";
 				csvSplit+="y = df[columns = [df.columns[-1]]]\n";
 			}
-			//TODO a peu près pareil qu'au-dessus mais pour le formulaitem de prediction
 		}else {
 			//if formule is null, all the fields are used to predict the last one
 			csvSplit+="X = df.drop(columns = [df.columns[-1]])\n";
