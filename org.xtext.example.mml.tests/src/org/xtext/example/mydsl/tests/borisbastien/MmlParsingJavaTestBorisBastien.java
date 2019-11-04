@@ -18,6 +18,7 @@ import org.xtext.example.mydsl.mml.MMLModel;
 
 import com.google.common.io.Files;
 import com.google.inject.Inject;
+import org.xtext.example.mydsl.tests.MmlInjectorProvider;
 
 @ExtendWith(InjectionExtension.class)
 @InjectWith(MmlInjectorProvider.class)
