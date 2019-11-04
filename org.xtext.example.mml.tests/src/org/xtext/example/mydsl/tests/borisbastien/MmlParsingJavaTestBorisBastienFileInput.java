@@ -91,7 +91,7 @@ public class MmlParsingJavaTestBorisBastienFileInput {
 					if(predictorItems.get(0).getColName() != null) {
 						for(FormulaItem item : predictorItems) {
 							if(predictorItems.get(0)!=item)sb.append(',');
-							sb.append(item.getColName());
+							sb.append("'"+item.getColName()+"'");
 						}
 					}else {
 						for(FormulaItem item : predictorItems) {
