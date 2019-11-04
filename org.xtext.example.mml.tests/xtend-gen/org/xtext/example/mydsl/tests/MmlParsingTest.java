@@ -15,6 +15,7 @@ import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.xtext.example.mydsl.mml.DataInput;
 import org.xtext.example.mydsl.mml.MMLModel;
 import org.xtext.example.mydsl.tests.MmlInjectorProvider;
 
@@ -29,7 +30,7 @@ public class MmlParsingTest {
   public void loadModel() {
     try {
       StringConcatenation _builder = new StringConcatenation();
-      _builder.append("datainput \"foo.csv\"");
+      _builder.append("datainput \"boston.csv\"");
       _builder.newLine();
       _builder.append("\t");
       _builder.append("mlframework scikit-learn");
@@ -59,6 +60,41 @@ public class MmlParsingTest {
       _builder_1.append(_join);
       Assertions.assertTrue(_isEmpty, _builder_1.toString());
       Assertions.assertEquals("foo.csv", result.getInput().getFilelocation());
+    } catch (Throwable _e) {
+      throw Exceptions.sneakyThrow(_e);
+    }
+  }
+  
+  @Test
+  public void compileDataInput() {
+    try {
+      StringConcatenation _builder = new StringConcatenation();
+      _builder.append("datainput \"boston.csv\" separator ;");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("mlframework scikit-learn");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("algorithm DT");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("TrainingTest { ");
+      _builder.newLine();
+      _builder.append("\t\t");
+      _builder.append("percentageTraining 70");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("}");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("mean_absolute_error");
+      _builder.newLine();
+      final MMLModel result = this.parseHelper.parse(_builder);
+      final DataInput dataInput = result.getInput();
+      final String fileLocation = dataInput.getFilelocation();
+      final String pythonImport = "import pandas as pd\n";
+      final String DEFAULT_COLUMN_SEPARATOR = ",";
+      final String csv_separator = DEFAULT_COLUMN_SEPARATOR;
     } catch (Throwable _e) {
       throw Exceptions.sneakyThrow(_e);
     }

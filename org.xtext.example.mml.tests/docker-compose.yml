@@ -1,0 +1,6 @@
+version: '3'
+services:
+  mml_py:
+    build: .
+    ports:
+      - "5000:5000"
