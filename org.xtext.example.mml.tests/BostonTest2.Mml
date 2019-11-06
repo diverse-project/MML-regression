@@ -1,7 +1,7 @@
 datainput "https://raw.githubusercontent.com/acherm/teaching-MDE1920/master/boston/boston.csv"
 mlframework scikit-learn
 algorithm DT
-formula 0~1+2+3
+formula 0~"test"+2+3
 TrainingTest {
 	percentageTraining 30
 }

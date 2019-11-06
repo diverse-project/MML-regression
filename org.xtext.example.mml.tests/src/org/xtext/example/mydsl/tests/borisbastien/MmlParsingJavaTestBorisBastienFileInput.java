@@ -49,11 +49,11 @@ public class MmlParsingJavaTestBorisBastienFileInput {
 	@Test
 	public void loadModel() throws Exception {
 		
-		MMLModel result = parseHelper.parse(new String(java.nio.file.Files.readAllBytes(Paths.get("BostonTest.Mml"))));
+		MMLModel result = parseHelper.parse(new String(java.nio.file.Files.readAllBytes(Paths.get("BostonTest2.Mml"))));
 		Assertions.assertNotNull(result);
 		EList<Resource.Diagnostic> errors = result.eResource().getErrors();
 		Assertions.assertTrue(errors.isEmpty(), "Unexpected errors");			
-		Assertions.assertEquals("foo.csv", result.getInput().getFilelocation());			
+		Assertions.assertEquals("https://raw.githubusercontent.com/acherm/teaching-MDE1920/master/boston/boston.csv", result.getInput().getFilelocation());			
 		
 	}		
 	
@@ -66,7 +66,6 @@ public class MmlParsingJavaTestBorisBastienFileInput {
 		Validation validation = result.getValidation();
 		RFormula formule = result.getFormula();
 		
-		String pythonImport = "import pandas as pd\n"; 
 		
 		//csv
 		String DEFAULT_COLUMN_SEPARATOR = ","; // by default
@@ -76,6 +75,59 @@ public class MmlParsingJavaTestBorisBastienFileInput {
 			System.err.println("parsing instruction..." + parsingInstruction);
 			csv_separator = parsingInstruction.getSep().toString();
 		}
+		
+		FrameworkLang framework = mlchoicealgo.getFramework();
+		
+		String code="";
+		
+		switch(framework.getValue()) {
+			case FrameworkLang.JAVA_WEKA_VALUE:
+				code=compileWeka(formule, code, mlchoicealgo, validation, code);
+				break;
+			case FrameworkLang.SCIKIT_VALUE:
+				code=compileScikit(formule, code, mlchoicealgo, validation, code);
+				break;
+			case FrameworkLang.R_VALUE:
+				code=compileR(formule, code, mlchoicealgo, validation, code);
+				break;
+			case FrameworkLang.XG_BOOST_VALUE:
+				code=compileXG(formule, code, mlchoicealgo, validation, code);
+				break;
+			default:break;
+		}
+		
+		Files.write(code.getBytes(), new File("mml.py"));
+		// end of Python generation
+		
+		
+		/*
+		 * Calling generated Python script (basic solution through systems call)
+		 * we assume that "python" is in the path
+		 */
+		Process p = Runtime.getRuntime().exec("python mml.py");
+		BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+		String line; 
+		while ((line = in.readLine()) != null) {
+			System.out.println(line);
+	    }
+
+		
+		
+	}
+
+	private String compileXG(RFormula formule, String code, MLChoiceAlgorithm mlchoicealgo, Validation validation, String code2) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private String compileR(RFormula formule, String code, MLChoiceAlgorithm mlchoicealgo, Validation validation, String code2) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private String compileScikit(RFormula formule, String fileLocation, MLChoiceAlgorithm mlchoicealgo, Validation validation, String csv_separator) {
+		
+		String pythonImport = "import pandas as pd\n"; 
 		String csvReading = "mml_data = pd.read_csv(" + mkValueInSingleQuote(fileLocation) + ", sep=" + mkValueInSingleQuote(csv_separator) + ")\n";						
 		
 		//formule : recuperation des champs du csv à garder
@@ -115,7 +167,6 @@ public class MmlParsingJavaTestBorisBastienFileInput {
 		}
 		
 		//algo
-		FrameworkLang framework = mlchoicealgo.getFramework();
 		MLAlgorithm algo = mlchoicealgo.getAlgorithm();
 		String algoDeclaration="";
 		if(algo instanceof SVR) {
@@ -143,13 +194,21 @@ public class MmlParsingJavaTestBorisBastienFileInput {
 		String metrics="";
 		String metricsResult="";
 		for(int i=0;i<validMetrics.size();i++) {
-			String metric = "accuracy"+i+"=";
+			String metric = "";
 			switch(validMetrics.get(i).name()) {
 				case "MSE":
 					pythonImport+="from sklearn.metrics import mean_squared_error\n";
-					metric+="mean_squared_error(y_test, clf.predict(X_test))";
+					metric+="accuracy"+i+"=mean_squared_error(y_test, clf.predict(X_test))";
 					break;
-				//TODO other types
+				case "MAE":
+					pythonImport+="from sklearn.metrics import mean_absolute_error\n";
+					metric+="accuracy"+i+"=mean_absolute_error(y_test, clf.predict(X_test))";
+					break;
+				case "MAPE":
+					pythonImport+="from sklearn.utils import check_arrays\n";
+					metric+="y_test, y_pred = check_arrays(y_test, clf.predict(X_test))";
+					metric+="accuracy"+i+"=np.mean(np.abs((y_test - y_pred) / y_test)) * 100";
+					break;
 				default:
 					break;
 			}
@@ -160,24 +219,12 @@ public class MmlParsingJavaTestBorisBastienFileInput {
 		String pandasCode = pythonImport + csvReading + csvSplit + algoDeclaration+ validationPrint+ metrics+metricsResult;
 		
 		pandasCode += "\nprint (mml_data)\n";
-		
-		Files.write(pandasCode.getBytes(), new File("mml.py"));
-		// end of Python generation
-		
-		
-		/*
-		 * Calling generated Python script (basic solution through systems call)
-		 * we assume that "python" is in the path
-		 */
-		Process p = Runtime.getRuntime().exec("python mml.py");
-		BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-		String line; 
-		while ((line = in.readLine()) != null) {
-			System.out.println(line);
-	    }
+		return pandasCode;
+	}
 
-		
-		
+	private String compileWeka(RFormula formule, String code, MLChoiceAlgorithm mlchoicealgo, Validation validation, String code2) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	private String mkValueInSingleQuote(String val) {

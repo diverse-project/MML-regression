@@ -3,7 +3,7 @@ from sklearn import tree
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 mml_data = pd.read_csv('https://raw.githubusercontent.com/acherm/teaching-MDE1920/master/boston/boston.csv', sep=',')
-X = df[df.columns.difference([1,2,3])]
+X = df[df.columns.difference(['test','null','null'])]
 y = df[columns = [df.columns[0]]]
 clf = tree.DecisionTreeRegressor()
 test_size = 30
