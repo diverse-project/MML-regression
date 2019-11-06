@@ -24,7 +24,7 @@
     <genEnums typeSafeEnumCompatible="false" ecoreEnum="Mml.ecore#//ValidationMetric">
       <genEnumLiterals ecoreEnumLiteral="Mml.ecore#//ValidationMetric/MSE"/>
       <genEnumLiterals ecoreEnumLiteral="Mml.ecore#//ValidationMetric/MAE"/>
-      <genEnumLiterals ecoreEnumLiteral="Mml.ecore#//ValidationMetric/MAPE"/>
+      <genEnumLiterals ecoreEnumLiteral="Mml.ecore#//ValidationMetric/MEAE"/>
     </genEnums>
     <genClasses ecoreClass="Mml.ecore#//MMLModel">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Mml.ecore#//MMLModel/input"/>

@@ -41,14 +41,14 @@ public enum ValidationMetric implements Enumerator
   MAE(1, "MAE", "mean_absolute_error"),
 
   /**
-   * The '<em><b>MAPE</b></em>' literal object.
+   * The '<em><b>MEAE</b></em>' literal object.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see #MAPE_VALUE
+   * @see #MEAE_VALUE
    * @generated
    * @ordered
    */
-  MAPE(2, "MAPE", "mean_absolute_percentage_error");
+  MEAE(2, "MEAE", "median_absolute_error");
 
   /**
    * The '<em><b>MSE</b></em>' literal value.
@@ -73,15 +73,15 @@ public enum ValidationMetric implements Enumerator
   public static final int MAE_VALUE = 1;
 
   /**
-   * The '<em><b>MAPE</b></em>' literal value.
+   * The '<em><b>MEAE</b></em>' literal value.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
-   * @see #MAPE
-   * @model literal="mean_absolute_percentage_error"
+   * @see #MEAE
+   * @model literal="median_absolute_error"
    * @generated
    * @ordered
    */
-  public static final int MAPE_VALUE = 2;
+  public static final int MEAE_VALUE = 2;
 
   /**
    * An array of all the '<em><b>Validation Metric</b></em>' enumerators.
@@ -94,7 +94,7 @@ public enum ValidationMetric implements Enumerator
     {
       MSE,
       MAE,
-      MAPE,
+      MEAE,
     };
 
   /**
@@ -161,7 +161,7 @@ public enum ValidationMetric implements Enumerator
     {
       case MSE_VALUE: return MSE;
       case MAE_VALUE: return MAE;
-      case MAPE_VALUE: return MAPE;
+      case MEAE_VALUE: return MEAE;
     }
     return null;
   }

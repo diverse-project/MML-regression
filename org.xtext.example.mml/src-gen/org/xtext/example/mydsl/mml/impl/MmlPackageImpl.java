@@ -964,7 +964,7 @@ public class MmlPackageImpl extends EPackageImpl implements MmlPackage
     initEEnum(validationMetricEEnum, ValidationMetric.class, "ValidationMetric");
     addEEnumLiteral(validationMetricEEnum, ValidationMetric.MSE);
     addEEnumLiteral(validationMetricEEnum, ValidationMetric.MAE);
-    addEEnumLiteral(validationMetricEEnum, ValidationMetric.MAPE);
+    addEEnumLiteral(validationMetricEEnum, ValidationMetric.MEAE);
 
     // Create resource
     createResource(eNS_URI);

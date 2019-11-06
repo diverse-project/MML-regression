@@ -1,0 +1,9 @@
+datainput "/home/nico/IdeaProjects/idm_project/MML-regression/runtimeXText/boston/BostonHousing.csv" separator ,
+mlframework scikit-learn
+algorithm GTB
+formula 4~0+1+2+3+"nox"+9+"tax"
+TrainingTest {
+    percentageTraining 40
+}
+mean_squared_error mean_absolute_error median_absolute_error
+
