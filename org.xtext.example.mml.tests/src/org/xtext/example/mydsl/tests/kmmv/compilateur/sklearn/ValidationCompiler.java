@@ -22,7 +22,36 @@ public class ValidationCompiler {
 		List<String> import_ = new LinkedList<>();
 		List<String> code_ = new LinkedList<>();
 		
-		// TODO
+		if(metrics != null) {
+			String cv = "";
+			if(stratificationMethod.getNumber() != 0)
+				cv = String.format(", cv=%d", stratificationMethod.getNumber());
+			
+			for(ValidationMetric metric : metrics) {
+				switch(metric) {
+					case MAE:
+						import_.add("from sklearn.metrics import mean_absolute_error");
+						import_.add("from sklearn.metrics import make_scorer");
+						import_.add("from sklearn.model_selection import cross_val_score");
+						code_.add(String.format("print(cross_val_score(clf, X, Y%s, scoring=make_scorer(mean_absolute_error)))", cv));
+						break;
+					case MSE:
+						import_.add("from sklearn.metrics import mean_squared_error");
+						import_.add("from sklearn.metrics import make_scorer");
+						import_.add("from sklearn.model_selection import cross_val_score");
+						code_.add(String.format("print(cross_val_score(clf, X, Y%s, scoring=make_scorer(mean_squared_error)))", cv));
+						break;
+					case MAPE:
+						import_.add("from numpy import mean");
+						import_.add("from numpy import abs");
+						import_.add("from sklearn.utils import check_arrays");
+						import_.add("from sklearn.model_selection import cross_val_predict");
+						code_.add(String.format("y_true, y_pred = check_arrays(Y, cross_val_predict(clf, X, Y%s))", cv));
+						code_.add("print(mean(abs((y_true - y_pred) / y_true)) * 100)");
+						break;
+				}
+			}
+		}
 		
 		return new Pair<>(import_, code_);
 	}
@@ -39,26 +68,23 @@ public class ValidationCompiler {
 			code_.add("test_size = 0.3");
 		code_.add("X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=test_size)");
 		
+		code_.add("clf.fit(X_train, Y_train)");
+		
 		if(metrics != null) {
-			if(metrics.contains(ValidationMetric.MAE))
-				import_.add("from sklearn.metrics import mean_absolute_error");
-			if(metrics.contains(ValidationMetric.MSE))
-				import_.add("from sklearn.metrics import mean_squared_error");
-			if(metrics.contains(ValidationMetric.MAPE)) {
-				import_.add("from numpy import mean");
-				import_.add("from numpy import abs");
-				import_.add("from sklearn.utils import check_arrays");
-			}
-			
 			for(ValidationMetric metric : metrics) {
 				switch(metric) {
 					case MAE:
+						import_.add("from sklearn.metrics import mean_absolute_error");
 						code_.add("print(mean_absolute_error(Y_test, clf.predict(X_test)))");
 						break;
 					case MSE:
+						import_.add("from sklearn.metrics import mean_squared_error");
 						code_.add("print(mean_squared_error(Y_test, clf.predict(X_test)))");
 						break;
 					case MAPE:
+						import_.add("from numpy import mean");
+						import_.add("from numpy import abs");
+						import_.add("from sklearn.utils import check_arrays");
 						code_.add("y_true, y_pred = check_arrays(Y_test, clf.predict(X_test))");
 						code_.add("print(mean(abs((y_true - y_pred) / y_true)) * 100)");
 						break;

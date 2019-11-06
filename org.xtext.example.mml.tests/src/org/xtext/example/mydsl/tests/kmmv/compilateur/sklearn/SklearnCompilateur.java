@@ -27,10 +27,23 @@ public class SklearnCompilateur implements Compilateur {
 		Pair<List<String>, List<String>> inputC = compileDataInput(input);
 		Pair<List<String>, List<String>> formulaC = compileRFormula(formula);
 		Pair<List<String>, List<String>> algorithmC = MLAlgorithmCompiler.compile(algorithm.getAlgorithm());
+		Pair<List<String>, List<String>> validationC = ValidationCompiler.compile(validation);
 		
-		// TODO		
+		List<String> buffer = new LinkedList<>(), bufferImports = new LinkedList<>();
 		
-		return "";
+		bufferImports.addAll(inputC.getFirst());
+		bufferImports.addAll(formulaC.getFirst());
+		bufferImports.addAll(algorithmC.getFirst());
+		bufferImports.addAll(validationC.getFirst());
+		
+		buffer.addAll(filterImport(bufferImports));
+		buffer.add("");
+		buffer.addAll(inputC.getSecond());
+		buffer.addAll(formulaC.getSecond());
+		buffer.addAll(algorithmC.getSecond());
+		buffer.addAll(validationC.getSecond());
+		
+		return String.join("\n", buffer);
 	}
 	
 	/**
@@ -41,9 +54,15 @@ public class SklearnCompilateur implements Compilateur {
 		return String.format("%s_%s_%s.py", input.getFilelocation().replace('.', '_'), Utils.algorithmName(algorithm.getAlgorithm()), uniqueId);
 	}
 	
-	private String importFilter(List<String> imports) {
-		// TODO
-		return "";
+	private List<String> filterImport(List<String> imports) {
+		List<String> result = new LinkedList<>();
+		
+		for(String imp : imports) {
+			if(!result.contains(imp))
+				result.add(imp);
+		}
+		
+		return result;
 	}
 	
 	private Pair<List<String>, List<String>> compileDataInput(DataInput input) {
@@ -95,41 +114,4 @@ public class SklearnCompilateur implements Compilateur {
 		
 		return new Pair<>(import_, code_);
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	// WIP
-	static public Pair<List<String>, List<String>> validationMetric(List<ValidationMetric> metrics) {
-		List<String> import_ = new LinkedList<>();
-		List<String> code_ = new LinkedList<>();
-		
-		if(metrics.contains(ValidationMetric.MAE))
-			import_.add("from sklearn.metrics import mean_absolute_error");
-		if(metrics.contains(ValidationMetric.MSE))
-			import_.add("from sklearn.metrics import mean_squared_error");
-		if(metrics.contains(ValidationMetric.MAPE))
-			import_.add("from numpy import mean as np.mean, abs as np.abs");
-		
-		for(ValidationMetric metric : metrics) {
-			switch(metric) {
-				case MAE:
-					code_.add("print(mean_absolute_error())");
-					break;
-				case MSE:
-					break;
-				case MAPE:
-					break;
-			}
-		}
-		
-		return new Pair<>(import_, code_);
-	}
-
-	
 }
