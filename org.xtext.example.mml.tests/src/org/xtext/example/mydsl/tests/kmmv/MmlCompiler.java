@@ -1,7 +1,6 @@
 package org.xtext.example.mydsl.tests.kmmv;
 
 import java.io.File;
-import java.io.IOException;
 
 import org.xtext.example.mydsl.mml.DataInput;
 import org.xtext.example.mydsl.mml.MLChoiceAlgorithm;

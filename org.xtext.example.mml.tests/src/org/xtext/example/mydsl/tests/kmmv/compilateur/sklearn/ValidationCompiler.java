@@ -65,7 +65,7 @@ public class ValidationCompiler {
 		if(stratificationMethod.getNumber() > 0 && stratificationMethod.getNumber() < 100)
 			code_.add(String.format("test_size = %f",stratificationMethod.getNumber()/100.0));
 		else
-			code_.add("test_size = 0.3");
+			code_.add("test_size = 0.7");
 		code_.add("X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=test_size)");
 		
 		code_.add("clf.fit(X_train, Y_train)");

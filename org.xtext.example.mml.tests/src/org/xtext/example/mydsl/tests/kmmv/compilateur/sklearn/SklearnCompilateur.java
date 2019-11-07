@@ -83,7 +83,7 @@ public class SklearnCompilateur implements Compilateur {
 		List<String> import_ = new LinkedList<>();
 		List<String> code_ = new LinkedList<>();
 		
-		code_.add("column = list(mml_data");
+		code_.add("column = list(mml_data)");
 				
 		if(formula != null && formula.getPredictive() != null) {
 			if(formula.getPredictive().getColName() != null)
