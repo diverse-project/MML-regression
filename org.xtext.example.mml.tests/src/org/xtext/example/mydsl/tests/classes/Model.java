@@ -18,5 +18,5 @@ public interface Model {
 	public String writeModel();
 	public String writeValidationMetric();
 	public String writePrint();
-	public String generate(MMLModel model, String filelocation);
+	public String generate();
 }
