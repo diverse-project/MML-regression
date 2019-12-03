@@ -21,4 +21,8 @@ public class Utils {
 			return "SGD";
 		return "";
 	}
+	
+	public static String tab() {
+		return "    ";
+	}
 }

@@ -87,7 +87,7 @@ public class SklearnCompilateur implements Compilateur {
 				
 		if(formula != null && formula.getPredictive() != null) {
 			if(formula.getPredictive().getColName() != null)
-				code_.add(String.format("Y_name = %s", formula.getPredictive().getColName()));
+				code_.add(String.format("Y_name = '%s'", formula.getPredictive().getColName()));
 			else
 				code_.add(String.format("Y_name = column[%d]", formula.getPredictive().getColumn()));
 		} else {
