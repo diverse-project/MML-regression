@@ -19,13 +19,13 @@ import org.xtext.example.mydsl.mml.StratificationMethod;
 import org.xtext.example.mydsl.mml.TrainingTest;
 import org.xtext.example.mydsl.mml.ValidationMetric;
 
-	public class ModelPython implements Model{
+	public class ModelScikit implements Model{
 
 		MMLModel model;
 		MLAlgorithm algo;
 		String filelocation;
 		
-		public ModelPython(MMLModel model, MLAlgorithm algo, String fileLocation) {
+		public ModelScikit(MMLModel model, MLAlgorithm algo, String fileLocation) {
 			this.model = model;
 			this.algo = algo;
 			this.filelocation = fileLocation;
@@ -49,7 +49,7 @@ import org.xtext.example.mydsl.mml.ValidationMetric;
 					"from sklearn.model_selection import train_test_split \n";
 			
 			if (strat instanceof CrossValidation) {
-				ret += "from sklearn.model_selection import cross_val_score \n";
+				ret += "from sklearn.model_selection import cross_val_predict \n";
 			}
 			//if ret
 			if(algo instanceof DT) {
@@ -134,7 +134,7 @@ import org.xtext.example.mydsl.mml.ValidationMetric;
 		public String writeStratificationMethod() {
 			String res = "";
 			if(model.getValidation().getStratification() instanceof CrossValidation) {
-				res = "y_test = cross_val_score(clf, X, y, cv="+model.getValidation().getStratification().getNumber()+")";
+				res = "y_test = cross_val_predict(clf, X, y, cv="+model.getValidation().getStratification().getNumber()+")";
 			}
 			if(model.getValidation().getStratification() instanceof TrainingTest) {
 				float num = model.getValidation().getStratification().getNumber();
@@ -192,11 +192,11 @@ import org.xtext.example.mydsl.mml.ValidationMetric;
 		public String writeModel() {
 			// TODO Auto-generated method stub
 			if(model.getValidation().getStratification() instanceof TrainingTest) {
-				return "clf.fit(X_train, y_train)";
+				return "clf.fit(X_train, y_train)\n"+ "y = clf.predict(X_test)";
 			}
 			else if(model.getValidation().getStratification() instanceof CrossValidation) {
 				//return	"y_pred = cross_val_predict(clf, X, y, cv=" + model.getValidation().getStratification().getNumber() + ")\n" + 
-				return "X_test = y";
+				return ""; //"X_test = y";
 			}
 			else return "[MODEL] not implemented yet";
 		}
@@ -212,7 +212,7 @@ import org.xtext.example.mydsl.mml.ValidationMetric;
 			// TODO Auto-generated method stub
 			String res = "\n";		
 			for(ValidationMetric item : model.getValidation().getMetric()) {
-				res += "print 'Mean Squared Error: {}'.format("+item.getLiteral()+"(y_test, clf.predict(X_test)))" + "\n";
+				res += "print '"+item.getLiteral()+": {}'.format("+item.getLiteral()+"(y, y_test))" + "\n";
 			}
 			return res;
 		}

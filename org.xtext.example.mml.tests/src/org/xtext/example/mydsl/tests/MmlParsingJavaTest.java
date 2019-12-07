@@ -31,7 +31,8 @@ import org.xtext.example.mydsl.mml.RandomForest;
 import org.xtext.example.mydsl.mml.SGD;
 import org.xtext.example.mydsl.mml.SVR;
 import org.xtext.example.mydsl.tests.classes.Model;
-import org.xtext.example.mydsl.tests.classes.ModelPython;
+import org.xtext.example.mydsl.tests.classes.ModelFactory;
+import org.xtext.example.mydsl.tests.classes.ModelScikit;
 
 import com.google.common.io.Files;
 import com.google.inject.Inject;
@@ -46,7 +47,7 @@ public class MmlParsingJavaTest {
 	ParseHelper<MMLModel> parseHelper;
 	
 	String path = "/home/hugues/Documents/eclipse/runtime-EclipseXtext/testmml/src/myprogram1.mml";
-	String csvPath = "/home/hugues/Documents/eclipse/runtime-EclipseXtext/testmml/src/Boston.csv";
+	String csvPath = "";
 	File program;	
 	String lang;
 	String filename = "test1";
@@ -57,10 +58,8 @@ public class MmlParsingJavaTest {
 		program = new File(path);
 		Assertions.assertNotNull(program, "mml file not found");
 		String contents = new Scanner(program).useDelimiter("\\Z").next();
-		//System.out.println(contents);
 		model = parseHelper.parse(contents);
-		//lang = model.getAlgorithms().getFramework().getLiteral();
-		
+		csvPath = model.getInput().getFilelocation();
 	}
 	
 	@Test
@@ -70,21 +69,19 @@ public class MmlParsingJavaTest {
 		String pathFile = "/home/hugues/Documents/cours/DMI/";
 		String fileName = "";
 		Random rand = new Random();
-		//add factory
+		ModelFactory modelFactory = new ModelFactory();
 		
 		for (MLChoiceAlgorithm algo : model.getAlgorithms()) {
-			if(algo.getFramework().getLiteral().equals("scikit-learn")) {
-				Model py = new ModelPython(model, algo.getAlgorithm(), csvPath);
-				fileName = algo.getFramework().getLiteral() + "_" +  getAlgoName(algo.getAlgorithm()) + "_" + (rand.nextInt(999 - 0 + 1) + 0) + ".py";
-				String res = py.generate();
-				System.out.println(res);
-				File file = new File(pathFile + fileName);
-				if(file.createNewFile()) {
-					FileOutputStream write = new FileOutputStream(pathFile + fileName);
-					write.write(res.getBytes());
-					write.flush();
-					write.close();
-				}
+			Model py = modelFactory.getModel(algo.getFramework().getLiteral(), model, algo.getAlgorithm(), csvPath);
+			fileName = algo.getFramework().getLiteral() + "_" +  getAlgoName(algo.getAlgorithm()) + "_" + (rand.nextInt(999 - 0 + 1) + 0) + ".py";
+			String res = py.generate();
+			System.out.println(res);
+			File file = new File(pathFile + fileName);
+			if(file.createNewFile()) {
+				FileOutputStream write = new FileOutputStream(pathFile + fileName);
+				write.write(res.getBytes());
+				write.flush();
+				write.close();
 			}
 		
 		}
@@ -95,7 +92,7 @@ public class MmlParsingJavaTest {
 		if (MLalgo instanceof SVR) {
 			name="SVR";
 		} else if (MLalgo instanceof RandomForest) {
-			name="RandomForest";
+			name="RF";
 		} else if (MLalgo instanceof DT) {
 			name="DT";
 		} else if (MLalgo instanceof SGD) {
