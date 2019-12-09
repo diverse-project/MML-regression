@@ -7,6 +7,8 @@ import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
+import org.xtext.example.mydsl.mml.FrameworkLang
+import org.xtext.example.mydsl.mml.*
 
 /**
  * Generates code from your model files on save.
@@ -16,10 +18,154 @@ import org.eclipse.xtext.generator.IGeneratorContext
 class MmlGenerator extends AbstractGenerator {
 
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
-//		fsa.generateFile('greetings.txt', 'People to greet: ' + 
-//			resource.allContents
-//				.filter(Greeting)
-//				.map[name]
-//				.join(', '))
+		val dataInputIterator = resource.allContents.filter(DataInput)
+		val dataInput = dataInputIterator.next
+		val fileLocation = dataInput.filelocation
+		val mlAlgoIterator = resource.allContents.filter(MLChoiceAlgorithm)
+		val mlchoicealgo = mlAlgoIterator.next
+		val validationIterator = resource.allContents.filter(Validation)
+		val validation = validationIterator.next
+		val formuleIterator = resource.allContents.filter(RFormula)
+		val formule = if(formuleIterator.hasNext)formuleIterator.next
+		
+		
+		//csv
+		val DEFAULT_COLUMN_SEPARATOR = ","; // by default
+		var csv_separator = DEFAULT_COLUMN_SEPARATOR;
+		val parsingInstruction = dataInput.getParsingInstruction();
+		if (parsingInstruction !== null) {			
+			//System.err.println("parsing instruction..." + parsingInstruction);
+			csv_separator = parsingInstruction.getSep().toString();
+		}
+		
+		val framework = mlchoicealgo.getFramework
+		var code=""
+		
+		switch(framework.getValue()) {
+			case FrameworkLang.JAVA_WEKA_VALUE:
+				code =compileWeka(formule, fileLocation, mlchoicealgo, validation, csv_separator)
+			case FrameworkLang.SCIKIT_VALUE:
+				code=compileScikit(formule, fileLocation, mlchoicealgo, validation, csv_separator)
+			case FrameworkLang.R_VALUE:
+				code=compileR(formule, fileLocation, mlchoicealgo, validation, csv_separator)
+			case FrameworkLang.XG_BOOST_VALUE:
+				code=compileXG(formule, fileLocation, mlchoicealgo, validation, csv_separator)
+			default:code=""
+		}
+        fsa.generateFile(
+           'test.txt', code
+        )
+        
+	}
+	
+	def String compileWeka(RFormula formule, String fileLocation, MLChoiceAlgorithm mlchoicealgo, Validation validation, String csv_separator) {
+		
+	}
+	
+	def String compileXG(RFormula formule, String fileLocation, MLChoiceAlgorithm mlchoicealgo, Validation validation, String csv_separator) {
+		
+	}
+	
+	def String compileR(RFormula formule, String fileLocation, MLChoiceAlgorithm mlchoicealgo, Validation validation, String csv_separator) {
+		
+	}
+	
+	def String compileScikit(RFormula formule, String fileLocation, MLChoiceAlgorithm mlchoicealgo, Validation validation, String csv_separator) {
+		
+		var pythonImport = "import pandas as pd\n"
+		var csvReading = "df = pd.read_csv(" + mkValueInSingleQuote(fileLocation) + ", sep=" + mkValueInSingleQuote(csv_separator) + ")\n";						
+		
+		//formule : recuperation des champs du csv à garder
+		var csvSplit="";
+		if(formule!==null) {
+			var xformule = formule.getPredictors();
+			var formuleItem = formule.getPredictive();
+			var items="";
+			if(xformule instanceof PredictorVariables) {
+				var predictorItems = xformule.getVars();
+				var sb = new StringBuilder();
+				if(predictorItems!==null && !predictorItems.isEmpty()) {
+					if(predictorItems.get(0).getColName() !== null) {
+						for(FormulaItem item : predictorItems) {
+							if(predictorItems.get(0)!=item)sb.append(',');
+							sb.append("'"+item.getColName()+"'");
+						}
+					}else {
+						for(FormulaItem item : predictorItems) {
+							if(predictorItems.get(0)!=item)sb.append(',');
+							sb.append(item.getColumn());
+						}
+					}
+						
+				}
+				items = sb.toString();
+				csvSplit+="X = df[df.columns.difference(["+items+"])]\n";
+				csvSplit+="y = df[columns = [df.columns["+formuleItem.getColumn()+"]]]\n";
+			}else if(xformule instanceof AllVariables) {
+				csvSplit+="X = df.drop(columns = [df.columns[-1]])\n";
+				csvSplit+="y = df[columns = [df.columns[-1]]]\n";
+			}
+		}else {
+			//if formule is null, all the fields are used to predict the last one
+			csvSplit+="X = df.drop(columns = [df.columns[-1]])\n";
+			csvSplit+="y = df[columns = [df.columns[-1]]]\n";
+		}
+		
+		//algo
+		var algo = mlchoicealgo.getAlgorithm();
+		var algoDeclaration="";
+		if(algo instanceof SVR) {
+			//TODO complete with same template as DT below
+		}else if(algo instanceof DT) { //DecisionTree
+			pythonImport+="from sklearn import tree\n";
+			algoDeclaration = "clf = tree.DecisionTreeRegressor()\n";
+		}//TODO other algos
+		
+		//validation
+		var stratMethod = validation.getStratification()
+		var validMetrics = validation.getMetric()
+		var number = stratMethod.getNumber()
+		var validationPrint=""
+		validationPrint += "test_size = "+number+"\n"
+		if(stratMethod instanceof CrossValidation){
+			//TODO equivalent à ci-dessous
+		}else if(stratMethod instanceof TrainingTest){
+			pythonImport+="from sklearn.model_selection import train_test_split\n"
+			validationPrint+="X_train, X_test, y_train, y_test = train_test_split(X, y, test_size="+number+")"
+		}
+		validationPrint+="\n"
+		
+		//ValidationMetric
+		var metrics=""
+		var metricsResult=""
+		for(var i=0;i<validMetrics.size();i++) {
+			var metric = "";
+			switch(validMetrics.get(i).name()) {
+				case "MSE":
+					//pythonImport+="from sklearn.metrics import mean_squared_error\n"
+					metric+="accuracy"+i+"=mean_squared_error(y_test, clf.predict(X_test))"
+				case "MAE":
+					pythonImport+="from sklearn.metrics import mean_absolute_error\n"
+					//metric+="accuracy"+i+"=mean_absolute_error(y_test, clf.predict(X_test))"
+				case "MAPE":
+					//pythonImport+="from sklearn.utils import check_arrays\n"
+					metric+="y_test, y_pred = check_arrays(y_test, clf.predict(X_test))"
+					//metric+="accuracy"+i+"=np.mean(np.abs((y_test - y_pred) / y_test)) * 100"
+				default:metric=''
+			}
+			metricsResult+="print(accuracy"+i+")\n"
+			metrics+=metric+"\n"
+		}
+		
+		var pandasCode = pythonImport + csvReading + csvSplit + algoDeclaration+ validationPrint+ metrics+metricsResult
+		return pandasCode
+	}
+	
+	def String mkValueInSingleQuote(String value) {
+		return "'" + value + "'";
+	}
+	
+	def String mkValueInDoubleQuote(String value) {
+		return "\"" + value + "\"";
 	}
 }
