@@ -26,23 +26,23 @@ public class WekaCompilateur implements Compilateur {
 		Pair<List<String>, List<String>> inputC = compileDataInput(input);
 		Pair<List<String>, List<String>> formulaC = compileRFormula(formula);
 		Pair<List<String>, List<String>> algorithmC = MLAlgorithmCompiler.compile(algorithm.getAlgorithm());
-//		Pair<List<String>, List<String>> validationC = ValidationCompiler.compile(validation);
+		Pair<List<String>, List<String>> validationC = ValidationCompiler.compile(validation);
 		
 		List<String> buffer = new LinkedList<>(), bufferImports = new LinkedList<>();
 		
 		bufferImports.addAll(inputC.getFirst());
 		bufferImports.addAll(formulaC.getFirst());
 		bufferImports.addAll(algorithmC.getFirst());
-//		bufferImports.addAll(validationC.getFirst());
+		bufferImports.addAll(validationC.getFirst());
 		
 		buffer.addAll(filterImport(bufferImports));
 		buffer.add("");
 		buffer.add("public class Main {");
-		buffer.add(String.format("%spublic static void main(String[] arg) {", Utils.tab()));
+		buffer.add(String.format("%spublic static void main(String[] arg) throws Exception {", Utils.tab()));
 		buffer.addAll(Utils.insertTab(inputC.getSecond(),2));
 		buffer.addAll(Utils.insertTab(formulaC.getSecond(),2));
 		buffer.addAll(Utils.insertTab(algorithmC.getSecond(),2));
-//		buffer.addAll(Utils.insertTab(validationC.getSecond(),2));
+		buffer.addAll(Utils.insertTab(validationC.getSecond(),2));
 		buffer.add(String.format("%s}\n}",Utils.tab()));
 		
 		return String.join("\n", buffer);

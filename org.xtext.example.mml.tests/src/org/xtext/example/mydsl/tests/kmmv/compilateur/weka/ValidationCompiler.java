@@ -1,4 +1,4 @@
-package org.xtext.example.mydsl.tests.kmmv.compilateur.sklearn;
+package org.xtext.example.mydsl.tests.kmmv.compilateur.weka;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -23,23 +23,23 @@ public class ValidationCompiler {
 		List<String> code_ = new LinkedList<>();
 		
 		if(metrics != null) {
-			String cv = "";
+			int fold = 5, metrics_ind = 0;
+			
 			if(stratificationMethod.getNumber() != 0)
-				cv = String.format(", cv=%d", stratificationMethod.getNumber());
+				fold = stratificationMethod.getNumber();
+			
+			import_.add("import weka.classifiers.Evaluation;");
 			
 			for(ValidationMetric metric : metrics) {
+				String evalName = String.format("eval_%d", metrics_ind++);
+				code_.add(String.format("Evaluation %s = new Evaluation(data);", evalName));
+				code_.add(String.format("%s.crossValidateModel(clf, data, %d);", evalName, fold));
 				switch(metric) {
 					case MAE:
-						import_.add("from sklearn.metrics import mean_absolute_error");
-						import_.add("from sklearn.metrics import make_scorer");
-						import_.add("from sklearn.model_selection import cross_val_score");
-						code_.add(String.format("print(cross_val_score(clf, X, Y%s, scoring=make_scorer(mean_absolute_error)))", cv));
+						code_.add(String.format("System.out.println(%s.meanAbsoluteError());", evalName));
 						break;
 					case MSE:
-						import_.add("from sklearn.metrics import mean_squared_error");
-						import_.add("from sklearn.metrics import make_scorer");
-						import_.add("from sklearn.model_selection import cross_val_score");
-						code_.add(String.format("print(cross_val_score(clf, X, Y%s, scoring=make_scorer(mean_squared_error)))", cv));
+						code_.add(String.format("System.out.println(%s.rootMeanSquaredError());", evalName));
 						break;
 					case MAPE:
 //						import_.add("from numpy import mean");
@@ -60,26 +60,29 @@ public class ValidationCompiler {
 		List<String> import_ = new LinkedList<>();
 		List<String> code_ = new LinkedList<>();
 		
-		import_.add("from sklearn.model_selection import train_test_split");
-		
 		if(stratificationMethod.getNumber() > 0 && stratificationMethod.getNumber() < 100)
-			code_.add(String.format("test_size = %f",stratificationMethod.getNumber()/100.0));
+			code_.add(String.format("double train_percent = %f;", stratificationMethod.getNumber()/100.0));
 		else
-			code_.add("test_size = 0.7");
-		code_.add("X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=test_size)");
-		
-		code_.add("clf.fit(X_train, Y_train)");
+			code_.add("double train_percent = 0.7;");
+		code_.add("int trainSize = (int) Math.round(data.numInstances() * train_percent);");
+		code_.add("int testSize = data.numInstances() - trainSize;");
+		code_.add("Instances traindata = new Instances(data, 0, trainSize);");
+		code_.add("Instances testdata = new Instances(data, trainSize, testSize);");
+		code_.add("clf.buildClassifier(traindata);");
 		
 		if(metrics != null) {
+			int metrics_ind = 0;
+			
 			for(ValidationMetric metric : metrics) {
+				String evalName = String.format("eval_%d", metrics_ind++);
+				code_.add(String.format("Evaluation %s = new Evaluation(traindata);", evalName));
+				code_.add(String.format("%s.evaluateModel(clf, testdata);", evalName));
 				switch(metric) {
 					case MAE:
-						import_.add("from sklearn.metrics import mean_absolute_error");
-						code_.add("print(mean_absolute_error(Y_test, clf.predict(X_test)))");
+						code_.add(String.format("System.out.println(%s.meanAbsoluteError());", evalName));
 						break;
 					case MSE:
-						import_.add("from sklearn.metrics import mean_squared_error");
-						code_.add("print(mean_squared_error(Y_test, clf.predict(X_test)))");
+						code_.add(String.format("System.out.println(%s.rootMeanSquaredError());", evalName));
 						break;
 					case MAPE:
 //						import_.add("from numpy import mean");
