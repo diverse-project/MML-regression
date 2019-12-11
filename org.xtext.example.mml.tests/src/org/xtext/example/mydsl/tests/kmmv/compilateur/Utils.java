@@ -1,5 +1,8 @@
 package org.xtext.example.mydsl.tests.kmmv.compilateur;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.xtext.example.mydsl.mml.DT;
 import org.xtext.example.mydsl.mml.GTB;
 import org.xtext.example.mydsl.mml.MLAlgorithm;
@@ -24,5 +27,17 @@ public class Utils {
 	
 	public static String tab() {
 		return "    ";
+	}
+	
+	private static List<String> insertTab(List<String> data) {
+		return data.stream().map(el -> tab() + el).collect(Collectors.toList());
+	}
+	
+	public static List<String> insertTab(List<String> data, int iteration) {
+		List<String> result = data;
+		for(int i=0; i < iteration; ++i) {
+			result = insertTab(result);
+		}
+		return result;
 	}
 }

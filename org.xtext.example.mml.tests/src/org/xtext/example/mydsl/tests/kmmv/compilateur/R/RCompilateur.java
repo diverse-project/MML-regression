@@ -20,4 +20,10 @@ public class RCompilateur implements Compilateur {
 		return null;
 	}
 
+	@Override
+	public String commandLine(String file) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

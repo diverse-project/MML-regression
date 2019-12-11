@@ -2,6 +2,7 @@ package org.xtext.example.mydsl.tests.kmmv;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.List;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -81,13 +82,16 @@ public class MmlParsingKMMVTest {
 				+ "TrainingTest { percentageTraining 70 }\n"
 				+ "mean_absolute_error\n"
 				+ "");
-		MmlCompiler.compile(result);
+		List<String> commandLines = MmlCompiler.compile(result);
 		
-		Process p = Runtime.getRuntime().exec("python foo2_csv_DT_0.py");
-		BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-		String line; 
-		while ((line = in.readLine()) != null) {
-			System.out.println(line);
-	    }
+		for(String command : commandLines) {
+			Process p = Runtime.getRuntime().exec(command);
+			BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			String line; 
+			while ((line = in.readLine()) != null) {
+				System.out.println(line);
+		    }
+		}
+		
 	}
 }

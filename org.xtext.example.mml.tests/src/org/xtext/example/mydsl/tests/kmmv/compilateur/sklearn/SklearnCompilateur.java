@@ -114,4 +114,9 @@ public class SklearnCompilateur implements Compilateur {
 		
 		return new Pair<>(import_, code_);
 	}
+
+	@Override
+	public String commandLine(String file) {
+		return String.format("python3 %s", file);
+	}
 }

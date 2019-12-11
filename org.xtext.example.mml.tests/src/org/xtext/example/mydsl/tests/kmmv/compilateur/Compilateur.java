@@ -21,4 +21,11 @@ public interface Compilateur {
 	 * @return
 	 */
 	String fileName(DataInput input, MLChoiceAlgorithm algorithm, int uniqueId);
+	
+	/**
+	 * Return the command line to execute in order to run the machine learning algorithm
+	 * @param file the file
+	 * @return the command line
+	 */
+	String commandLine(String file);
 }
