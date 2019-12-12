@@ -8,6 +8,7 @@ import org.xtext.example.mydsl.mml.TrainingTest;
 import org.xtext.example.mydsl.mml.Validation;
 import org.xtext.example.mydsl.mml.ValidationMetric;
 import org.xtext.example.mydsl.tests.kmmv.compilateur.Pair;
+import org.xtext.example.mydsl.tests.kmmv.compilateur.Utils;
 
 public class ValidationCompiler {
 	public static Pair<List<String>, List<String>> compile(Validation validation) {
@@ -42,12 +43,16 @@ public class ValidationCompiler {
 						code_.add(String.format("System.out.println(%s.rootMeanSquaredError());", evalName));
 						break;
 					case MAPE:
-//						import_.add("from numpy import mean");
-//						import_.add("from numpy import abs");
-//						import_.add("from sklearn.utils import check_arrays");
-//						import_.add("from sklearn.model_selection import cross_val_predict");
-//						code_.add(String.format("y_true, y_pred = check_arrays(Y, cross_val_predict(clf, X, Y%s))", cv));
-//						code_.add("print(mean(abs((y_true - y_pred) / y_true)) * 100)");
+						String bufferName = String.format("mape_%d", metrics_ind++);
+						String predictionName = String.format("prediction_%d", metrics_ind++);
+						import_.add("import weka.classifiers.evaluation.NominalPrediction;");
+						code_.add(String.format("double %s = 0.0;",bufferName));
+						code_.add(String.format("FastVector %s = %s.predictions();",predictionName, evalName));
+						code_.add(String.format("for(int i=0; i<%s.size(); ++i) {",predictionName));
+						code_.add(String.format("%sNominalPrediction np = (NominalPrediction) %s.elementAt(i);",Utils.tab(), predictionName));
+						code_.add(String.format("%s%s += Math.abs(np.actual() - np.predicted());", Utils.tab(), bufferName));
+						code_.add("}");
+						code_.add(String.format("System.out.println(%s*100/%s.size());", bufferName, predictionName));
 						break;
 				}
 			}
@@ -85,11 +90,16 @@ public class ValidationCompiler {
 						code_.add(String.format("System.out.println(%s.rootMeanSquaredError());", evalName));
 						break;
 					case MAPE:
-//						import_.add("from numpy import mean");
-//						import_.add("from numpy import abs");
-//						import_.add("from sklearn.utils import check_arrays");
-//						code_.add("y_true, y_pred = check_arrays(Y_test, clf.predict(X_test))");
-//						code_.add("print(mean(abs((y_true - y_pred) / y_true)) * 100)");
+						String bufferName = String.format("mape_%d", metrics_ind++);
+						String predictionName = String.format("prediction_%d", metrics_ind++);
+						import_.add("import weka.classifiers.evaluation.NominalPrediction;");
+						code_.add(String.format("double %s = 0.0;",bufferName));
+						code_.add(String.format("FastVector %s = %s.predictions();",predictionName, evalName));
+						code_.add(String.format("for(int i=0; i<%s.size(); ++i) {",predictionName));
+						code_.add(String.format("%sNominalPrediction np = (NominalPrediction) %s.elementAt(i);",Utils.tab(), predictionName));
+						code_.add(String.format("%s%s += Math.abs(np.actual() - np.predicted());", Utils.tab(), bufferName));
+						code_.add("}");
+						code_.add(String.format("System.out.println(%s*100/%s.size());", bufferName, predictionName));
 						break;
 				}
 			}
