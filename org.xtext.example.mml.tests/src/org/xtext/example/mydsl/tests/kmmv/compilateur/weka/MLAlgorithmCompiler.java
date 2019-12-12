@@ -74,7 +74,9 @@ public class MLAlgorithmCompiler {
 		import_.add("import weka.classifiers.Classifier;");
 		import_.add("import weka.classifiers.functions.SGD;");
 		
-		code_.add("Classifier clf = new SGD();");
+		code_.add("SGD clf = new SGD();");
+		code_.add("String[] options = {\"-do-not-check-capabilities\"};");
+		code_.add("clf.setOptions(options);");
 		
 		return new Pair<>(import_, code_);
 	}
@@ -94,7 +96,7 @@ public class MLAlgorithmCompiler {
 				import_.add("import weka.classifiers.functions.supportVector.PolyKernel;");
 				code_.add("clf.setKernel(new PolyKernel());");
 			} else if(algorithm.getKernel().toString().equals("linear")) {
-				System.err.println("WEKA SVR linear kernel not supported");
+				System.err.println("WEKA SVR linear kernel not supported. Poly used instead.");
 			} else if(algorithm.getKernel().toString().equals("rbf")) {
 				import_.add("import weka.classifiers.functions.supportVector.RBFKernel;");
 				code_.add("clf.setKernel(new RBFKernel());");
