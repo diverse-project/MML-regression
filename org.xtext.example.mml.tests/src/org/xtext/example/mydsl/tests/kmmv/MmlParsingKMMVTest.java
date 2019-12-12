@@ -78,26 +78,6 @@ public class MmlParsingKMMVTest {
 	}
 	
 	@Test
-	public void compileDataInput() throws Exception {
-		MMLModel result = parseHelper.parse("datainput \"boston.csv\" separator ,\n"
-				+ "mlframework scikit-learn\n"
-				+ "algorithm DT\n"
-				+ "TrainingTest { percentageTraining 70 }\n"
-				+ "mean_absolute_error\n"
-				+ "");
-		List<String> commandLines = MmlCompiler.compile(result);
-		
-		for(String command : commandLines) {
-			Process p = Runtime.getRuntime().exec(command);
-			BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			String line; 
-			while ((line = in.readLine()) != null) {
-				//System.out.println(line);
-		    }
-		}
-	}
-	
-	@Test
 	public void compileTests() throws Exception {
 		File folder = new File("");
 		for(int i = 1; i <= 10; ++i) {
