@@ -42,12 +42,12 @@ public class ValidationCompiler {
 						code_.add(String.format("print(cross_val_score(clf, X, Y%s, scoring=make_scorer(mean_squared_error)))", cv));
 						break;
 					case MAPE:
-//						import_.add("from numpy import mean");
-//						import_.add("from numpy import abs");
-//						import_.add("from sklearn.utils import check_arrays");
-//						import_.add("from sklearn.model_selection import cross_val_predict");
-//						code_.add(String.format("y_true, y_pred = check_arrays(Y, cross_val_predict(clf, X, Y%s))", cv));
-//						code_.add("print(mean(abs((y_true - y_pred) / y_true)) * 100)");
+						import_.add("from numpy import mean");
+						import_.add("from numpy import abs");
+						import_.add("from numpy import array");
+						import_.add("from sklearn.model_selection import cross_val_predict");
+						code_.add(String.format("y_true, y_pred = array(Y), array(cross_val_predict(clf, X, Y%s))", cv));
+						code_.add("print(mean(abs((y_true - y_pred) / y_true)) * 100)");
 						break;
 				}
 			}
@@ -82,11 +82,11 @@ public class ValidationCompiler {
 						code_.add("print(mean_squared_error(Y_test, clf.predict(X_test)))");
 						break;
 					case MAPE:
-//						import_.add("from numpy import mean");
-//						import_.add("from numpy import abs");
-//						import_.add("from sklearn.utils import check_arrays");
-//						code_.add("y_true, y_pred = check_arrays(Y_test, clf.predict(X_test))");
-//						code_.add("print(mean(abs((y_true - y_pred) / y_true)) * 100)");
+						import_.add("from numpy import mean");
+						import_.add("from numpy import abs");
+						import_.add("from numpy import array");
+						code_.add("y_true, y_pred = array(Y_test), array(clf.predict(X_test))");
+						code_.add("print(mean(abs((y_true - y_pred) / y_true)) * 100)");
 						break;
 				}
 			}
