@@ -1,7 +1,10 @@
 package org.xtext.example.mydsl.tests.kmmv;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.eclipse.emf.common.util.EList;
@@ -76,7 +79,7 @@ public class MmlParsingKMMVTest {
 	
 	@Test
 	public void compileDataInput() throws Exception {
-		MMLModel result = parseHelper.parse("datainput \"foo2.csv\" separator ;\n"
+		MMLModel result = parseHelper.parse("datainput \"boston.csv\" separator ,\n"
 				+ "mlframework scikit-learn\n"
 				+ "algorithm DT\n"
 				+ "TrainingTest { percentageTraining 70 }\n"
@@ -89,9 +92,35 @@ public class MmlParsingKMMVTest {
 			BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			String line; 
 			while ((line = in.readLine()) != null) {
-				System.out.println(line);
+				//System.out.println(line);
 		    }
 		}
-		
+	}
+	
+	@Test
+	public void compileTests() throws Exception {
+		File folder = new File("");
+		for(int i = 1; i <= 10; ++i) {
+			try {
+				String data = new String(Files.readAllBytes(Paths.get(folder.getAbsoluteFile()+"/prg"+Integer.toString(i)+".mml")));
+				MMLModel model = parseHelper.parse(data);
+				
+				List<String> commandLines = MmlCompiler.compile(model);
+				
+				for(String command : commandLines) {
+					String[] exec = {"bash", "-c", command};
+					Process p = Runtime.getRuntime().exec(exec);
+					BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+					String line; 
+					while ((line = in.readLine()) != null) {
+						System.out.println(line);
+				    }
+				}
+			} catch (Exception e) {
+				System.err.println(e.getMessage());
+				System.err.println(e.getCause());
+			}
+			System.out.println("");
+		}
 	}
 }

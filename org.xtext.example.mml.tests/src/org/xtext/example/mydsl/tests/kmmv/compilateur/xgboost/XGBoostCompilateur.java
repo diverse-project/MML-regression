@@ -9,7 +9,7 @@ import org.xtext.example.mydsl.tests.kmmv.compilateur.Compilateur;
 public class XGBoostCompilateur implements Compilateur {
 
 	@Override
-	public String compile(DataInput input, MLChoiceAlgorithm algorithm, RFormula formula, Validation validation) {
+	public String compile(DataInput input, MLChoiceAlgorithm algorithm, RFormula formula, Validation validation, int uniqueId) {
 		// TODO Auto-generated method stub
 		return null;
 	}

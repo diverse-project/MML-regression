@@ -78,6 +78,8 @@ public class ValidationCompiler {
 		if(metrics != null) {
 			int metrics_ind = 0;
 			
+			import_.add("import weka.classifiers.Evaluation;");
+			
 			for(ValidationMetric metric : metrics) {
 				String evalName = String.format("eval_%d", metrics_ind++);
 				code_.add(String.format("Evaluation %s = new Evaluation(traindata);", evalName));

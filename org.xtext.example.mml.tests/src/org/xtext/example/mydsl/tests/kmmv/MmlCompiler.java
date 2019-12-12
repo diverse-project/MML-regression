@@ -29,7 +29,7 @@ public class MmlCompiler {
 		Compilateur r = new RCompilateur();
 		Compilateur weka = new WekaCompilateur();
 		Compilateur xgboost = new XGBoostCompilateur();
-		int compteur = 0;
+		int compteur = 0, tmp;
 		
 		DataInput input = model.getInput();
 		RFormula formula = model.getFormula();
@@ -39,38 +39,39 @@ public class MmlCompiler {
 		String filename;
 		
 		for(MLChoiceAlgorithm algorithm : model.getAlgorithms()) {
+			tmp = compteur;
 			switch(algorithm.getFramework()) {
 				case SCIKIT:
 					filename = scikit.fileName(input, algorithm, compteur++);
 					Files.write(
-							scikit.compile(input, algorithm, formula, validation).getBytes(),
+							scikit.compile(input, algorithm, formula, validation, tmp).getBytes(),
 							new File(filename)
 					);
 					commandLines.add(scikit.commandLine(filename));
 					break;
 				case R:
 					filename = r.fileName(input, algorithm, compteur++);
-					Files.write(
-							r.compile(input, algorithm, formula, validation).getBytes(),
-							new File(filename)
-					);
-					commandLines.add(r.commandLine(filename));
+//					Files.write(
+//							r.compile(input, algorithm, formula, validation, tmp).getBytes(),
+//							new File(filename)
+//					);
+//					commandLines.add(r.commandLine(filename));
 					break;
 				case JAVA_WEKA:
 					filename = weka.fileName(input, algorithm, compteur++);
 					Files.write(
-							weka.compile(input, algorithm, formula, validation).getBytes(),
+							weka.compile(input, algorithm, formula, validation, tmp).getBytes(),
 							new File(filename)
 					);
 					commandLines.add(weka.commandLine(filename));
 					break;
 				case XG_BOOST:
 					filename = xgboost.fileName(input, algorithm, compteur++);
-					Files.write(
-							xgboost.compile(input, algorithm, formula, validation).getBytes(),
-							new File(filename)
-					);
-					commandLines.add(xgboost.commandLine(filename));
+//					Files.write(
+//							xgboost.compile(input, algorithm, formula, validation, tmp).getBytes(),
+//							new File(filename)
+//					);
+//					commandLines.add(xgboost.commandLine(filename));
 					break;
 				default:
 					break;

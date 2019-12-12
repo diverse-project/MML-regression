@@ -1,0 +1,7 @@
+datainput "boston.csv" separator ,
+	mlframework scikit-learn algorithm DT
+	mlframework Weka algorithm DT
+	mlframework R algorithm DT
+	mlframework xgboost algorithm DT
+TrainingTest { percentageTraining 70 }
+mean_absolute_error

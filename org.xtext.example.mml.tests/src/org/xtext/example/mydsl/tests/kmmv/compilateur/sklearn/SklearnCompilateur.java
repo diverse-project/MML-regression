@@ -23,7 +23,7 @@ public class SklearnCompilateur implements Compilateur {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String compile(DataInput input, MLChoiceAlgorithm algorithm, RFormula formula, Validation validation) {
+	public String compile(DataInput input, MLChoiceAlgorithm algorithm, RFormula formula, Validation validation, int uniqueId) {
 		Pair<List<String>, List<String>> inputC = compileDataInput(input);
 		Pair<List<String>, List<String>> formulaC = compileRFormula(formula);
 		Pair<List<String>, List<String>> algorithmC = MLAlgorithmCompiler.compile(algorithm.getAlgorithm());

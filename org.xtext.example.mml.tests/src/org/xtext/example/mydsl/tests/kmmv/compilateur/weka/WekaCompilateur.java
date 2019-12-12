@@ -22,7 +22,7 @@ import org.xtext.example.mydsl.tests.kmmv.compilateur.Utils;
 public class WekaCompilateur implements Compilateur {
 
 	@Override
-	public String compile(DataInput input, MLChoiceAlgorithm algorithm, RFormula formula, Validation validation) {
+	public String compile(DataInput input, MLChoiceAlgorithm algorithm, RFormula formula, Validation validation, int uniqueId) {
 		Pair<List<String>, List<String>> inputC = compileDataInput(input);
 		Pair<List<String>, List<String>> formulaC = compileRFormula(formula);
 		Pair<List<String>, List<String>> algorithmC = MLAlgorithmCompiler.compile(algorithm.getAlgorithm());
@@ -37,7 +37,7 @@ public class WekaCompilateur implements Compilateur {
 		
 		buffer.addAll(filterImport(bufferImports));
 		buffer.add("");
-		buffer.add("public class Main {");
+		buffer.add(String.format("public class %s {", className(input, algorithm, uniqueId)));
 		buffer.add(String.format("%spublic static void main(String[] arg) throws Exception {", Utils.tab()));
 		buffer.addAll(Utils.insertTab(inputC.getSecond(),2));
 		buffer.addAll(Utils.insertTab(formulaC.getSecond(),2));
@@ -50,7 +50,11 @@ public class WekaCompilateur implements Compilateur {
 
 	@Override
 	public String fileName(DataInput input, MLChoiceAlgorithm algorithm, int uniqueId) {
-		return String.format("%s_%s_%s.java", input.getFilelocation().replace('.', '_'), Utils.algorithmName(algorithm.getAlgorithm()), uniqueId);
+		return String.format("%s.java", className(input, algorithm, uniqueId));
+	}
+	
+	private String className(DataInput input, MLChoiceAlgorithm algorithm, int uniqueId) {
+		return String.format("%s_%s_%s", input.getFilelocation().replace('.', '_'), Utils.algorithmName(algorithm.getAlgorithm()), uniqueId);
 	}
 
 	private Pair<List<String>, List<String>> compileDataInput(DataInput input) {
@@ -73,11 +77,12 @@ public class WekaCompilateur implements Compilateur {
 		import_.add("import java.util.List;");
 		import_.add("import java.util.LinkedList;");
 		import_.add("import weka.core.Instances;");
+		import_.add("import java.util.Enumeration;");
 		
 		code_.add("List<String> column = new LinkedList<>();");
 		code_.add("String className = \"\";");
-		code_.add("for(Attribute atr : data.enumerateAttributes())");
-		code_.add(String.format("%scolumn.add(atr.name());", Utils.tab()));
+		code_.add("for(Enumeration<Attribute> atr = data.enumerateAttributes(); atr.hasMoreElements();)");
+		code_.add(String.format("%scolumn.add(atr.nextElement().name());", Utils.tab()));
 		
 		if(formula != null && formula.getPredictive() != null) {
 			if(formula.getPredictive().getColName() != null)
@@ -125,6 +130,6 @@ public class WekaCompilateur implements Compilateur {
 
 	@Override
 	public String commandLine(String file) {
-		return String.format("javac %s && java %s", file, file.substring(0, file.length()-5));
+		return String.format("javac -cp weka.jar %s && java -cp .:weka.jar %s", file, file.substring(0, file.length()-5));
 	}
 }

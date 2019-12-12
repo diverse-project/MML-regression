@@ -11,7 +11,7 @@ public interface Compilateur {
 	 * @param validation
 	 * @return
 	 */
-	String compile(DataInput input, MLChoiceAlgorithm algorithm, RFormula formula, Validation validation);
+	String compile(DataInput input, MLChoiceAlgorithm algorithm, RFormula formula, Validation validation, int uniqueId);
 	
 	/**
 	 * Generate an unique filename.
