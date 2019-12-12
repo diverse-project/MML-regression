@@ -30,11 +30,12 @@ public class ValidationCompiler {
 				fold = stratificationMethod.getNumber();
 			
 			import_.add("import weka.classifiers.Evaluation;");
+			import_.add("import java.util.Random;");
 			
 			for(ValidationMetric metric : metrics) {
 				String evalName = String.format("eval_%d", metrics_ind++);
 				code_.add(String.format("Evaluation %s = new Evaluation(data);", evalName));
-				code_.add(String.format("%s.crossValidateModel(clf, data, %d);", evalName, fold));
+				code_.add(String.format("%s.crossValidateModel(clf, data, %d, new Random());", evalName, fold));
 				switch(metric) {
 					case MAE:
 						code_.add(String.format("System.out.println(%s.meanAbsoluteError());", evalName));
@@ -44,15 +45,17 @@ public class ValidationCompiler {
 						break;
 					case MAPE:
 						String bufferName = String.format("mape_%d", metrics_ind++);
-						String predictionName = String.format("prediction_%d", metrics_ind++);
-						import_.add("import weka.classifiers.evaluation.NominalPrediction;");
+						String bufferSizeName = String.format("mape_size_%d", metrics_ind++);
+						
+						import_.add("import weka.classifiers.evaluation.Prediction;");
+						
 						code_.add(String.format("double %s = 0.0;",bufferName));
-						code_.add(String.format("FastVector %s = %s.predictions();",predictionName, evalName));
-						code_.add(String.format("for(int i=0; i<%s.size(); ++i) {",predictionName));
-						code_.add(String.format("%sNominalPrediction np = (NominalPrediction) %s.elementAt(i);",Utils.tab(), predictionName));
-						code_.add(String.format("%s%s += Math.abs(np.actual() - np.predicted());", Utils.tab(), bufferName));
+						code_.add(String.format("double %s = 0.0;",bufferSizeName));
+						code_.add(String.format("for(Prediction prediction : %s.predictions()) {", evalName));
+						code_.add(String.format("%s%s += Math.abs(prediction.actual() - prediction.predicted())*prediction.weight();", Utils.tab(), bufferName));
+						code_.add(String.format("%s%s += prediction.weight();", Utils.tab(), bufferSizeName));
 						code_.add("}");
-						code_.add(String.format("System.out.println(%s*100/%s.size());", bufferName, predictionName));
+						code_.add(String.format("System.out.println(%s*100/%s);", bufferName, bufferSizeName));
 						break;
 				}
 			}
@@ -93,15 +96,17 @@ public class ValidationCompiler {
 						break;
 					case MAPE:
 						String bufferName = String.format("mape_%d", metrics_ind++);
-						String predictionName = String.format("prediction_%d", metrics_ind++);
-						import_.add("import weka.classifiers.evaluation.NominalPrediction;");
+						String bufferSizeName = String.format("mape_size_%d", metrics_ind++);
+						
+						import_.add("import weka.classifiers.evaluation.Prediction;");
+						
 						code_.add(String.format("double %s = 0.0;",bufferName));
-						code_.add(String.format("FastVector %s = %s.predictions();",predictionName, evalName));
-						code_.add(String.format("for(int i=0; i<%s.size(); ++i) {",predictionName));
-						code_.add(String.format("%sNominalPrediction np = (NominalPrediction) %s.elementAt(i);",Utils.tab(), predictionName));
-						code_.add(String.format("%s%s += Math.abs(np.actual() - np.predicted());", Utils.tab(), bufferName));
+						code_.add(String.format("double %s = 0.0;",bufferSizeName));
+						code_.add(String.format("for(Prediction prediction : %s.predictions()) {", evalName));
+						code_.add(String.format("%s%s += Math.abs(prediction.actual() - prediction.predicted())*prediction.weight();", Utils.tab(), bufferName));
+						code_.add(String.format("%s%s += prediction.weight();", Utils.tab(), bufferSizeName));
 						code_.add("}");
-						code_.add(String.format("System.out.println(%s*100/%s.size());", bufferName, predictionName));
+						code_.add(String.format("System.out.println(%s*100/%s);", bufferName, bufferSizeName));
 						break;
 				}
 			}

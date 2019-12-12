@@ -15,7 +15,7 @@ public class RCompilateur implements Compilateur {
 	}
 
 	@Override
-	public String fileName(DataInput input, MLChoiceAlgorithm algorithm, int uniqueId) {
+	public String fileName(DataInput input, MLChoiceAlgorithm algorithm, Validation validation, int uniqueId) {
 		// TODO Auto-generated method stub
 		return null;
 	}

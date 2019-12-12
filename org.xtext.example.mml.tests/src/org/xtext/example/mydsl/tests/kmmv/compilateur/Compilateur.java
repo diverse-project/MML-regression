@@ -20,7 +20,7 @@ public interface Compilateur {
 	 * @param uniqueId
 	 * @return
 	 */
-	String fileName(DataInput input, MLChoiceAlgorithm algorithm, int uniqueId);
+	String fileName(DataInput input, MLChoiceAlgorithm algorithm, Validation validation, int uniqueId);
 	
 	/**
 	 * Return the command line to execute in order to run the machine learning algorithm

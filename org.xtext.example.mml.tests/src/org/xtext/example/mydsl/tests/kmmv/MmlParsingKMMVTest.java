@@ -88,10 +88,11 @@ public class MmlParsingKMMVTest {
 				List<String> commandLines = MmlCompiler.compile(model);
 				
 				for(String command : commandLines) {
+					System.out.println(command);
 					String[] exec = {"bash", "-c", command};
 					Process p = Runtime.getRuntime().exec(exec);
 					BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-					String line; 
+					String line;
 					while ((line = in.readLine()) != null) {
 						System.out.println(line);
 				    }

@@ -30,16 +30,18 @@ public class ValidationCompiler {
 			for(ValidationMetric metric : metrics) {
 				switch(metric) {
 					case MAE:
+						import_.add("from numpy import mean");
 						import_.add("from sklearn.metrics import mean_absolute_error");
 						import_.add("from sklearn.metrics import make_scorer");
 						import_.add("from sklearn.model_selection import cross_val_score");
-						code_.add(String.format("print(cross_val_score(clf, X, Y%s, scoring=make_scorer(mean_absolute_error)))", cv));
+						code_.add(String.format("print(mean(cross_val_score(clf, X, Y%s, scoring=make_scorer(mean_absolute_error))))", cv));
 						break;
 					case MSE:
+						import_.add("from numpy import mean");
 						import_.add("from sklearn.metrics import mean_squared_error");
 						import_.add("from sklearn.metrics import make_scorer");
 						import_.add("from sklearn.model_selection import cross_val_score");
-						code_.add(String.format("print(cross_val_score(clf, X, Y%s, scoring=make_scorer(mean_squared_error)))", cv));
+						code_.add(String.format("print(mean(cross_val_score(clf, X, Y%s, scoring=make_scorer(mean_squared_error))))", cv));
 						break;
 					case MAPE:
 						import_.add("from numpy import mean");
@@ -63,9 +65,9 @@ public class ValidationCompiler {
 		import_.add("from sklearn.model_selection import train_test_split");
 		
 		if(stratificationMethod.getNumber() > 0 && stratificationMethod.getNumber() < 100)
-			code_.add(String.format("test_size = %f",stratificationMethod.getNumber()/100.0));
+			code_.add(String.format("test_size = %f",1-stratificationMethod.getNumber()/100.0));
 		else
-			code_.add("test_size = 0.7");
+			code_.add("test_size = 0.3");
 		code_.add("X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=test_size)");
 		
 		code_.add("clf.fit(X_train, Y_train)");

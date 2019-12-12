@@ -37,7 +37,7 @@ public class WekaCompilateur implements Compilateur {
 		
 		buffer.addAll(filterImport(bufferImports));
 		buffer.add("");
-		buffer.add(String.format("public class %s {", className(input, algorithm, uniqueId)));
+		buffer.add(String.format("public class %s {", className(input, algorithm, validation, uniqueId)));
 		buffer.add(String.format("%spublic static void main(String[] arg) throws Exception {", Utils.tab()));
 		buffer.addAll(Utils.insertTab(inputC.getSecond(),2));
 		buffer.addAll(Utils.insertTab(formulaC.getSecond(),2));
@@ -49,12 +49,12 @@ public class WekaCompilateur implements Compilateur {
 	}
 
 	@Override
-	public String fileName(DataInput input, MLChoiceAlgorithm algorithm, int uniqueId) {
-		return String.format("%s.java", className(input, algorithm, uniqueId));
+	public String fileName(DataInput input, MLChoiceAlgorithm algorithm, Validation validation, int uniqueId) {
+		return String.format("%s.java", className(input, algorithm, validation, uniqueId));
 	}
 	
-	private String className(DataInput input, MLChoiceAlgorithm algorithm, int uniqueId) {
-		return String.format("%s_%s_%s", input.getFilelocation().replace('.', '_'), Utils.algorithmName(algorithm.getAlgorithm()), uniqueId);
+	private String className(DataInput input, MLChoiceAlgorithm algorithm, Validation validation, int uniqueId) {
+		return String.format("%s_%s_%s_%s", input.getFilelocation().replace('.', '_'), Utils.algorithmName(algorithm.getAlgorithm()), Utils.stratificationToString(validation.getStratification()), uniqueId);
 	}
 
 	private Pair<List<String>, List<String>> compileDataInput(DataInput input) {

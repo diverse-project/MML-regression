@@ -60,7 +60,7 @@ public class MLAlgorithmCompiler {
 		
 		import_.add("from sklearn.ensemble import RandomForestRegressor");
 		
-		code_.add("clf = RandomForestRegressor");
+		code_.add("clf = RandomForestRegressor()");
 		
 		return new Pair<>(import_, code_);
 	}

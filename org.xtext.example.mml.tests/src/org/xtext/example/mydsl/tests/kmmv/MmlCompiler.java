@@ -42,7 +42,7 @@ public class MmlCompiler {
 			tmp = compteur;
 			switch(algorithm.getFramework()) {
 				case SCIKIT:
-					filename = scikit.fileName(input, algorithm, compteur++);
+					filename = scikit.fileName(input, algorithm, validation, compteur++);
 					Files.write(
 							scikit.compile(input, algorithm, formula, validation, tmp).getBytes(),
 							new File(filename)
@@ -50,7 +50,7 @@ public class MmlCompiler {
 					commandLines.add(scikit.commandLine(filename));
 					break;
 				case R:
-					filename = r.fileName(input, algorithm, compteur++);
+					filename = r.fileName(input, algorithm, validation, compteur++);
 //					Files.write(
 //							r.compile(input, algorithm, formula, validation, tmp).getBytes(),
 //							new File(filename)
@@ -58,7 +58,7 @@ public class MmlCompiler {
 //					commandLines.add(r.commandLine(filename));
 					break;
 				case JAVA_WEKA:
-					filename = weka.fileName(input, algorithm, compteur++);
+					filename = weka.fileName(input, algorithm, validation, compteur++);
 					Files.write(
 							weka.compile(input, algorithm, formula, validation, tmp).getBytes(),
 							new File(filename)
@@ -66,7 +66,7 @@ public class MmlCompiler {
 					commandLines.add(weka.commandLine(filename));
 					break;
 				case XG_BOOST:
-					filename = xgboost.fileName(input, algorithm, compteur++);
+					filename = xgboost.fileName(input, algorithm, validation, compteur++);
 //					Files.write(
 //							xgboost.compile(input, algorithm, formula, validation, tmp).getBytes(),
 //							new File(filename)

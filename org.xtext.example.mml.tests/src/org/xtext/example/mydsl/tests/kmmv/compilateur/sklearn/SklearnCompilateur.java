@@ -50,8 +50,8 @@ public class SklearnCompilateur implements Compilateur {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String fileName(DataInput input, MLChoiceAlgorithm algorithm, int uniqueId) {
-		return String.format("%s_%s_%s.py", input.getFilelocation().replace('.', '_'), Utils.algorithmName(algorithm.getAlgorithm()), uniqueId);
+	public String fileName(DataInput input, MLChoiceAlgorithm algorithm, Validation validation, int uniqueId) {
+		return String.format("%s_%s_%s_%s.py", input.getFilelocation().replace('.', '_'), Utils.algorithmName(algorithm.getAlgorithm()), Utils.stratificationToString(validation.getStratification()), uniqueId);
 	}
 	
 	private List<String> filterImport(List<String> imports) {
