@@ -65,7 +65,7 @@ public class MmlResult {
 		}
 		
 		public String toString() {
-			return String.format("%s %s with %s elapsed %d with %d MAPE", this.framework, Utils.algorithmName(this.algorithm), this.time, this.result);
+			return String.format("%s %s with %s elapsed %s with %s MAPE", this.framework, Utils.algorithmName(this.algorithm), this.fileLocation, Double.toString(this.time), Double.toString(this.result));
 		}
 	}
 	
@@ -104,7 +104,7 @@ public class MmlResult {
 	
 	public String toMarkdown() {
 		List<String> markdown = new LinkedList<>();
-		markdown.add("| File | Algorithm | Framework | Time (s) | Result |");
+		markdown.add("| Data | Algorithm | Framework | Execution Time (sec) | MAPE (%) |");
 		markdown.add("|---|---|---|---|---|");
 		for(Element e : this.results) {
 			markdown.add(e.toMarkdown());

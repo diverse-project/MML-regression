@@ -6,26 +6,26 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
-import org.eclipse.xtext.testing.InjectWith;
-import org.eclipse.xtext.testing.extensions.InjectionExtension;
 import org.eclipse.xtext.testing.util.ParseHelper;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.xtext.example.mydsl.MmlStandaloneSetup;
 import org.xtext.example.mydsl.mml.MMLModel;
-import org.xtext.example.mydsl.tests.MmlInjectorProvider;
 import org.xtext.example.mydsl.tests.kmmv.compilateur.Utils;
 
-import com.google.inject.Inject;
+import com.google.inject.Injector;
 
-@ExtendWith(InjectionExtension.class)
-@InjectWith(MmlInjectorProvider.class)
 public class MmlEvaluator {
 	
-	@Inject
 	ParseHelper<MMLModel> parseHelper;
+	
+	public MmlEvaluator() {
+		Injector injector = new MmlStandaloneSetup().createInjectorAndDoEMFRegistration();
+		this.parseHelper = injector.getInstance(ParseHelper.class);
+	}
 
 	public MmlResult compile_and_run(String file) throws Exception {
 		MmlResult result = new MmlResult();
-		MMLModel model = parseHelper.parse(new String(Files.readAllBytes(Paths.get(file))));
+		String data = new String(Files.readAllBytes(Paths.get(file)));
+		MMLModel model = parseHelper.parse(data);
 		
 		String fileLocation = model.getInput().getFilelocation();
 		
@@ -69,8 +69,10 @@ public class MmlEvaluator {
 		MmlResult result = new MmlResult();
 		
 		for(String file : args) {
+			System.out.println("Compiling and running " + file);
 			try {
 				result.addAll(evaluator.compile_and_run(file));
+				System.out.println("Done");
 			} catch (Exception ex) {
 				System.err.println(ex.getMessage());
 				System.err.println(ex.getCause());

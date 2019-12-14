@@ -54,7 +54,7 @@ public class WekaCompilateur implements Compilateur {
 	}
 	
 	private String className(DataInput input, MLChoiceAlgorithm algorithm, Validation validation, int uniqueId) {
-		return String.format("%s_%s_%s_%s", input.getFilelocation().replace('.', '_'), Utils.algorithmName(algorithm.getAlgorithm()), Utils.stratificationToString(validation.getStratification()), uniqueId);
+		return String.format("%s_%s_%s_%s", input.getFilelocation().replace(".", "_"), Utils.algorithmName(algorithm.getAlgorithm()), Utils.stratificationToString(validation.getStratification()), uniqueId);
 	}
 
 	private Pair<List<String>, List<String>> compileDataInput(DataInput input) {

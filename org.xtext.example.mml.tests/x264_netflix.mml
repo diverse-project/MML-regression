@@ -1,0 +1,13 @@
+datainput "x264_netflix.csv" separator ,
+	mlframework scikit-learn algorithm DT
+	mlframework scikit-learn algorithm RF
+	mlframework scikit-learn algorithm SVR kernel=poly
+	mlframework scikit-learn algorithm SGD
+	mlframework scikit-learn algorithm GTB
+	mlframework Weka algorithm DT
+	mlframework Weka algorithm RF
+	mlframework Weka algorithm SVR kernel=poly
+	mlframework Weka algorithm SGD
+	mlframework Weka algorithm GTB
+CrossValidation { numRepetitionCross 5 }
+mean_absolute_error
