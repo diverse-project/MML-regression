@@ -31,11 +31,11 @@ public class MmlResult {
 			if(result == 0)
 				result = Utils.algorithmName(this.algorithm).compareTo(Utils.algorithmName(other.algorithm));
 			if(result == 0)
-				result = this.framework.compareTo(other.framework);
-			if(result == 0)
 				result = compareByResult(other);
 			if(result == 0)
 				result = compareByTime(other);
+			if(result == 0)
+				result = this.framework.compareTo(other.framework);
 			
 			return result;
 		}
