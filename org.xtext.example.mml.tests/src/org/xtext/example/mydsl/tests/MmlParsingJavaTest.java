@@ -1,16 +1,8 @@
 package org.xtext.example.mydsl.tests;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.InputStreamReader;
-import java.util.Random;
 import java.util.Scanner;
 
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtext.testing.InjectWith;
 import org.eclipse.xtext.testing.extensions.InjectionExtension;
 import org.eclipse.xtext.testing.util.ParseHelper;
@@ -20,21 +12,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.xtext.example.mydsl.mml.CSVParsingConfiguration;
-import org.xtext.example.mydsl.mml.DT;
-import org.xtext.example.mydsl.mml.DataInput;
-import org.xtext.example.mydsl.mml.GTB;
-import org.xtext.example.mydsl.mml.MLAlgorithm;
 import org.xtext.example.mydsl.mml.MLChoiceAlgorithm;
 import org.xtext.example.mydsl.mml.MMLModel;
-import org.xtext.example.mydsl.mml.RandomForest;
-import org.xtext.example.mydsl.mml.SGD;
-import org.xtext.example.mydsl.mml.SVR;
-import org.xtext.example.mydsl.tests.classes.Model;
+import org.xtext.example.mydsl.tests.classes.Generator;
 import org.xtext.example.mydsl.tests.classes.ModelFactory;
-import org.xtext.example.mydsl.tests.classes.ModelScikit;
 
-import com.google.common.io.Files;
 import com.google.inject.Inject;
 
 
@@ -65,42 +47,13 @@ public class MmlParsingJavaTest {
 	@Test
 	public void loadModel() throws Exception {
 		
-		String result = "";
 		String pathFile = "/home/hugues/Documents/cours/DMI/";
-		String fileName = "";
-		Random rand = new Random();
-		ModelFactory modelFactory = new ModelFactory();
+		Generator generator = new Generator(pathFile);
 		
 		for (MLChoiceAlgorithm algo : model.getAlgorithms()) {
-			Model py = modelFactory.getModel(algo.getFramework().getLiteral(), model, algo.getAlgorithm(), csvPath);
-			fileName = algo.getFramework().getLiteral() + "_" +  getAlgoName(algo.getAlgorithm()) + "_" + (rand.nextInt(999 - 0 + 1) + 0) + ".py";
-			String res = py.generate();
-			System.out.println(res);
-			File file = new File(pathFile + fileName);
-			if(file.createNewFile()) {
-				FileOutputStream write = new FileOutputStream(pathFile + fileName);
-				write.write(res.getBytes());
-				write.flush();
-				write.close();
-			}
-		
+			generator.configure(ModelFactory.getModel(algo), model, pathFile, algo.getFramework().getLiteral());
+			generator.execute();		
 		}
-	}		
-	
-	public String getAlgoName(MLAlgorithm MLalgo) {
-		String name = "";
-		if (MLalgo instanceof SVR) {
-			name="SVR";
-		} else if (MLalgo instanceof RandomForest) {
-			name="RF";
-		} else if (MLalgo instanceof DT) {
-			name="DT";
-		} else if (MLalgo instanceof SGD) {
-			name="SGD";
-		} else if (MLalgo instanceof GTB) {
-			name="GTB";
-		}
-		return name;
 	}
 
 	private String mkValueInSingleQuote(String val) {

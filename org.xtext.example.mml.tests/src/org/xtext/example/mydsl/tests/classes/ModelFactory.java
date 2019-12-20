@@ -1,19 +1,19 @@
 package org.xtext.example.mydsl.tests.classes;
 
 import org.xtext.example.mydsl.mml.FrameworkLang;
-import org.xtext.example.mydsl.mml.MLAlgorithm;
-import org.xtext.example.mydsl.mml.MMLModel;
+import org.xtext.example.mydsl.mml.MLChoiceAlgorithm;
 
 public class ModelFactory {
 
-	public Model getModel(String model_txt, MMLModel model, MLAlgorithm algo, String fileLocation) {
-		if(model_txt.equalsIgnoreCase(FrameworkLang.SCIKIT.getLiteral())) 
+	public static TemplateModel getModel(MLChoiceAlgorithm algo) {
+		System.out.println(algo.getFramework().getLiteral());
+		if(algo.getFramework().getLiteral().equalsIgnoreCase(FrameworkLang.SCIKIT.getLiteral())) 
 		{
-			return new ModelScikit(model, algo, fileLocation);
+			return new ModelScikit(algo.getAlgorithm());
 		}
-		else if(model_txt.equalsIgnoreCase(FrameworkLang.XG_BOOST.getLiteral()))
+		else if(algo.getFramework().getLiteral().equalsIgnoreCase(FrameworkLang.XG_BOOST.getLiteral()))
 		{
-			return new ModelXgboost(model, algo, fileLocation);
+			return new ModelXgboost(algo.getAlgorithm());
 		}
 		return null;
 		

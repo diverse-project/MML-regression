@@ -17,16 +17,14 @@ import org.xtext.example.mydsl.mml.StratificationMethod;
 import org.xtext.example.mydsl.mml.TrainingTest;
 import org.xtext.example.mydsl.mml.ValidationMetric;
 
-public class ModelXgboost implements Model{
+public class ModelXgboost extends TemplateModel{
 
 	MMLModel model;
 	MLAlgorithm algo;
 	String filelocation;
 	
-	public ModelXgboost(MMLModel model, MLAlgorithm algo, String fileLocation) {
-		this.model = model;
-		this.algo = algo;
-		this.filelocation = fileLocation;
+	public ModelXgboost(MLAlgorithm algo) {
+		super(algo);
 	}
 	
 	@Override
@@ -224,20 +222,5 @@ public class ModelXgboost implements Model{
 		}
 		return res;
 	}
-
-	@Override
-	public String generate() {
-		// TODO Auto-generated method stub
-		String ret = "";
-		ret += this.writeImport() + "\n";
-		ret += this.writeFileLocation(filelocation)  + "\n";
-		ret += this.writeVarCible() + "\n";
-		ret += this.writeAlgorithm() + "\n";
-		ret += this.writeStratificationMethod() + "\n";
-		ret += this.writeModel() + "\n";
-		ret += this.writePrint();
-		return ret;
-	}
-	
 	
 }
