@@ -93,6 +93,7 @@ public class SklearnCompilateur implements Compilateur {
 		} else {
 			code_.add("Y_name = column[-1]");
 		}
+		code_.add("Y = mml_data[[Y_name]]");
 		
 		if(formula != null && formula.getPredictors() != null) {
 			if(formula.getPredictors() instanceof AllVariables) {
@@ -125,8 +126,6 @@ public class SklearnCompilateur implements Compilateur {
 		} else {
 			code_.add("X = mml_data.drop(columns=Y_name)");
 		}
-		
-		code_.add("Y = mml_data[Y_name]");
 		
 		return new Pair<>(import_, code_);
 	}

@@ -96,20 +96,33 @@ public class WekaCompilateur implements Compilateur {
 		code_.add("data.setClassIndex(column.indexOf(className));");
 		
 		if(formula != null && formula.getPredictors() != null && !(formula.getPredictors() instanceof AllVariables)) {			
-			import_.add("import java.util.Collections;");
+			List<String> predictorsName = ((PredictorVariables) formula.getPredictors())
+					.getVars()
+					.stream()
+					.filter(variable -> variable.getColName() != null && !variable.getColName().isBlank())
+					.map(variable -> String.format("\"%s\"", variable.getColName()))
+					.collect(Collectors.toList());
+			List<Integer> predictorsIndex = ((PredictorVariables) formula.getPredictors())
+					.getVars()
+					.stream()
+					.filter(variable -> variable.getColName() == null || variable.getColName().isBlank())
+					.map(variable -> variable.getColumn())
+					.collect(Collectors.toList());
 			
-			code_.add("List<String> columnToKeep = new LinkedList<>();");
-			List<String> predictors = ((PredictorVariables) formula.getPredictors())
-				.getVars()
-				.stream()
-				.map(variable -> String.format("\"%s\"", variable))
-				.collect(Collectors.toList());
-			for(String predictor : predictors)
-				code_.add(String.format("columnToKeep.add(%s);",predictor));
+			import_.add("import java.util.Collections;");
+			import_.add("import java.util.Set;");
+			import_.add("import java.util.HashSet;");
+			import_.add("import java.util.stream.Collectors;");
+			
+			code_.add("Set<String> columnToKeep = new HashSet<>();");
+			for(String predN : predictorsName)
+				code_.add(String.format("columnToKeep.add(%s);", predN));
+			for(Integer predI : predictorsIndex)
+				code_.add(String.format("columnToKeep.add(column.get(%d));", predI));
 			code_.add("if(!columnToKeep.contains(className))");
 			code_.add(String.format("%scolumnToKeep.add(className);",Utils.tab()));
 			code_.add("List<Integer> removeColumn = column.stream().filter(name -> !columnToKeep.contains(name)).map(name -> column.indexOf(name)).collect(Collectors.toList());");
-			code_.add("Collections.reverse(removeColumn)");
+			code_.add("Collections.reverse(removeColumn);");
 			code_.add("for(Integer index : removeColumn)");
 			code_.add(String.format("%sdata.deleteAttributeAt(index);", Utils.tab()));
 		}

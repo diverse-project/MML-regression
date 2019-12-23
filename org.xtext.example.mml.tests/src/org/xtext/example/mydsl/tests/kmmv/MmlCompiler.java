@@ -58,12 +58,12 @@ public class MmlCompiler {
 //					commandLines.add(r.commandLine(filename));
 					break;
 				case JAVA_WEKA:
-//					filename = weka.fileName(input, algorithm, validation, compteur++);
-//					Files.write(
-//							weka.compile(input, algorithm, formula, validation, tmp).getBytes(),
-//							new File(filename)
-//					);
-//					commandLines.add(weka.commandLine(filename));
+					filename = weka.fileName(input, algorithm, validation, compteur++);
+					Files.write(
+							weka.compile(input, algorithm, formula, validation, tmp).getBytes(),
+							new File(filename)
+					);
+					commandLines.add(weka.commandLine(filename));
 					break;
 				case XG_BOOST:
 					filename = xgboost.fileName(input, algorithm, validation, compteur++);
