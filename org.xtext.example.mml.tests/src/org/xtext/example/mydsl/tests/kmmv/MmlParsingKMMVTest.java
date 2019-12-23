@@ -80,7 +80,7 @@ public class MmlParsingKMMVTest {
 	@Test
 	public void compileTests() throws Exception {
 		File folder = new File("");
-		for(int i = 1; i <= 10; ++i) {
+		for(int i = 1; i <= 1; ++i) {
 			try {
 				String data = new String(Files.readAllBytes(Paths.get(folder.getAbsoluteFile()+"/prg"+Integer.toString(i)+".mml")));
 				MMLModel model = parseHelper.parse(data);

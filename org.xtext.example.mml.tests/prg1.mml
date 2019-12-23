@@ -3,5 +3,6 @@ datainput "boston.csv" separator ,
 	mlframework Weka algorithm DT
 	mlframework R algorithm DT
 	mlframework xgboost algorithm DT
+formula 0 + 2 + "zn" + "chas"
 TrainingTest { percentageTraining 70 }
 mean_absolute_error

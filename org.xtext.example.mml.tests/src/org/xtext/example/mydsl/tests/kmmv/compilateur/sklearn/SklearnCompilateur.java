@@ -98,12 +98,28 @@ public class SklearnCompilateur implements Compilateur {
 			if(formula.getPredictors() instanceof AllVariables) {
 				code_.add("X = mml_data.drop(columns=Y_name)");
 			} else {
-				List<String> predictors = ((PredictorVariables) formula.getPredictors())
-					.getVars()
-					.stream()
-					.map(variable -> String.format("\"%s\"", variable))
-					.collect(Collectors.toList());
-				code_.add(String.format("X = mml_data[[%s]]", String.join(",", predictors)));
+				List<String> predictorsName = ((PredictorVariables) formula.getPredictors())
+						.getVars()
+						.stream()
+						.filter(variable -> variable.getColName() != null && !variable.getColName().isBlank())
+						.map(variable -> String.format("'%s'", variable.getColName()))
+						.collect(Collectors.toList());
+				List<Integer> predictorsIndex = ((PredictorVariables) formula.getPredictors())
+						.getVars()
+						.stream()
+						.filter(variable -> variable.getColName() == null || variable.getColName().isBlank())
+						.map(variable -> variable.getColumn())
+						.collect(Collectors.toList());
+				
+				code_.add("predictorsSet = set()");
+				for(String predN : predictorsName)
+					code_.add(String.format("predictorsSet.add(%s)", predN));
+				for(Integer predI : predictorsIndex)
+					code_.add(String.format("predictorsSet.add(column[%d])", predI));
+				code_.add("predictors = list(predictorsSet)");
+				code_.add("X = mml_data[[predictors[0]]]");
+				code_.add("for i in range(1, len(predictors)):");
+				code_.add(String.format("%sX.join(mml_data[[predictors[i]]])", Utils.tab()));
 			}
 				
 		} else {
