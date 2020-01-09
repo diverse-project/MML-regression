@@ -51,11 +51,11 @@ public class MmlCompiler {
 					break;
 				case R:
 					filename = r.fileName(input, algorithm, validation, compteur++);
-//					Files.write(
-//							r.compile(input, algorithm, formula, validation, tmp).getBytes(),
-//							new File(filename)
-//					);
-//					commandLines.add(r.commandLine(filename));
+					Files.write(
+							r.compile(input, algorithm, formula, validation, tmp).getBytes(),
+							new File(filename)
+					);
+					commandLines.add(r.commandLine(filename));
 					break;
 				case JAVA_WEKA:
 					filename = weka.fileName(input, algorithm, validation, compteur++);

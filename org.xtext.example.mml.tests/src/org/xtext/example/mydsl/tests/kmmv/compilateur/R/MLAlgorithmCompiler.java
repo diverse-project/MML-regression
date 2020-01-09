@@ -6,6 +6,10 @@ import java.util.List;
 import org.xtext.example.mydsl.mml.DT;
 import org.xtext.example.mydsl.mml.GTB;
 import org.xtext.example.mydsl.mml.MLAlgorithm;
+import org.xtext.example.mydsl.mml.Validation;
+import org.xtext.example.mydsl.mml.ValidationMetric;
+import org.xtext.example.mydsl.mml.CrossValidation;
+import org.xtext.example.mydsl.mml.TrainingTest;
 import org.xtext.example.mydsl.mml.RandomForest;
 import org.xtext.example.mydsl.mml.SGD;
 import org.xtext.example.mydsl.mml.SVR;
@@ -39,8 +43,9 @@ public class MLAlgorithmCompiler {
 				depth = ", tuneGrid=depth";
 				code_.add(String.format("depth <- expand.grid(maxdepth = %d)", algorithm.getMax_depth()));
 			}
-			if(validation.getMetric() != null) {
-				if(validation.getMetric().contains("MAPE")) {
+			List<ValidationMetric> metrics = validation.getMetric();
+			if(metrics != null) {
+				if(metrics.contains(ValidationMetric.MAPE)) {
 					code_.add(String.format("model_mape <- train(formula, data=mml_data, method='rpart2'%s, trControl=train_control_mape)", depth));
 					
 					if(metrics.size()>1)
@@ -68,8 +73,9 @@ public class MLAlgorithmCompiler {
 		List<String> code_ = new LinkedList<>();
 		
 		if(validation.getStratification() instanceof CrossValidation) {
-			if(validation.getMetric() != null) {
-				if(validation.getMetric().contains("MAPE")) {
+			List<ValidationMetric> metrics = validation.getMetric();
+			if(metrics != null) {
+				if(metrics.contains(ValidationMetric.MAPE)) {
 					code_.add("model_mape <- train(formula, data=mml_data, method='gbm', verbose=FALSE, trControl=train_control_mape)");
 					
 					if(metrics.size()>1)
@@ -94,8 +100,9 @@ public class MLAlgorithmCompiler {
 		List<String> code_ = new LinkedList<>();
 		
 		if(validation.getStratification() instanceof CrossValidation) {
-			if(validation.getMetric() != null) {
-				if(validation.getMetric().contains("MAPE")) {
+			List<ValidationMetric> metrics = validation.getMetric();
+			if(metrics != null) {
+				if(metrics.contains(ValidationMetric.MAPE)) {
 					code_.add("model_mape <- train(formula, data=mml_data, method='rf', trControl=train_control_mape)");
 					
 					if(metrics.size()>1)
@@ -138,22 +145,22 @@ public class MLAlgorithmCompiler {
 		List<String> code_ = new LinkedList<>();
 		
 		if(validation.getStratification() instanceof CrossValidation) {
-			String cost = '1';
+			String cost = "1";
 			if(algorithm.getC() != null)  {
 				cost = algorithm.getC(); // getC() is a string ?
 			}
 			
 			if(algorithm.getKernel() != null) {			
 				switch(algorithm.getKernel()) {
-					case linear:
+					case LINEAR:
 						code_.add(String.format("params <- expand.grid(C = %s)", cost));
 						code_.add("clf <- 'svmLinear'");
 						break;
-					case poly:
+					case POLY:
 						code_.add(String.format("params <- expand.grid(C = %s, degree = 2, scale = 1)", cost)); // LENT
 						code_.add("clf <- 'svmPoly'");
 						break;
-					case rbf:
+					case RBF:
 						code_.add(String.format("params <- expand.grid(C = %s, sigma = 0.01)", cost));
 						code_.add("clf <- 'svmRadial'");
 						break;
@@ -163,8 +170,9 @@ public class MLAlgorithmCompiler {
 				code_.add("clf <- 'svmRadial'");
 			}
 			
-			if(validation.getMetric() != null) {
-				if(validation.getMetric().contains("MAPE")) {
+			List<ValidationMetric> metrics = validation.getMetric();
+			if(metrics != null) {
+				if(metrics.contains(ValidationMetric.MAPE)) {
 					code_.add("model_mape <- train(formula, data=mml_data, method=clf, tuneGrid=params, trControl=train_control_mape)");
 					
 					if(metrics.size()>1)
@@ -184,13 +192,13 @@ public class MLAlgorithmCompiler {
 			
 			if(algorithm.getKernel() != null) {			
 				switch(algorithm.getKernel()) {
-					case linear:
+					case LINEAR:
 						code_.add(String.format("model <- svm(formula, data=training, type = 'eps-regression', kernel='linear'%s)", cost));
 						break;
-					case poly:
+					case POLY:
 						code_.add(String.format("model <- svm(formula, data=training, type = 'eps-regression', kernel='polynomial'%s)", cost));
 						break;
-					case rbf:
+					case RBF:
 						code_.add(String.format("model <- svm(formula, data=training, type = 'eps-regression', kernel='radial'%s)", cost));
 						break;
 				}

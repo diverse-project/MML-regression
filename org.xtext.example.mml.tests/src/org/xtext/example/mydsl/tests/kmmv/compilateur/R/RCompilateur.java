@@ -1,10 +1,13 @@
 package org.xtext.example.mydsl.tests.kmmv.compilateur.R;
 
-import org.xtext.example.mydsl.mml.DataInput;
-import org.xtext.example.mydsl.mml.MLChoiceAlgorithm;
-import org.xtext.example.mydsl.mml.RFormula;
-import org.xtext.example.mydsl.mml.Validation;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.xtext.example.mydsl.mml.*;
 import org.xtext.example.mydsl.tests.kmmv.compilateur.Compilateur;
+import org.xtext.example.mydsl.tests.kmmv.compilateur.Pair;
+import org.xtext.example.mydsl.tests.kmmv.compilateur.Utils;
 
 public class RCompilateur implements Compilateur {
 
@@ -108,7 +111,7 @@ public class RCompilateur implements Compilateur {
 		}
 		
 		code_.add("X_names <- c(names(X))");
-		code_.add("formula <- as.formula(paste(Y_name, paste(X_names, collapse=' + '), sep' ~ '))")
+		code_.add("formula <- as.formula(paste(Y_name, paste(X_names, collapse=' + '), sep' ~ '))");
 		
 		return new Pair<>(import_, code_);
 	}

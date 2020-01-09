@@ -8,6 +8,7 @@ import org.xtext.example.mydsl.mml.TrainingTest;
 import org.xtext.example.mydsl.mml.Validation;
 import org.xtext.example.mydsl.mml.ValidationMetric;
 import org.xtext.example.mydsl.tests.kmmv.compilateur.Pair;
+import org.xtext.example.mydsl.tests.kmmv.compilateur.Utils;
 
 public class ValidationCompiler {
 	public static Pair<List<String>, List<String>> compile(Validation validation) {
@@ -29,7 +30,7 @@ public class ValidationCompiler {
 			if(stratificationMethod.getNumber() != 0)
 				cv = stratificationMethod.getNumber();
 			
-			if(metrics.contains("MAPE")) {
+			if(metrics.contains(ValidationMetric.MAPE)) {
 				code_.add("mapeSummary <- function (data, lev = NULL, model = NULL) {");
 				code_.add(String.format("%smape <- function(a, b) mean(abs((a - b)/a))*100", Utils.tab()));
 				code_.add(String.format("%sout <- mape(data$obs, data$pred)", Utils.tab()));
@@ -66,9 +67,9 @@ public class ValidationCompiler {
 	
 	public static Pair<List<String>, List<String>> compileMetrics(Validation validation) {
 		if(validation.getStratification() instanceof CrossValidation)
-			return compile((CrossValidation)validation.getStratification(), validation.getMetric());
+			return compileMetrics((CrossValidation)validation.getStratification(), validation.getMetric());
 		if(validation.getStratification() instanceof TrainingTest)
-			return compile((TrainingTest)validation.getStratification(), validation.getMetric());
+			return compileMetrics((TrainingTest)validation.getStratification(), validation.getMetric());
 		return new Pair<>(List.of(), List.of());
 	}
 	
