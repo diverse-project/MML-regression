@@ -1,6 +1,7 @@
 package org.xtext.example.mydsl.tests.classes;
 
 import java.util.Iterator;
+import java.util.Map;
 
 import org.eclipse.emf.common.util.EList;
 import org.xtext.example.mydsl.mml.CrossValidation;
@@ -19,20 +20,25 @@ import org.xtext.example.mydsl.mml.ValidationMetric;
 
 public class ModelXgboost extends TemplateModel{
 
-	MMLModel model;
-	MLAlgorithm algo;
-	String filelocation;
+	private String algoname;
+	
 	
 	public ModelXgboost(MLAlgorithm algo) {
 		super(algo);
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String writeFileLocation(String filelocation) {
 		// TODO Auto-generated method stub
 		return "df = pd.read_csv('"+filelocation+"')";
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String writeImport() {
 		// TODO Auto-generated method stub
@@ -51,18 +57,23 @@ public class ModelXgboost extends TemplateModel{
 		}
 		//if ret
 		if(algo instanceof DT) {
+			this.algoname = "DT";
 			ret += "from sklearn import tree \n";
 		}
 		if(algo instanceof SVR) {
+			this.algoname = "SVR";
 			ret += "from sklearn import svm \n";
 		}
 		if(algo instanceof RandomForest) {
+			this.algoname = "RF";
 			ret += "from sklearn.ensemble import RandomForestRegressor \n";
 		}
 		if(algo instanceof SGD) {
+			this.algoname = "SGD";
 			ret += "from sklearn import linear_model \n";
 		}
 		if(algo instanceof GTB) {
+			this.algoname = "GTB";
 			ret += "from sklearn.ensemble import GradientBoostingRegressor \n";
 		}
 		
@@ -82,12 +93,9 @@ public class ModelXgboost extends TemplateModel{
 		return ret;
 	}
 
-	@Override
-	public String writeReadCSV(String filelocation) {
-		// TODO Auto-generated method stub
-		return "[ReadCSV] not implemented yet";
-	}
-
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String writeVarCible() {
 		
@@ -127,7 +135,10 @@ public class ModelXgboost extends TemplateModel{
 		
 		return ret;
 	}
-
+	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String writeStratificationMethod() {
 		String res = "";
@@ -142,6 +153,9 @@ public class ModelXgboost extends TemplateModel{
 	return res;	
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String writeAlgorithm() {
 		String res = "";
@@ -186,6 +200,9 @@ public class ModelXgboost extends TemplateModel{
 		return res;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String writeModel() {
 		// TODO Auto-generated method stub
@@ -202,20 +219,16 @@ public class ModelXgboost extends TemplateModel{
 		}
 		else if(model.getValidation().getStratification() instanceof CrossValidation) {
 			//return	"y_pred = cross_val_predict(clf, X, y, cv=" + model.getValidation().getStratification().getNumber() + ")\n" + 
-			return ""; //"X_test = y";
+			return "preds = y\n"; //"X_test = y";
 		}
 		else return "[MODEL] not implemented yet";
 	}
 
-	@Override
-	public String writeValidationMetric() {
-		// TODO Auto-generated method stub
-		return "[ValidationMetric] not implemented yet";
-	}
-
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String writePrint() {
-		// TODO Auto-generated method stub
 		String res = "\n";		
 		for(ValidationMetric item : model.getValidation().getMetric()) {
 			res += "print '"+item.getLiteral()+": {}'.format("+item.getLiteral()+"(preds, y_test))" + "\n";
@@ -223,4 +236,21 @@ public class ModelXgboost extends TemplateModel{
 		return res;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Map<String, Float> getScore(String line, Map<String, Float> map) {
+		String[] values = line.split(":");
+		map.put("XgBoost_"+this.algoname+"_"+values[0], Float.valueOf(values[1]));
+		return map;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getName() {
+		return "XGBoost";
+	}
 }

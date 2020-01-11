@@ -1,7 +1,13 @@
 package org.xtext.example.mydsl.tests;
 
 import java.io.File;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.xtext.testing.InjectWith;
 import org.eclipse.xtext.testing.extensions.InjectionExtension;
@@ -28,7 +34,8 @@ public class MmlParsingJavaTest {
 	@Inject
 	ParseHelper<MMLModel> parseHelper;
 	
-	String path = "/home/hugues/Documents/eclipse/runtime-EclipseXtext/testmml/src/myprogram1.mml";
+	//Path to the mml to compile
+	String path = "/home/hugues/Documents/eclipse/workspace/MML-regression/org.xtext.example.mml.tests/programmeMML/myprogram3.mml";
 	String csvPath = "";
 	File program;	
 	String lang;
@@ -48,17 +55,57 @@ public class MmlParsingJavaTest {
 	public void loadModel() throws Exception {
 		
 		String pathFile = "/home/hugues/Documents/cours/DMI/";
-		Generator generator = new Generator(pathFile);
+		
+		//Instantiate a Generator
+		Generator generator = new Generator();
+		Map<String, Float> scores = new HashMap<>();
+		Map<String, Double> execTime = new HashMap<>();
 		
 		for (MLChoiceAlgorithm algo : model.getAlgorithms()) {
-			generator.configure(ModelFactory.getModel(algo), model, pathFile, algo.getFramework().getLiteral());
-			generator.execute();		
+			
+			//Set the strategy (Scikit, XGboost, R) with a factory
+			generator.setStrategy(ModelFactory.getModel(algo));
+			
+			//Configure the generator
+			generator.configure(model, algo.getFramework().getLiteral());
+			
+			//Generate and compile program
+			generator.generate();
+			
+			//Get the scores of the program
+			scores = Stream.of(scores, generator.getScore())
+					.flatMap(map -> map.entrySet().stream())
+					.collect(Collectors.toMap(
+					    Map.Entry::getKey,
+					    Map.Entry::getValue,
+					    Float::min));
+			
+			//Get the execution time of the program
+			execTime = Stream.of(execTime, generator.getExecTime())
+					.flatMap(map -> map.entrySet().stream())
+					.collect(Collectors.toMap(
+					    Map.Entry::getKey,
+					    Map.Entry::getValue,
+					    Double::min));
 		}
+		
+		//Output the scores for each program (sorted)
+		System.out.println("\nBest scores : ");
+		scores.entrySet().stream()
+			.sorted(Map.Entry.comparingByValue())
+			.collect(
+					Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+							(oldValue, newValue) -> oldValue, LinkedHashMap::new))
+			.forEach((k,v) -> System.out.println(k+":"+v));
+		
+		//Output the execution time of each program (sorted)
+		System.out.println("\nExecution Time : ");
+		execTime.entrySet().stream()
+			.sorted(Map.Entry.comparingByValue())
+			.collect(
+					Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+							(oldValue, newValue) -> oldValue, LinkedHashMap::new))
+			.forEach((k,v) -> System.out.println(k+":"+v+"s"));
 	}
-
-	private String mkValueInSingleQuote(String val) {
-		return "'" + val + "'";
-	}
-
 
 }

@@ -1,0 +1,7 @@
+datainput "/home/hugues/Documents/eclipse/workspace/MML-regression/org.xtext.example.mml.tests/programmeMML/Boston.csv" separator ,
+mlframework scikit-learn algorithm RF
+mlframework xgboost algorithm RF
+mlframework R algorithm RF
+formula "medv"~ .
+TrainingTest { percentageTraining 3 }
+mean_squared_error mean_absolute_error
