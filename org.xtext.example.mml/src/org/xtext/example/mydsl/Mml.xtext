@@ -77,9 +77,10 @@ FLOAT: INT '.' INT;
 
 /*
  * mini DSL to specify "formula"
- * inspired from R formula 
+ * inspired from R formula
+ * predictive = les colonnes qu'on veut prédire 
  */
- 
+
 RFormula:
 	('formula' (predictive=FormulaItem "~")? predictors=XFormula)
 ;
