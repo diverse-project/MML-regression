@@ -3,7 +3,15 @@
 /MmlParsingTest.java
 /.test.java._trace
 /.MmlCompilateurScikitLearn.java._trace
+<<<<<<< HEAD
 /.MmlCompilateurScikitLearn.xtendbin
 /.test.xtendbin
+=======
+/.MmlCompilateurR.java._trace
+/.MmlCompilateurR.xtendbin
+/.MmlCompilateurScikitLearn.xtendbin
+/.test.xtendbin
+/MmlCompilateurR.java
+>>>>>>> cd842fbadf7ff2cfb472f72da3a82a611772e3a2
 /MmlCompilateurScikitLearn.java
 /test.java
