@@ -12,6 +12,12 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.^extension.ExtendWith
 import org.xtext.example.mydsl.mml.DataInput
 import org.xtext.example.mydsl.mml.MMLModel
+//import java.nio.file.Files
+import java.io.File
+import com.google.common.io.Files
+import org.xtext.example.mydsl.mml.MLChoiceAlgorithm
+import org.xtext.example.mydsl.mml.FrameworkLang
+import org.xtext.example.mydsl.mml.MLAlgorithm
 
 @ExtendWith(InjectionExtension)
 @InjectWith(MmlInjectorProvider)
@@ -50,23 +56,43 @@ class MmlParsingTest {
 		''')
 		val DataInput dataInput = result.input;
 		val String fileLocation = dataInput.filelocation;
-
-		val String pythonImport = "import pandas as pd\n";
+		val String validationMetric = "mean_squared_error";
+		val String trainning = "train_test_split";
+		
+		var String pythonImport = "import pandas as pd\n";
+		pythonImport += "from sklearn.model_selection import "+trainning+"\n";
+		pythonImport += "from sklearn import *\n";
+		pythonImport += "from sklearn.metrics import "+validationMetric+"\n";
 		val String DEFAULT_COLUMN_SEPARATOR = ","; // by default
 		val String csv_separator = DEFAULT_COLUMN_SEPARATOR;
-		/*if (parsingInstruction != null) {
+		
+		val MLChoiceAlgorithm mlChoiceAlgorithm = result.algorithm;
+		val FrameworkLang frameworklang = mlChoiceAlgorithm.framework;
+		val MLAlgorithm mlAlgorithm = mlChoiceAlgorithm.algorithm;
+		val String SCIKIT = "scikit-learn";
+		val String test = "";
+		val String pythonAlgorithm = "DecisionTree";
+		val double percentageTraining = 0.7;
+		val double percentageTest = 1 - 0.7;
+		/*
+		if (parsingInstruction != null) {
 			System.err.println("parsing instruction..." + parsingInstruction);
 			csv_separator = parsingInstruction.getSep().toString();
 		}
-		String
-		csvReading = "mml_data = pd.read_csv(" + mkValueInSingleQuote(fileLocation) + ", sep=" +
-			mkValueInSingleQuote(csv_separator) + ")";
-		String
-		pandasCode = pythonImport + csvReading;
-
-		pandasCode += "\nprint (mml_data)\n";
-
-		Files.write(pandasCode.getBytes(), new File("mml.py"));
+		*/
+		val String	csvReading = "mml_data = pd.read_csv(\""+ fileLocation + "\")";
+		var String	pandasCode = pythonImport + csvReading;
+		val String column = "column = mml_data.columns[-1]";
+		pandasCode += "\n"+column+" \nX = mml_data.drop(columns=[column]) \n";
+		pandasCode += "\ny = mml_data[column] \n";
+		pandasCode += "\ntest_size = "+ percentageTest +" \n";
+		pandasCode += "\nX_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size) \n";
+		pandasCode += "\nclf = tree.DecisionTreeRegressor() \n";
+		pandasCode += "\nclf.fit(X_train, y_train) \n";
+		pandasCode += "\naccuracy = mean_squared_error(y_test, clf.predict(X_test)) \n";
+		pandasCode += "\nprint(accuracy) \n";
+		
+		Files.write(pandasCode.getBytes(), new File("/home/barry/Bureau/python/tuto/mml.py"));
 		// end of Python generation
 		/*
 		 * Calling generated Python script (basic solution through systems call)
