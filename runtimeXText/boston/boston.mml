@@ -1,6 +1,16 @@
 datainput "/home/nico/IdeaProjects/idm_project/MML-regression/runtimeXText/boston/BostonHousing.csv" separator ,
 mlframework scikit-learn
 algorithm GTB
+mlframework scikit-learn
+algorithm DT
+mlframework scikit-learn
+algorithm RandomForest
+mlframework scikit-learn
+algorithm SVR kernel=linear
+mlframework xgboost
+algorithm RandomForest
+mlframework R
+algorithm DT
 formula 4~0+1+2+3+"nox"+9+"tax"
 TrainingTest {
     percentageTraining 40

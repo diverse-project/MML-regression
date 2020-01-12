@@ -4,13 +4,13 @@ import org.xtext.example.mydsl.mml.MLChoiceAlgorithm;
 import org.xtext.example.mydsl.mml.MMLModel;
 
 public abstract class CodeGenerator {
-	
+
 	// Blocks of code
 	protected StringBuilder imports = new StringBuilder();
 	protected StringBuilder algorithm = new StringBuilder();
 	protected StringBuilder predictive = new StringBuilder();
 	protected StringBuilder validation = new StringBuilder();
-	
+
 	protected abstract void generateImports(String separator, MLChoiceAlgorithm algo);
 
 	protected abstract void generateAlgorithm(MLChoiceAlgorithm algo);
@@ -18,7 +18,9 @@ public abstract class CodeGenerator {
 	protected abstract void generatePredictive(MLChoiceAlgorithm algo);
 
 	protected abstract void generateValidation(MLChoiceAlgorithm algo);
-	
+
+	protected abstract void addLastOperations();
+
 	protected MMLModel result;
 
 	// template method
@@ -44,10 +46,9 @@ public abstract class CodeGenerator {
 		// validation related code generation
 		generateValidation(algo); 
 		
-		// Append at the end
-		if (algo.getFramework().getName().equals("SCIKIT")) {
-			imports.insert(0, "#!/usr/bin/env python2\n");
-		}
+		// append last operations if necessary
+		addLastOperations(); 
+	
 		program.append(imports.toString());
 		program.append(predictive.toString());
 		program.append(algorithm.toString());

@@ -7,44 +7,30 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.xtext.testing.InjectWith;
 import org.eclipse.xtext.testing.extensions.InjectionExtension;
 import org.eclipse.xtext.testing.util.ParseHelper;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.xtext.example.mydsl.mml.CSVParsingConfiguration;
-import org.xtext.example.mydsl.mml.CrossValidation;
 import org.xtext.example.mydsl.mml.DT;
 import org.xtext.example.mydsl.mml.DataInput;
-import org.xtext.example.mydsl.mml.FormulaItem;
 import org.xtext.example.mydsl.mml.GTB;
 import org.xtext.example.mydsl.mml.MLAlgorithm;
 import org.xtext.example.mydsl.mml.MLChoiceAlgorithm;
 import org.xtext.example.mydsl.mml.MMLModel;
-import org.xtext.example.mydsl.mml.PredictorVariables;
 import org.xtext.example.mydsl.mml.RandomForest;
 import org.xtext.example.mydsl.mml.SGD;
-import org.xtext.example.mydsl.mml.SVMKernel;
 import org.xtext.example.mydsl.mml.SVR;
-import org.xtext.example.mydsl.mml.StratificationMethod;
-import org.xtext.example.mydsl.mml.TrainingTest;
-import org.xtext.example.mydsl.mml.ValidationMetric;
-import org.xtext.example.mydsl.tests.pythonCode.PythonCode;
+import org.xtext.example.mydsl.tests.algoList.PythonCode;
+import org.xtext.example.mydsl.tests.algoList.RCode;
+import org.xtext.example.mydsl.tests.algoList.XgboostCode;
 import org.xtext.example.mydsl.tests.templateMethod.CodeGenerator;
 
 import com.google.common.io.Files;
@@ -96,7 +82,6 @@ public class MmlParsingJavaTest {
 	@Test
 	public void compileDataInput() throws Exception {
 		DataInput dataInput = result.getInput();
-		String fileLocation = dataInput.getFilelocation();
 		String DEFAULT_COLUMN_SEPARATOR = ","; // by default
 		String csv_separator = DEFAULT_COLUMN_SEPARATOR;
 
@@ -109,21 +94,45 @@ public class MmlParsingJavaTest {
 		String filename;
 
 		CodeGenerator gen = null;
+
 		for (MLChoiceAlgorithm algo : result.getAlgorithms()) {
-			if (algo.getFramework().getName().equals("SCIKIT")) {
+			long start = System.nanoTime();
+
+			filename = algo.getFramework().getName();
+			switch (filename) {
+			case "SCIKIT":
 				gen = new PythonCode();
-			} else {
-				// TODO java R xgboost
+				filename += "_" + getName(algo.getAlgorithm()) + ".py";
+				break;
+			case "XGBoost":
+				gen = new XgboostCode();
+				filename += "_" + getName(algo.getAlgorithm()) + ".py";
+				break;
+			case "R":
+				gen = new RCode();
+				filename += "_" + getName(algo.getAlgorithm()) + ".R";
+				break;
+			default:
+				System.err.println(String.format("\"%s\" is not implemented yet.", filename));
+				filename += algo.getFramework().getName() + ".unimplementedformat";
+				break;
 			}
-			StringBuilder program = gen.generate(csv_separator, algo, result);
 			
-			filename = algo.getFramework().getName() + "_" + getName(algo.getAlgorithm())
-					+ (algo.getFramework().getName().equals("SCIKIT") ? ".py" : ".autre");
+			StringBuilder program = gen.generate(csv_separator, algo, result);
+
 			files_code.putIfAbsent(filename, program);
+			long finish = System.nanoTime();
+			long timeElapsed = finish - start;
+
+			System.out.println(String.format("Time elapsed for %s : %s ns", filename, timeElapsed));
 		}
 
 		for (Map.Entry<String, StringBuilder> entry : files_code.entrySet()) {
-			Files.write(entry.getValue().toString().getBytes(), new File(entry.getKey()));
+			File file = new File(entry.getKey());
+			file.setExecutable(true, false);
+			file.setReadable(true, false);
+			file.setWritable(true, false);
+			Files.write(entry.getValue().toString().getBytes(), file);
 		}
 		// end of Python generation
 
@@ -154,5 +163,4 @@ public class MmlParsingJavaTest {
 		}
 		return name;
 	}
-
 }

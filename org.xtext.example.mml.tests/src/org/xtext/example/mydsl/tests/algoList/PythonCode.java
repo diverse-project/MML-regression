@@ -1,4 +1,4 @@
-package org.xtext.example.mydsl.tests.pythonCode;
+package org.xtext.example.mydsl.tests.algoList;
 
 import org.eclipse.emf.common.util.EList;
 import org.xtext.example.mydsl.mml.CrossValidation;
@@ -18,17 +18,17 @@ import org.xtext.example.mydsl.tests.templateMethod.CodeGenerator;
 
 public class PythonCode extends CodeGenerator {
 
+	@Override
 	protected void generateImports(String csv_separator, MLChoiceAlgorithm algo) {
 		imports.append("import pandas as pd\n");
+		imports.append("import warnings\n");
 		imports.append("df = pd.read_csv(" + simpleQuote(result.getInput().getFilelocation()) + ", sep="
 				+ simpleQuote(csv_separator) + ")\n");
+		imports.append("warnings.filterwarnings(\"ignore\")\n");
 		imports.append("\n");
 	}
 
-	private String simpleQuote(String val) {
-		return "'" + val + "'";
-	}
-
+	@Override
 	protected void generateAlgorithm(MLChoiceAlgorithm algo) {
 		MLAlgorithm MLalgo = algo.getAlgorithm();
 		if (MLalgo instanceof SVR) {
@@ -71,6 +71,7 @@ public class PythonCode extends CodeGenerator {
 		algorithm.append("\n");
 	}
 
+	@Override
 	protected void generatePredictive(MLChoiceAlgorithm algo) {
 		FormulaItem myItem = result.getFormula().getPredictive();
 
@@ -117,6 +118,7 @@ public class PythonCode extends CodeGenerator {
 		predictive.append("\n");
 	}
 
+	@Override
 	protected void generateValidation(MLChoiceAlgorithm algo) {
 		StratificationMethod stratification = result.getValidation().getStratification();
 
@@ -127,7 +129,6 @@ public class PythonCode extends CodeGenerator {
 			validation.append("accuracy = cross_validate(clf, X, y, cv=" + crossVal.getNumber() + ")\n");
 			validation.append("y_pred = cross_val_predict(clf, X, y, cv=" + crossVal.getNumber() + ")\n");
 			validation.append("y_test = y\n");
-			validation.append("print(accuracy)\n");
 		} else {
 			TrainingTest training = (TrainingTest) stratification;
 			imports.insert(0, "from sklearn.model_selection import train_test_split\n");
@@ -144,4 +145,12 @@ public class PythonCode extends CodeGenerator {
 		validation.append("\n");
 	}
 
+	@Override
+	protected void addLastOperations() {
+		imports.insert(0, "#!/usr/bin/env python2\n");
+	}
+
+	private String simpleQuote(String val) {
+		return "'" + val + "'";
+	}
 }
