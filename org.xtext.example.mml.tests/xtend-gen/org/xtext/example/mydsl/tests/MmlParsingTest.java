@@ -3,7 +3,9 @@
  */
 package org.xtext.example.mydsl.tests;
 
+import com.google.common.io.Files;
 import com.google.inject.Inject;
+import java.io.File;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtend2.lib.StringConcatenation;
@@ -16,6 +18,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.xtext.example.mydsl.mml.DataInput;
+import org.xtext.example.mydsl.mml.FrameworkLang;
+import org.xtext.example.mydsl.mml.MLAlgorithm;
+import org.xtext.example.mydsl.mml.MLChoiceAlgorithm;
 import org.xtext.example.mydsl.mml.MMLModel;
 import org.xtext.example.mydsl.tests.MmlInjectorProvider;
 
@@ -92,9 +97,47 @@ public class MmlParsingTest {
       final MMLModel result = this.parseHelper.parse(_builder);
       final DataInput dataInput = result.getInput();
       final String fileLocation = dataInput.getFilelocation();
-      final String pythonImport = "import pandas as pd\n";
+      final String validationMetric = "mean_squared_error";
+      final String trainning = "train_test_split";
+      String pythonImport = "import pandas as pd\n";
+      String _pythonImport = pythonImport;
+      pythonImport = (_pythonImport + (("from sklearn.model_selection import " + trainning) + "\n"));
+      String _pythonImport_1 = pythonImport;
+      pythonImport = (_pythonImport_1 + "from sklearn import *\n");
+      String _pythonImport_2 = pythonImport;
+      pythonImport = (_pythonImport_2 + (("from sklearn.metrics import " + validationMetric) + "\n"));
       final String DEFAULT_COLUMN_SEPARATOR = ",";
       final String csv_separator = DEFAULT_COLUMN_SEPARATOR;
+      final MLChoiceAlgorithm mlChoiceAlgorithm = result.getAlgorithm();
+      final FrameworkLang frameworklang = mlChoiceAlgorithm.getFramework();
+      final MLAlgorithm mlAlgorithm = mlChoiceAlgorithm.getAlgorithm();
+      final String SCIKIT = "scikit-learn";
+      final String test = "";
+      final String pythonAlgorithm = "DecisionTree";
+      final double percentageTraining = 0.7;
+      final double percentageTest = (1 - 0.7);
+      final String csvReading = (("mml_data = pd.read_csv(\"" + fileLocation) + "\")");
+      String pandasCode = (pythonImport + csvReading);
+      final String column = "column = mml_data.columns[-1]";
+      String _pandasCode = pandasCode;
+      pandasCode = (_pandasCode + (("\n" + column) + " \nX = mml_data.drop(columns=[column]) \n"));
+      String _pandasCode_1 = pandasCode;
+      pandasCode = (_pandasCode_1 + "\ny = mml_data[column] \n");
+      String _pandasCode_2 = pandasCode;
+      pandasCode = (_pandasCode_2 + (("\ntest_size = " + Double.valueOf(percentageTest)) + " \n"));
+      String _pandasCode_3 = pandasCode;
+      pandasCode = (_pandasCode_3 + "\nX_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size) \n");
+      String _pandasCode_4 = pandasCode;
+      pandasCode = (_pandasCode_4 + "\nclf = tree.DecisionTreeRegressor() \n");
+      String _pandasCode_5 = pandasCode;
+      pandasCode = (_pandasCode_5 + "\nclf.fit(X_train, y_train) \n");
+      String _pandasCode_6 = pandasCode;
+      pandasCode = (_pandasCode_6 + "\naccuracy = mean_squared_error(y_test, clf.predict(X_test)) \n");
+      String _pandasCode_7 = pandasCode;
+      pandasCode = (_pandasCode_7 + "\nprint(accuracy) \n");
+      byte[] _bytes = pandasCode.getBytes();
+      File _file = new File("/home/barry/Bureau/python/tuto/mml.py");
+      Files.write(_bytes, _file);
     } catch (Throwable _e) {
       throw Exceptions.sneakyThrow(_e);
     }

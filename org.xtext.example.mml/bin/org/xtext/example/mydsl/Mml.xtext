@@ -8,9 +8,6 @@ MMLModel:
 	formula=RFormula?
 	validation=Validation
 	;
-
-
-
 	
 /*
  * 
