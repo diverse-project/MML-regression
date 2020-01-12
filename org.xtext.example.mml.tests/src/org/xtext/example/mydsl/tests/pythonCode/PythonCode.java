@@ -1,0 +1,147 @@
+package org.xtext.example.mydsl.tests.pythonCode;
+
+import org.eclipse.emf.common.util.EList;
+import org.xtext.example.mydsl.mml.CrossValidation;
+import org.xtext.example.mydsl.mml.DT;
+import org.xtext.example.mydsl.mml.FormulaItem;
+import org.xtext.example.mydsl.mml.GTB;
+import org.xtext.example.mydsl.mml.MLAlgorithm;
+import org.xtext.example.mydsl.mml.MLChoiceAlgorithm;
+import org.xtext.example.mydsl.mml.PredictorVariables;
+import org.xtext.example.mydsl.mml.RandomForest;
+import org.xtext.example.mydsl.mml.SGD;
+import org.xtext.example.mydsl.mml.SVR;
+import org.xtext.example.mydsl.mml.StratificationMethod;
+import org.xtext.example.mydsl.mml.TrainingTest;
+import org.xtext.example.mydsl.mml.ValidationMetric;
+import org.xtext.example.mydsl.tests.templateMethod.CodeGenerator;
+
+public class PythonCode extends CodeGenerator {
+
+	protected void generateImports(String csv_separator, MLChoiceAlgorithm algo) {
+		imports.append("import pandas as pd\n");
+		imports.append("df = pd.read_csv(" + simpleQuote(result.getInput().getFilelocation()) + ", sep="
+				+ simpleQuote(csv_separator) + ")\n");
+		imports.append("\n");
+	}
+
+	private String simpleQuote(String val) {
+		return "'" + val + "'";
+	}
+
+	protected void generateAlgorithm(MLChoiceAlgorithm algo) {
+		MLAlgorithm MLalgo = algo.getAlgorithm();
+		if (MLalgo instanceof SVR) {
+			imports.insert(0, "from sklearn.svm import SVR\n");
+			SVR svr = (SVR) algo.getAlgorithm();
+			String valC = (svr.getC() != null) ? "C=" + svr.getC() : "";
+			String kernel = (svr.getKernel() != null) ? "kernel=" + simpleQuote(svr.getKernel().getName()) : "";
+
+			if (valC.isEmpty()) {
+				if (!kernel.isEmpty()) {
+					algorithm.append("clf = SVR(" + kernel + ",epsilon=0.2)\n");
+				} else {
+					algorithm.append("clf = SVR(epsilon=0.2)\n");
+				}
+			} else {
+				if (!kernel.isEmpty()) {
+					algorithm.append("clf = SVR(" + valC + "," + kernel + ",epsilon=0.2)\n");
+
+				} else {
+					algorithm.append("clf = SVR(" + valC + ",epsilon=0.2)\n");
+				}
+			}
+			// algorithm.append("clf.fit(X, y)\n");
+		} else if (MLalgo instanceof RandomForest) {
+			imports.insert(0, "from sklearn.ensemble import RandomForestRegressor\n");
+			algorithm.append("clf = RandomForestRegressor()\n");
+		} else if (MLalgo instanceof DT) {
+			DT dt = (DT) algo.getAlgorithm();
+			imports.insert(0, "from sklearn.tree import DecisionTreeRegressor\n");
+			String max_depth = (dt.getMax_depth() == 0) ? "" : "max_depth=" + dt.getMax_depth();
+
+			algorithm.append("clf = DecisionTreeRegressor(" + max_depth + ")\n");
+		} else if (MLalgo instanceof SGD) {
+			imports.insert(0, "from sklearn.linear_model import SGDRegressor\n");
+			algorithm.append("clf = SGDRegressor()\n");
+		} else if (MLalgo instanceof GTB) {
+			imports.insert(0, "from sklearn.ensemble import GradientBoostingRegressor\n");
+			algorithm.append("clf = GradientBoostingRegressor()\n");
+		}
+		algorithm.append("\n");
+	}
+
+	protected void generatePredictive(MLChoiceAlgorithm algo) {
+		FormulaItem myItem = result.getFormula().getPredictive();
+
+		if (myItem == null) {
+			predictive.insert(0, "col_index = df.shape[1] - 1\n");
+		}
+
+		if (result.getFormula().getPredictors() instanceof PredictorVariables) {
+			EList<FormulaItem> predictorVars = ((PredictorVariables) result.getFormula().getPredictors()).getVars();
+
+			predictive.append("coltokeep = [");
+			FormulaItem item;
+			for (int i = 0; i < predictorVars.size(); i++) {
+				item = predictorVars.get(i);
+				if (item.getColName() != null) {
+					predictive.append(simpleQuote(item.getColName()));
+				} else {
+					predictive.append("df.columns[" + item.getColumn() + "]");
+				}
+
+				if (i != predictorVars.size() - 1) {
+					predictive.append(", ");
+				}
+			}
+			predictive.append("]\n");
+			predictive.append("X = df[coltokeep]\n");
+		} else {
+			if (myItem == null) {
+				predictive.append("X = df.drop([col_index], axis=1)\n");
+			} else if (myItem.getColName() != null) {
+				predictive.append("X = df.drop([" + simpleQuote(myItem.getColName()) + "], axis=1)\n");
+			} else {
+				predictive.append("X = df.drop(df.columns[" + myItem.getColumn() + "], axis=1)\n");
+			}
+		}
+
+		if (myItem == null) {
+			predictive.append("y = df[col_index]\n");
+		} else if (myItem.getColName() != null) {
+			predictive.append("y = df[" + simpleQuote(myItem.getColName()) + "]\n");
+		} else {
+			predictive.append("y = df[df.columns[" + myItem.getColumn() + "]]\n");
+		}
+		predictive.append("\n");
+	}
+
+	protected void generateValidation(MLChoiceAlgorithm algo) {
+		StratificationMethod stratification = result.getValidation().getStratification();
+
+		if (stratification instanceof CrossValidation) {
+			CrossValidation crossVal = (CrossValidation) stratification;
+			imports.insert(0, "from sklearn.model_selection import cross_validate\n");
+			imports.insert(0, "from sklearn.model_selection import cross_val_predict\n");
+			validation.append("accuracy = cross_validate(clf, X, y, cv=" + crossVal.getNumber() + ")\n");
+			validation.append("y_pred = cross_val_predict(clf, X, y, cv=" + crossVal.getNumber() + ")\n");
+			validation.append("y_test = y\n");
+			validation.append("print(accuracy)\n");
+		} else {
+			TrainingTest training = (TrainingTest) stratification;
+			imports.insert(0, "from sklearn.model_selection import train_test_split\n");
+			validation.append("X_train, X_test, y_train, y_test = train_test_split(X, y, test_size="
+					+ ((float) training.getNumber() / 100.0) + ")\n");
+			validation.append("clf.fit(X_train,y_train)\n");
+			validation.append("y_pred = clf.predict(X_test)\n");
+		}
+		for (ValidationMetric metric : result.getValidation().getMetric()) {
+			imports.insert(0, "from sklearn.metrics import " + metric.getLiteral() + "\n");
+			validation.append("print(" + metric.getLiteral() + "(y_test, y_pred))\n");
+		}
+
+		validation.append("\n");
+	}
+
+}

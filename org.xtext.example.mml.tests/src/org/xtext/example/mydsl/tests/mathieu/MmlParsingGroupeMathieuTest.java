@@ -61,7 +61,7 @@ public class MmlParsingGroupeMathieuTest {
 		String csv_separator = DEFAULT_COLUMN_SEPARATOR;
 		CSVParsingConfiguration parsingInstruction = dataInput.getParsingInstruction();
 		if (parsingInstruction != null) {			
-			System.err.println("parsing instruction..." + parsingInstruction);
+			System.err.println("parsing instruction : " + parsingInstruction.getSep());
 			csv_separator = parsingInstruction.getSep().toString();
 		}
 		String csvReading = "mml_data = pd.read_csv(" + mkValueInSingleQuote(fileLocation) + ", sep=" + mkValueInSingleQuote(csv_separator) + ")";						
@@ -98,7 +98,7 @@ public class MmlParsingGroupeMathieuTest {
 				+ "mlframework scikit-learn\n"
 				+ "algorithm GradientBoostingRegressor\n"
 				+ "CrossValidation { numRepetitionCross 5 }\n"
-				+ "mean_absolute_percentage_error\n"
+				+ "mean_absolute_error\n"
 				+ "");
 		Assertions.assertNotNull(result);
 		EList<Resource.Diagnostic> errors = result.eResource().getErrors();
@@ -117,7 +117,7 @@ public class MmlParsingGroupeMathieuTest {
 				+ "mlframework scikit-learn\n"
 				+ "algorithm GradientBoostingRegressor\n"
 				+ "CrossValidation { numRepetitionCross 5 }\n"
-				+ "mean_absolute_percentage_error\n"
+				+ "mean_absolute_error\n"
 				+ "");
 		Assertions.assertNotNull(result);
 		EList<Resource.Diagnostic> errors = result.eResource().getErrors();
