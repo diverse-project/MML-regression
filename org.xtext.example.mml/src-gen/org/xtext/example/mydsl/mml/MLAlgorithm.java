@@ -3,6 +3,7 @@
  */
 package org.xtext.example.mydsl.mml;
 
+
 import org.eclipse.emf.ecore.EObject;
 
 /**
@@ -17,4 +18,7 @@ import org.eclipse.emf.ecore.EObject;
  */
 public interface MLAlgorithm extends EObject
 {
+	public String accept(AlgorithmVisitor<String> v);
+	
 } // MLAlgorithm
+

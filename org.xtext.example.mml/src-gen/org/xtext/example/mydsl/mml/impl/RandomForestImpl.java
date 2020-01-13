@@ -4,38 +4,39 @@
 package org.xtext.example.mydsl.mml.impl;
 
 import org.eclipse.emf.ecore.EClass;
-
+import org.xtext.example.mydsl.mml.AlgorithmVisitor;
 import org.xtext.example.mydsl.mml.MmlPackage;
 import org.xtext.example.mydsl.mml.RandomForest;
 
 /**
- * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>Random Forest</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> An implementation of the model object '<em><b>Random
+ * Forest</b></em>'. <!-- end-user-doc -->
  *
  * @generated
  */
-public class RandomForestImpl extends MLAlgorithmImpl implements RandomForest
-{
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  protected RandomForestImpl()
-  {
-    super();
-  }
+public class RandomForestImpl extends MLAlgorithmImpl implements RandomForest {
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	protected RandomForestImpl() {
+		super();
+	}
 
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  @Override
-  protected EClass eStaticClass()
-  {
-    return MmlPackage.Literals.RANDOM_FOREST;
-  }
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	@Override
+	protected EClass eStaticClass() {
+		return MmlPackage.Literals.RANDOM_FOREST;
+	}
 
-} //RandomForestImpl
+	@Override
+	public String accept(AlgorithmVisitor<String> v) {
+		return v.visit(this);
+	}
+
+} // RandomForestImpl

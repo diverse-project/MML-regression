@@ -4,38 +4,39 @@
 package org.xtext.example.mydsl.mml.impl;
 
 import org.eclipse.emf.ecore.EClass;
-
+import org.xtext.example.mydsl.mml.AlgorithmVisitor;
 import org.xtext.example.mydsl.mml.GTB;
 import org.xtext.example.mydsl.mml.MmlPackage;
 
 /**
- * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>GTB</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> An implementation of the model object
+ * '<em><b>GTB</b></em>'. <!-- end-user-doc -->
  *
  * @generated
  */
-public class GTBImpl extends MLAlgorithmImpl implements GTB
-{
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  protected GTBImpl()
-  {
-    super();
-  }
+public class GTBImpl extends MLAlgorithmImpl implements GTB {
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	protected GTBImpl() {
+		super();
+	}
 
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  @Override
-  protected EClass eStaticClass()
-  {
-    return MmlPackage.Literals.GTB;
-  }
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	@Override
+	protected EClass eStaticClass() {
+		return MmlPackage.Literals.GTB;
+	}
+	
+	@Override
+	public String accept(AlgorithmVisitor<String> v) {
+		return v.visit(this);
+	}
 
-} //GTBImpl
+} // GTBImpl

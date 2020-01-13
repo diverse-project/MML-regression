@@ -4,38 +4,39 @@
 package org.xtext.example.mydsl.mml.impl;
 
 import org.eclipse.emf.ecore.EClass;
-
+import org.xtext.example.mydsl.mml.AlgorithmVisitor;
 import org.xtext.example.mydsl.mml.MmlPackage;
 import org.xtext.example.mydsl.mml.SGD;
 
 /**
- * <!-- begin-user-doc -->
- * An implementation of the model object '<em><b>SGD</b></em>'.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> An implementation of the model object
+ * '<em><b>SGD</b></em>'. <!-- end-user-doc -->
  *
  * @generated
  */
-public class SGDImpl extends MLAlgorithmImpl implements SGD
-{
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  protected SGDImpl()
-  {
-    super();
-  }
+public class SGDImpl extends MLAlgorithmImpl implements SGD {
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	protected SGDImpl() {
+		super();
+	}
 
-  /**
-   * <!-- begin-user-doc -->
-   * <!-- end-user-doc -->
-   * @generated
-   */
-  @Override
-  protected EClass eStaticClass()
-  {
-    return MmlPackage.Literals.SGD;
-  }
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	@Override
+	protected EClass eStaticClass() {
+		return MmlPackage.Literals.SGD;
+	}
 
-} //SGDImpl
+	@Override
+	public String accept(AlgorithmVisitor<String> v) {
+		return v.visit(this);
+	}
+
+} // SGDImpl
