@@ -3,7 +3,10 @@
  */
 package org.xtext.example.mydsl.tests
 
+import com.google.common.io.Files
 import com.google.inject.Inject
+import java.io.File
+import java.util.List
 import org.eclipse.xtext.testing.InjectWith
 import org.eclipse.xtext.testing.extensions.InjectionExtension
 import org.eclipse.xtext.testing.util.ParseHelper
@@ -11,13 +14,16 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.^extension.ExtendWith
 import org.xtext.example.mydsl.mml.DataInput
-import org.xtext.example.mydsl.mml.MMLModel
-//import java.nio.file.Files
-import java.io.File
-import com.google.common.io.Files
-import org.xtext.example.mydsl.mml.MLChoiceAlgorithm
 import org.xtext.example.mydsl.mml.FrameworkLang
 import org.xtext.example.mydsl.mml.MLAlgorithm
+import org.xtext.example.mydsl.mml.MLChoiceAlgorithm
+import org.xtext.example.mydsl.mml.MMLModel
+import org.xtext.example.mydsl.mml.StratificationMethod
+import org.xtext.example.mydsl.mml.Validation
+import org.xtext.example.mydsl.mml.ValidationMetric
+import java.util.stream.DoubleStream.Builder
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
 @ExtendWith(InjectionExtension)
 @InjectWith(MmlInjectorProvider)
@@ -56,7 +62,18 @@ class MmlParsingTest {
 		''')
 		val DataInput dataInput = result.input;
 		val String fileLocation = dataInput.filelocation;
-		val String validationMetric = "mean_squared_error";
+		
+		//TrainningTest
+		val Validation validation = result.validation;
+		val StratificationMethod stratification = validation.stratification;
+		//Metric
+		val List<ValidationMetric> metrics = validation.metric;
+		
+		//TrainningPercentage
+		val double percentageTraining = stratification.number as double / 100.0;
+		val double percentageTest = 1.0 - percentageTraining;
+		
+		val String validationMetric = metrics.get(0).literal.toString();
 		val String trainning = "train_test_split";
 		
 		var String pythonImport = "import pandas as pd\n";
@@ -69,11 +86,12 @@ class MmlParsingTest {
 		val MLChoiceAlgorithm mlChoiceAlgorithm = result.algorithm;
 		val FrameworkLang frameworklang = mlChoiceAlgorithm.framework;
 		val MLAlgorithm mlAlgorithm = mlChoiceAlgorithm.algorithm;
+		
 		val String SCIKIT = "scikit-learn";
 		val String test = "";
 		val String pythonAlgorithm = "DecisionTree";
-		val double percentageTraining = 0.7;
-		val double percentageTest = 1 - 0.7;
+		
+		
 		/*
 		if (parsingInstruction != null) {
 			System.err.println("parsing instruction..." + parsingInstruction);
@@ -89,25 +107,27 @@ class MmlParsingTest {
 		pandasCode += "\nX_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size) \n";
 		pandasCode += "\nclf = tree.DecisionTreeRegressor() \n";
 		pandasCode += "\nclf.fit(X_train, y_train) \n";
-		pandasCode += "\naccuracy = mean_squared_error(y_test, clf.predict(X_test)) \n";
+		pandasCode += "\naccuracy = "+validationMetric+"(y_test, clf.predict(X_test)) \n";
 		pandasCode += "\nprint(accuracy) \n";
 		
-		Files.write(pandasCode.getBytes(), new File("/home/barry/Bureau/python/tuto/mml.py"));
+		Files.write(pandasCode.getBytes(), new File("mml.py"));
 		// end of Python generation
 		/*
 		 * Calling generated Python script (basic solution through systems call)
 		 * we assume that "python" is in the path
+		 * 
+		 * virtualenv -p python3 venv
+		 * 
+		 * venv/bin/pip install -r requirements.txt
 		 */
-		/*
-		Process
-		p = Runtime.getRuntime().exec("python mml.py");
-		BufferedReader
-		in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-		String
-		line;
-		while ((line = in.readLine()) != null) {
+		
+		val Process	p = Runtime.getRuntime().exec("python mml.py");
+		val BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+		var String line;
+		
+		while (( line = in.readLine()) !== null) {
 			System.out.println(line);
-		}*/
+		}
 	/*
 	private String mkValueInSingleQuote
 	(String val){

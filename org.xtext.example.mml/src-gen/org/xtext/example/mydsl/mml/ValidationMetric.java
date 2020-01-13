@@ -20,6 +20,7 @@ import org.eclipse.emf.common.util.Enumerator;
  */
 public enum ValidationMetric implements Enumerator
 {
+	
   /**
    * The '<em><b>MSE</b></em>' literal object.
    * <!-- begin-user-doc -->

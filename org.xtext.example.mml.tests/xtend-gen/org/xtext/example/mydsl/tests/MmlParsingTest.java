@@ -5,7 +5,11 @@ package org.xtext.example.mydsl.tests;
 
 import com.google.common.io.Files;
 import com.google.inject.Inject;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.List;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtend2.lib.StringConcatenation;
@@ -22,6 +26,9 @@ import org.xtext.example.mydsl.mml.FrameworkLang;
 import org.xtext.example.mydsl.mml.MLAlgorithm;
 import org.xtext.example.mydsl.mml.MLChoiceAlgorithm;
 import org.xtext.example.mydsl.mml.MMLModel;
+import org.xtext.example.mydsl.mml.StratificationMethod;
+import org.xtext.example.mydsl.mml.Validation;
+import org.xtext.example.mydsl.mml.ValidationMetric;
 import org.xtext.example.mydsl.tests.MmlInjectorProvider;
 
 @ExtendWith(InjectionExtension.class)
@@ -97,7 +104,13 @@ public class MmlParsingTest {
       final MMLModel result = this.parseHelper.parse(_builder);
       final DataInput dataInput = result.getInput();
       final String fileLocation = dataInput.getFilelocation();
-      final String validationMetric = "mean_squared_error";
+      final Validation validation = result.getValidation();
+      final StratificationMethod stratification = validation.getStratification();
+      final List<ValidationMetric> metrics = validation.getMetric();
+      int _number = stratification.getNumber();
+      final double percentageTraining = (((double) _number) / 100.0);
+      final double percentageTest = (1.0 - percentageTraining);
+      final String validationMetric = metrics.get(0).getLiteral().toString();
       final String trainning = "train_test_split";
       String pythonImport = "import pandas as pd\n";
       String _pythonImport = pythonImport;
@@ -114,8 +127,6 @@ public class MmlParsingTest {
       final String SCIKIT = "scikit-learn";
       final String test = "";
       final String pythonAlgorithm = "DecisionTree";
-      final double percentageTraining = 0.7;
-      final double percentageTest = (1 - 0.7);
       final String csvReading = (("mml_data = pd.read_csv(\"" + fileLocation) + "\")");
       String pandasCode = (pythonImport + csvReading);
       final String column = "column = mml_data.columns[-1]";
@@ -132,12 +143,20 @@ public class MmlParsingTest {
       String _pandasCode_5 = pandasCode;
       pandasCode = (_pandasCode_5 + "\nclf.fit(X_train, y_train) \n");
       String _pandasCode_6 = pandasCode;
-      pandasCode = (_pandasCode_6 + "\naccuracy = mean_squared_error(y_test, clf.predict(X_test)) \n");
+      pandasCode = (_pandasCode_6 + (("\naccuracy = " + validationMetric) + "(y_test, clf.predict(X_test)) \n"));
       String _pandasCode_7 = pandasCode;
       pandasCode = (_pandasCode_7 + "\nprint(accuracy) \n");
       byte[] _bytes = pandasCode.getBytes();
-      File _file = new File("/home/barry/Bureau/python/tuto/mml.py");
+      File _file = new File("mml.py");
       Files.write(_bytes, _file);
+      final Process p = Runtime.getRuntime().exec("python mml.py");
+      InputStream _inputStream = p.getInputStream();
+      InputStreamReader _inputStreamReader = new InputStreamReader(_inputStream);
+      final BufferedReader in = new BufferedReader(_inputStreamReader);
+      String line = null;
+      while (((line = in.readLine()) != null)) {
+        System.out.println(line);
+      }
     } catch (Throwable _e) {
       throw Exceptions.sneakyThrow(_e);
     }
