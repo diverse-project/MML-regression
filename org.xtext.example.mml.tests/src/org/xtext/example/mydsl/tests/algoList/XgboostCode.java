@@ -40,21 +40,21 @@ public class XgboostCode extends CodeGenerator {
 
 			if (valC.isEmpty()) {
 				if (!kernel.isEmpty()) {
-					algorithm.append("xgb_model =SVR(" + kernel + ",epsilon=0.2)\n");
+					algorithm.append("xgb_model = SVR(" + kernel + ",epsilon=0.2)\n");
 				} else {
-					algorithm.append("xgb_model =SVR(epsilon=0.2)\n");
+					algorithm.append("xgb_model = SVR(epsilon=0.2)\n");
 				}
 			} else {
 				if (!kernel.isEmpty()) {
-					algorithm.append("xgb_model =SVR(" + valC + "," + kernel + ",epsilon=0.2)\n");
+					algorithm.append("xgb_model = SVR(" + valC + "," + kernel + ",epsilon=0.2)\n");
 
 				} else {
-					algorithm.append("xgb_model =SVR(" + valC + ",epsilon=0.2)\n");
+					algorithm.append("xgb_model = SVR(" + valC + ",epsilon=0.2)\n");
 				}
 			}
 			// algorithm.append("xgb_model.fit(X, y)\n");
 		} else if (MLalgo instanceof RandomForest) {
-			algorithm.append("xgb_model = xgb.XGBRFRegressor()\n");
+			algorithm.append("xgb_model = xgb.XGBRegressor()\n");
 		} else if (MLalgo instanceof DT) {
 			DT dt = (DT) algo.getAlgorithm();
 			String max_depth = (dt.getMax_depth() == 0) ? "" : "max_depth=" + dt.getMax_depth();
@@ -126,6 +126,7 @@ public class XgboostCode extends CodeGenerator {
 			validation.append("accuracy = cross_validate(xgb_model, X, y, cv=" + crossVal.getNumber() + ")\n");
 			validation.append("y_pred = cross_val_predict(xgb_model, X, y, cv=" + crossVal.getNumber() + ")\n");
 			validation.append("y_test = y\n");
+			validation.append("print(\"accuracy : \" + str(accuracy))\n");
 		} else {
 			TrainingTest training = (TrainingTest) stratification;
 			imports.insert(0, "from sklearn.model_selection import train_test_split\n");
@@ -136,7 +137,7 @@ public class XgboostCode extends CodeGenerator {
 		}
 		for (ValidationMetric metric : result.getValidation().getMetric()) {
 			imports.insert(0, "from sklearn.metrics import " + metric.getLiteral() + "\n");
-			validation.append("print(" + metric.getLiteral() + "(y_test, y_pred))\n");
+			validation.append("print(\'" + metric.getLiteral() + " : \' + str(" + metric.getLiteral() + "(y_test, y_pred)))\n");
 		}
 		validation.append("\n");
 	}

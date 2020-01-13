@@ -19,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.xtext.example.mydsl.mml.CSVParsingConfiguration;
+import org.xtext.example.mydsl.mml.CrossValidation;
 import org.xtext.example.mydsl.mml.DT;
 import org.xtext.example.mydsl.mml.DataInput;
 import org.xtext.example.mydsl.mml.GTB;
@@ -28,6 +29,7 @@ import org.xtext.example.mydsl.mml.MMLModel;
 import org.xtext.example.mydsl.mml.RandomForest;
 import org.xtext.example.mydsl.mml.SGD;
 import org.xtext.example.mydsl.mml.SVR;
+import org.xtext.example.mydsl.mml.StratificationMethod;
 import org.xtext.example.mydsl.tests.algoList.PythonCode;
 import org.xtext.example.mydsl.tests.algoList.RCode;
 import org.xtext.example.mydsl.tests.algoList.XgboostCode;
@@ -95,26 +97,28 @@ public class MmlParsingJavaTest {
 
 		CodeGenerator gen = null;
 
+		String stratificationName = result.getValidation().getStratification().eClass().getName();
 		for (MLChoiceAlgorithm algo : result.getAlgorithms()) {
 			long start = System.nanoTime();
 
 			filename = algo.getFramework().getName();
+
 			switch (filename) {
 			case "SCIKIT":
 				gen = new PythonCode();
-				filename += "_" + getName(algo.getAlgorithm()) + ".py";
+				filename += String.format("_%s_%s.py", stratificationName, getName(algo.getAlgorithm()));
 				break;
 			case "XGBoost":
 				gen = new XgboostCode();
-				filename += "_" + getName(algo.getAlgorithm()) + ".py";
+				filename += String.format("_%s_%s.py", stratificationName, getName(algo.getAlgorithm()));
 				break;
 			case "R":
 				gen = new RCode();
-				filename += "_" + getName(algo.getAlgorithm()) + ".R";
+				filename += String.format("_%s_%s.R", stratificationName, getName(algo.getAlgorithm()));
 				break;
 			default:
 				System.err.println(String.format("\"%s\" is not implemented yet.", filename));
-				filename += algo.getFramework().getName() + ".unimplementedformat";
+				filename += String.format("_%s_%s.unimplementedformat", stratificationName, getName(algo.getAlgorithm()));;
 				break;
 			}
 			
@@ -129,10 +133,10 @@ public class MmlParsingJavaTest {
 
 		for (Map.Entry<String, StringBuilder> entry : files_code.entrySet()) {
 			File file = new File(entry.getKey());
+			Files.write(entry.getValue().toString().getBytes(), file);
 			file.setExecutable(true, false);
 			file.setReadable(true, false);
 			file.setWritable(true, false);
-			Files.write(entry.getValue().toString().getBytes(), file);
 		}
 		// end of Python generation
 
