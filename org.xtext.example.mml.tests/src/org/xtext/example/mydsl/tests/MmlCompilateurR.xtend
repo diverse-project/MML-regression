@@ -82,6 +82,6 @@ class MmlCompilateurR {
 		View(result)
 		#mse(testY, result)
 		*/
-		Files.write(rasCode.getBytes(), new File("mml.py"));
+		Files.write(rasCode.getBytes(), new File("mml.R"));
 	}
 }
