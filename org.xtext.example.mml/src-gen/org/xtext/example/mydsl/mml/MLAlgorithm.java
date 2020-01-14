@@ -4,6 +4,9 @@
 package org.xtext.example.mydsl.mml;
 
 
+import java.util.List;
+import java.util.Map;
+
 import org.eclipse.emf.ecore.EObject;
 
 /**
@@ -18,7 +21,7 @@ import org.eclipse.emf.ecore.EObject;
  */
 public interface MLAlgorithm extends EObject
 {
-	public String accept(AlgorithmVisitor<String> v);
+	public Map<String,List<String>> accept(AlgorithmVisitor<Map<String,List<String>>> v);
 	
 } // MLAlgorithm
 

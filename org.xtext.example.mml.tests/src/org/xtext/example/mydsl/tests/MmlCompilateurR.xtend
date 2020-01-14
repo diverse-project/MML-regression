@@ -22,6 +22,9 @@ import org.xtext.example.mydsl.mml.RandomForest
 import org.xtext.example.mydsl.mml.SGD
 import org.xtext.example.mydsl.mml.GTB
 import org.xtext.example.mydsl.mml.impl.AlgorithmVisitorImpl
+import java.util.Map
+import java.util.List
+import java.util.HashMap
 
 @ExtendWith(InjectionExtension)
 @InjectWith(MmlInjectorProvider)
@@ -50,7 +53,7 @@ class MmlCompilateurR {
 		val String csv_separator = DEFAULT_COLUMN_SEPARATOR;
 		var String rasCode = "read.csv(\"" + fileLocation + ",head = TRUE, sep=\"" + csv_separator + "\"\")->df" +
 			"\n" + importDPLYR + "\n";
-		val MLChoiceAlgorithm algorithm = result.algorithm
+		val MLChoiceAlgorithm MLCAlgorithm = result.algorithm
 
 		val RFormula formula = result.formula;
 		if (formula === null) {
@@ -66,8 +69,8 @@ class MmlCompilateurR {
 			}
 		}
 
-		val MLAlgorithm mlA = algorithm.algorithm;
-		mlA.accept(new AlgorithmVisitorImpl());
+		val MLAlgorithm mlA = MLCAlgorithm.algorithm;
+		val Map<String,List<String>> map = mlA.accept(new AlgorithmVisitorImpl("R"));
 		//visitor.visit(mlA);		
 
 		/*

@@ -3,6 +3,9 @@
  */
 package org.xtext.example.mydsl.mml.impl;
 
+import java.util.List;
+import java.util.Map;
+
 import org.eclipse.emf.ecore.EClass;
 import org.xtext.example.mydsl.mml.AlgorithmVisitor;
 import org.xtext.example.mydsl.mml.GTB;
@@ -35,7 +38,7 @@ public class GTBImpl extends MLAlgorithmImpl implements GTB {
 	}
 	
 	@Override
-	public String accept(AlgorithmVisitor<String> v) {
+	public Map<String,List<String>> accept(AlgorithmVisitor<Map<String,List<String>>> v) {
 		return v.visit(this);
 	}
 

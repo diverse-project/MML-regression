@@ -3,6 +3,9 @@
  */
 package org.xtext.example.mydsl.mml.impl;
 
+import java.util.List;
+import java.util.Map;
+
 import org.eclipse.emf.ecore.EClass;
 
 import org.eclipse.emf.ecore.impl.MinimalEObjectImpl;
@@ -37,8 +40,8 @@ public class MLAlgorithmImpl extends MinimalEObjectImpl.Container implements MLA
 	}
 
 	@Override
-	public String accept(AlgorithmVisitor<String> v) {
-		return "MLAlgorithmImpl";
+	public Map<String,List<String>> accept(AlgorithmVisitor<Map<String,List<String>>> v) {
+		return null;
 	}
 	
 
