@@ -23,3 +23,4 @@ print("accuracy : " + str(accuracy))
 print('mean_squared_error : ' + str(mean_squared_error(y_test, y_pred)))
 print('mean_absolute_error : ' + str(mean_absolute_error(y_test, y_pred)))
 print('median_absolute_error : ' + str(median_absolute_error(y_test, y_pred)))
+

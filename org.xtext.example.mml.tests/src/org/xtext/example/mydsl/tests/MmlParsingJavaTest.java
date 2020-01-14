@@ -19,7 +19,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.xtext.example.mydsl.mml.CSVParsingConfiguration;
-import org.xtext.example.mydsl.mml.CrossValidation;
 import org.xtext.example.mydsl.mml.DT;
 import org.xtext.example.mydsl.mml.DataInput;
 import org.xtext.example.mydsl.mml.GTB;
@@ -29,12 +28,9 @@ import org.xtext.example.mydsl.mml.MMLModel;
 import org.xtext.example.mydsl.mml.RandomForest;
 import org.xtext.example.mydsl.mml.SGD;
 import org.xtext.example.mydsl.mml.SVR;
-import org.xtext.example.mydsl.mml.StratificationMethod;
 import org.xtext.example.mydsl.tests.algoList.PythonCode;
-import org.xtext.example.mydsl.tests.algoList.RCode;
 import org.xtext.example.mydsl.tests.algoList.XgboostCode;
 import org.xtext.example.mydsl.tests.templateMethod.CodeGenerator;
-
 import com.google.common.io.Files;
 import com.google.inject.Inject;
 
@@ -111,10 +107,6 @@ public class MmlParsingJavaTest {
 			case "XGBoost":
 				gen = new XgboostCode();
 				filename += String.format("_%s_%s.py", stratificationName, getName(algo.getAlgorithm()));
-				break;
-			case "R":
-				gen = new RCode();
-				filename += String.format("_%s_%s.R", stratificationName, getName(algo.getAlgorithm()));
 				break;
 			default:
 				System.err.println(String.format("\"%s\" is not implemented yet.", filename));
