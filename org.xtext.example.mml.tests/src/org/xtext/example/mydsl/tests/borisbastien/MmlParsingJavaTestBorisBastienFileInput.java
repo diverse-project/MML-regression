@@ -98,7 +98,6 @@ public class MmlParsingJavaTestBorisBastienFileInput {
 		}
 		
 		Files.write(code.getBytes(), new File("mml.py"));
-		// end of Python generation
 		
 		
 		/*
@@ -116,21 +115,124 @@ public class MmlParsingJavaTestBorisBastienFileInput {
 		
 	}
 
-	private String compileXG(RFormula formule, String code, MLChoiceAlgorithm mlchoicealgo, Validation validation, String code2) {
+	private String compileXG(RFormula formule, String fileLocation, MLChoiceAlgorithm mlchoicealgo, Validation validation, String csv_separator) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	private String compileR(RFormula formule, String code, MLChoiceAlgorithm mlchoicealgo, Validation validation, String code2) {
-		// TODO Auto-generated method stub
-		return null;
+	private String compileR(RFormula formule, String fileLocation, MLChoiceAlgorithm mlchoicealgo, Validation validation, String csv_separator) {
+		//TODO adapt for R using RStudio
+		//TODO R import needed?
+		String rImport= "library(data.table)\n";
+		//formule : recuperation des champs du csv à garder
+		String csvSplit="";
+		if(formule!=null) {
+			XFormula xformule = formule.getPredictors();
+			FormulaItem formuleItem = formule.getPredictive();
+			String items="";
+			if(xformule instanceof PredictorVariables) {
+				List<FormulaItem> predictorItems = ((PredictorVariables) xformule).getVars();
+				StringBuilder sb = new StringBuilder();
+				if(predictorItems!=null && !predictorItems.isEmpty()) {
+					if(predictorItems.get(0).getColName() != null) {
+						for(FormulaItem item : predictorItems) {
+							if(predictorItems.get(0)!=item)sb.append(',');
+							sb.append(mkValueInDoubleQuote(item.getColName()));
+						}
+					}else {
+						for(FormulaItem item : predictorItems) {
+							if(predictorItems.get(0)!=item)sb.append(',');
+							sb.append(item.getColumn());
+						}
+					}
+						
+				}
+				items = sb.toString(); 						
+				
+				csvSplit+="X <- read.csv(file="+mkValueInDoubleQuote(fileLocation)+", select=c("+items+") ,header=TRUE, sep="+mkValueInDoubleQuote(csv_separator)+")\n";
+				csvSplit+="y <- read.csv(file="+mkValueInDoubleQuote(fileLocation)+", select=c("+formuleItem.getColumn()+") ,header=TRUE, sep="+mkValueInDoubleQuote(csv_separator)+")\\n";
+			}else if(xformule instanceof AllVariables) {
+				csvSplit+="myFile <- read.csv(file="+mkValueInDoubleQuote(fileLocation)+",header=TRUE, sep="+mkValueInDoubleQuote(csv_separator)+")\n";
+				csvSplit+="h<-head(myFile)\nlastcol <- tail(h, n=1)\n";
+				csvSplit+="X <- read.csv(file="+mkValueInDoubleQuote(fileLocation)+", drop=c(lastcol) ,header=TRUE, sep="+mkValueInDoubleQuote(csv_separator)+")\n";
+				csvSplit+="y <- read.csv(file="+mkValueInDoubleQuote(fileLocation)+", select=c(lastcol) ,header=TRUE, sep="+mkValueInDoubleQuote(csv_separator)+")\n";
+			}
+		}else {
+			//if formule is null, all the fields are used to predict the last one
+			csvSplit+="myFile <- read.csv(file="+mkValueInDoubleQuote(fileLocation)+",header=TRUE, sep="+mkValueInDoubleQuote(csv_separator)+")\n";
+			csvSplit+="h<-head(myFile)\nlastcol <- tail(h, n=1)\n";
+			csvSplit+="X <- read.csv(file="+mkValueInDoubleQuote(fileLocation)+", drop=c(lastcol) ,header=TRUE, sep="+mkValueInDoubleQuote(csv_separator)+")\n";
+			csvSplit+="y <- read.csv(file="+mkValueInDoubleQuote(fileLocation)+", select=c(lastcol) ,header=TRUE, sep="+mkValueInDoubleQuote(csv_separator)+")\n";
+		}
+		
+		//algo
+		MLAlgorithm algo = mlchoicealgo.getAlgorithm();
+		String algoDeclaration="";
+		if(algo instanceof SVR) {
+			//TODO complete with same template as DT below
+		}else if(algo instanceof DT) { //DecisionTree
+			rImport+="from sklearn import tree\n";
+			algoDeclaration = "clf = tree.DecisionTreeRegressor()\n";
+		}//TODO other algos
+		
+		//validation
+		StratificationMethod stratMethod = validation.getStratification();
+		EList<ValidationMetric> validMetrics = validation.getMetric();
+		int number = stratMethod.getNumber();
+		String validationPrint="";
+		validationPrint += "test_size = "+number+"\n";
+		if(stratMethod instanceof CrossValidation){
+			//TODO equivalent à ci-dessous
+		}else if(stratMethod instanceof TrainingTest){
+			rImport+="from sklearn.model_selection import train_test_split\n";
+			validationPrint+="X_train, X_test, y_train, y_test = train_test_split(X, y, test_size="+number+")"; 
+		}
+		validationPrint+="\n";
+		
+		//ValidationMetric
+		String metrics="";
+		String metricsResult="";
+		for(int i=0;i<validMetrics.size();i++) {
+			String metric = "";
+			switch(validMetrics.get(i).name()) {
+				case "MSE":
+					rImport+="from sklearn.metrics import mean_squared_error\n";
+					metric+="accuracy"+i+"=mean_squared_error(y_test, clf.predict(X_test))";
+					break;
+				case "MAE":
+					rImport+="from sklearn.metrics import mean_absolute_error\n";
+					metric+="accuracy"+i+"=mean_absolute_error(y_test, clf.predict(X_test))";
+					break;
+				case "MAPE":
+					rImport+="from sklearn.utils import check_arrays\n";
+					metric+="y_test, y_pred = check_arrays(y_test, clf.predict(X_test))";
+					metric+="accuracy"+i+"=np.mean(np.abs((y_test - y_pred) / y_test)) * 100";
+					break;
+				default:
+					break;
+			}
+			metricsResult+="print(accuracy"+i+")\n";
+			metrics+=metric+"\n";
+		}
+		
+		String pandasCode = rImport + csvSplit + algoDeclaration+ validationPrint+ metrics+metricsResult;
+		
+		return pandasCode;
 	}
 
+<<<<<<< HEAD
 	@SuppressWarnings("unused")
+=======
+	
+	
+	
+	
+	
+>>>>>>> branch 'master' of https://github.com/Little6ix/MML-regression.git
 	private String compileScikit(RFormula formule, String fileLocation, MLChoiceAlgorithm mlchoicealgo, Validation validation, String csv_separator) {
 		
 		String pythonImport = "import pandas as pd\n"; 
-		String csvReading = "mml_data = pd.read_csv(" + mkValueInSingleQuote(fileLocation) + ", sep=" + mkValueInSingleQuote(csv_separator) + ")\n";						
+		String csvReading = "df = pd.read_csv(" + mkValueInSingleQuote(fileLocation) + ", sep=" + mkValueInSingleQuote(csv_separator) + ")\n";						
 		
 		//formule : recuperation des champs du csv à garder
 		String csvSplit="";
@@ -253,8 +355,6 @@ public class MmlParsingJavaTestBorisBastienFileInput {
 		}
 		
 		String pandasCode = pythonImport + csvReading + csvSplit + algoDeclaration+ validationPrint+ metrics+metricsResult;
-		
-		pandasCode += "\nprint (mml_data)\n";
 		return pandasCode;
 	}
 
@@ -265,6 +365,10 @@ public class MmlParsingJavaTestBorisBastienFileInput {
 
 	private String mkValueInSingleQuote(String val) {
 		return "'" + val + "'";
+	}
+	
+	private String mkValueInDoubleQuote(String val) {
+		return "\"" + val + "\"";
 	}
 
 

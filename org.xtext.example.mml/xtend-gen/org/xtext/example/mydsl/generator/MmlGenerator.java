@@ -3,10 +3,31 @@
  */
 package org.xtext.example.mydsl.generator;
 
+import com.google.common.base.Objects;
+import com.google.common.collect.Iterators;
+import java.util.Iterator;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtext.generator.AbstractGenerator;
 import org.eclipse.xtext.generator.IFileSystemAccess2;
 import org.eclipse.xtext.generator.IGeneratorContext;
+import org.xtext.example.mydsl.mml.AllVariables;
+import org.xtext.example.mydsl.mml.CSVParsingConfiguration;
+import org.xtext.example.mydsl.mml.CrossValidation;
+import org.xtext.example.mydsl.mml.DT;
+import org.xtext.example.mydsl.mml.DataInput;
+import org.xtext.example.mydsl.mml.FormulaItem;
+import org.xtext.example.mydsl.mml.FrameworkLang;
+import org.xtext.example.mydsl.mml.MLAlgorithm;
+import org.xtext.example.mydsl.mml.MLChoiceAlgorithm;
+import org.xtext.example.mydsl.mml.PredictorVariables;
+import org.xtext.example.mydsl.mml.RFormula;
+import org.xtext.example.mydsl.mml.SVR;
+import org.xtext.example.mydsl.mml.StratificationMethod;
+import org.xtext.example.mydsl.mml.TrainingTest;
+import org.xtext.example.mydsl.mml.Validation;
+import org.xtext.example.mydsl.mml.ValidationMetric;
+import org.xtext.example.mydsl.mml.XFormula;
 
 /**
  * Generates code from your model files on save.
@@ -17,5 +38,199 @@ import org.eclipse.xtext.generator.IGeneratorContext;
 public class MmlGenerator extends AbstractGenerator {
   @Override
   public void doGenerate(final Resource resource, final IFileSystemAccess2 fsa, final IGeneratorContext context) {
+    final Iterator<DataInput> dataInputIterator = Iterators.<DataInput>filter(resource.getAllContents(), DataInput.class);
+    final DataInput dataInput = dataInputIterator.next();
+    final String fileLocation = dataInput.getFilelocation();
+    final Iterator<MLChoiceAlgorithm> mlAlgoIterator = Iterators.<MLChoiceAlgorithm>filter(resource.getAllContents(), MLChoiceAlgorithm.class);
+    final MLChoiceAlgorithm mlchoicealgo = mlAlgoIterator.next();
+    final Iterator<Validation> validationIterator = Iterators.<Validation>filter(resource.getAllContents(), Validation.class);
+    final Validation validation = validationIterator.next();
+    final Iterator<RFormula> formuleIterator = Iterators.<RFormula>filter(resource.getAllContents(), RFormula.class);
+    RFormula _xifexpression = null;
+    boolean _hasNext = formuleIterator.hasNext();
+    if (_hasNext) {
+      _xifexpression = formuleIterator.next();
+    }
+    final RFormula formule = _xifexpression;
+    final String DEFAULT_COLUMN_SEPARATOR = ",";
+    String csv_separator = DEFAULT_COLUMN_SEPARATOR;
+    final CSVParsingConfiguration parsingInstruction = dataInput.getParsingInstruction();
+    if ((parsingInstruction != null)) {
+      csv_separator = parsingInstruction.getSep().toString();
+    }
+    final FrameworkLang framework = mlchoicealgo.getFramework();
+    String code = "";
+    int _value = framework.getValue();
+    switch (_value) {
+      case FrameworkLang.JAVA_WEKA_VALUE:
+        code = this.compileWeka(formule, fileLocation, mlchoicealgo, validation, csv_separator);
+        break;
+      case FrameworkLang.SCIKIT_VALUE:
+        code = this.compileScikit(formule, fileLocation, mlchoicealgo, validation, csv_separator);
+        break;
+      case FrameworkLang.R_VALUE:
+        code = this.compileR(formule, fileLocation, mlchoicealgo, validation, csv_separator);
+        break;
+      case FrameworkLang.XG_BOOST_VALUE:
+        code = this.compileXG(formule, fileLocation, mlchoicealgo, validation, csv_separator);
+        break;
+      default:
+        code = "";
+        break;
+    }
+    fsa.generateFile(
+      "test.txt", code);
+  }
+  
+  public String compileWeka(final RFormula formule, final String fileLocation, final MLChoiceAlgorithm mlchoicealgo, final Validation validation, final String csv_separator) {
+    return null;
+  }
+  
+  public String compileXG(final RFormula formule, final String fileLocation, final MLChoiceAlgorithm mlchoicealgo, final Validation validation, final String csv_separator) {
+    return null;
+  }
+  
+  public String compileR(final RFormula formule, final String fileLocation, final MLChoiceAlgorithm mlchoicealgo, final Validation validation, final String csv_separator) {
+    return null;
+  }
+  
+  public String compileScikit(final RFormula formule, final String fileLocation, final MLChoiceAlgorithm mlchoicealgo, final Validation validation, final String csv_separator) {
+    String pythonImport = "import pandas as pd\n";
+    String _mkValueInSingleQuote = this.mkValueInSingleQuote(fileLocation);
+    String _plus = ("df = pd.read_csv(" + _mkValueInSingleQuote);
+    String _plus_1 = (_plus + ", sep=");
+    String _mkValueInSingleQuote_1 = this.mkValueInSingleQuote(csv_separator);
+    String _plus_2 = (_plus_1 + _mkValueInSingleQuote_1);
+    String csvReading = (_plus_2 + ")\n");
+    String csvSplit = "";
+    if ((formule != null)) {
+      XFormula xformule = formule.getPredictors();
+      FormulaItem formuleItem = formule.getPredictive();
+      String items = "";
+      if ((xformule instanceof PredictorVariables)) {
+        EList<FormulaItem> predictorItems = ((PredictorVariables)xformule).getVars();
+        StringBuilder sb = new StringBuilder();
+        if (((predictorItems != null) && (!predictorItems.isEmpty()))) {
+          String _colName = predictorItems.get(0).getColName();
+          boolean _tripleNotEquals = (_colName != null);
+          if (_tripleNotEquals) {
+            for (final FormulaItem item : predictorItems) {
+              {
+                FormulaItem _get = predictorItems.get(0);
+                boolean _notEquals = (!Objects.equal(_get, item));
+                if (_notEquals) {
+                  sb.append(",");
+                }
+                String _colName_1 = item.getColName();
+                String _plus_3 = ("\'" + _colName_1);
+                String _plus_4 = (_plus_3 + "\'");
+                sb.append(_plus_4);
+              }
+            }
+          } else {
+            for (final FormulaItem item_1 : predictorItems) {
+              {
+                FormulaItem _get = predictorItems.get(0);
+                boolean _notEquals = (!Objects.equal(_get, item_1));
+                if (_notEquals) {
+                  sb.append(",");
+                }
+                sb.append(item_1.getColumn());
+              }
+            }
+          }
+        }
+        items = sb.toString();
+        String _csvSplit = csvSplit;
+        csvSplit = (_csvSplit + (("X = df[df.columns.difference([" + items) + "])]\n"));
+        String _csvSplit_1 = csvSplit;
+        int _column = formuleItem.getColumn();
+        String _plus_3 = ("y = df[columns = [df.columns[" + Integer.valueOf(_column));
+        String _plus_4 = (_plus_3 + "]]]\n");
+        csvSplit = (_csvSplit_1 + _plus_4);
+      } else {
+        if ((xformule instanceof AllVariables)) {
+          String _csvSplit_2 = csvSplit;
+          csvSplit = (_csvSplit_2 + "X = df.drop(columns = [df.columns[-1]])\n");
+          String _csvSplit_3 = csvSplit;
+          csvSplit = (_csvSplit_3 + "y = df[columns = [df.columns[-1]]]\n");
+        }
+      }
+    } else {
+      String _csvSplit_4 = csvSplit;
+      csvSplit = (_csvSplit_4 + "X = df.drop(columns = [df.columns[-1]])\n");
+      String _csvSplit_5 = csvSplit;
+      csvSplit = (_csvSplit_5 + "y = df[columns = [df.columns[-1]]]\n");
+    }
+    MLAlgorithm algo = mlchoicealgo.getAlgorithm();
+    String algoDeclaration = "";
+    if ((algo instanceof SVR)) {
+    } else {
+      if ((algo instanceof DT)) {
+        String _pythonImport = pythonImport;
+        pythonImport = (_pythonImport + "from sklearn import tree\n");
+        algoDeclaration = "clf = tree.DecisionTreeRegressor()\n";
+      }
+    }
+    StratificationMethod stratMethod = validation.getStratification();
+    EList<ValidationMetric> validMetrics = validation.getMetric();
+    int number = stratMethod.getNumber();
+    String validationPrint = "";
+    String _validationPrint = validationPrint;
+    validationPrint = (_validationPrint + (("test_size = " + Integer.valueOf(number)) + "\n"));
+    if ((stratMethod instanceof CrossValidation)) {
+    } else {
+      if ((stratMethod instanceof TrainingTest)) {
+        String _pythonImport_1 = pythonImport;
+        pythonImport = (_pythonImport_1 + "from sklearn.model_selection import train_test_split\n");
+        String _validationPrint_1 = validationPrint;
+        validationPrint = (_validationPrint_1 + (("X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=" + Integer.valueOf(number)) + ")"));
+      }
+    }
+    String _validationPrint_2 = validationPrint;
+    validationPrint = (_validationPrint_2 + "\n");
+    String metrics = "";
+    String metricsResult = "";
+    for (int i = 0; (i < validMetrics.size()); i++) {
+      {
+        String metric = "";
+        String _name = validMetrics.get(i).name();
+        if (_name != null) {
+          switch (_name) {
+            case "MSE":
+              String _metric = metric;
+              metric = (_metric + (("accuracy" + Integer.valueOf(i)) + "=mean_squared_error(y_test, clf.predict(X_test))"));
+              break;
+            case "MAE":
+              String _pythonImport_2 = pythonImport;
+              pythonImport = (_pythonImport_2 + "from sklearn.metrics import mean_absolute_error\n");
+              break;
+            case "MAPE":
+              String _metric_1 = metric;
+              metric = (_metric_1 + "y_test, y_pred = check_arrays(y_test, clf.predict(X_test))");
+              break;
+            default:
+              metric = "";
+              break;
+          }
+        } else {
+          metric = "";
+        }
+        String _metricsResult = metricsResult;
+        metricsResult = (_metricsResult + (("print(accuracy" + Integer.valueOf(i)) + ")\n"));
+        String _metrics = metrics;
+        metrics = (_metrics + (metric + "\n"));
+      }
+    }
+    String pandasCode = ((((((pythonImport + csvReading) + csvSplit) + algoDeclaration) + validationPrint) + metrics) + metricsResult);
+    return pandasCode;
+  }
+  
+  public String mkValueInSingleQuote(final String value) {
+    return (("\'" + value) + "\'");
+  }
+  
+  public String mkValueInDoubleQuote(final String value) {
+    return (("\"" + value) + "\"");
   }
 }
