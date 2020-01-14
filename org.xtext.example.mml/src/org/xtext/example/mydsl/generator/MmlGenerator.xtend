@@ -40,6 +40,7 @@ class MmlGenerator extends AbstractGenerator {
 		
 		val framework = mlchoicealgo.getFramework
 		var code=""
+		var type=""
 		
 		switch(framework.getValue()) {
 			case FrameworkLang.JAVA_WEKA_VALUE:
@@ -52,8 +53,15 @@ class MmlGenerator extends AbstractGenerator {
 				code=compileXG(formule, fileLocation, mlchoicealgo, validation, csv_separator)
 			default:code=""
 		}
+		switch(framework.getValue()) {
+			case FrameworkLang.JAVA_WEKA_VALUE:type="java"
+			case FrameworkLang.SCIKIT_VALUE:type="py"
+			case FrameworkLang.R_VALUE:type="r"
+			case FrameworkLang.XG_BOOST_VALUE:type="py"
+			default:type=""
+		}
         fsa.generateFile(
-           'test.txt', code
+           'test.'+type, code
         )
         
 	}
@@ -67,7 +75,101 @@ class MmlGenerator extends AbstractGenerator {
 	}
 	
 	def String compileR(RFormula formule, String fileLocation, MLChoiceAlgorithm mlchoicealgo, Validation validation, String csv_separator) {
+		//TODO adapt for R using RStudio
+		//TODO R import needed?
+		var rImport= "library(data.table)\n";
+		//formule : recuperation des champs du csv à garder
+		var csvSplit="";
+		if(formule!==null) {
+			var xformule = formule.getPredictors();
+			var formuleItem = formule.getPredictive();
+			var items="";
+			if(xformule instanceof PredictorVariables) {
+				var predictorItems = xformule.getVars();
+				var sb = new StringBuilder();
+				if(predictorItems!==null && !predictorItems.isEmpty()) {
+					if(predictorItems.get(0).getColName() !== null) {
+						for(FormulaItem item : predictorItems) {
+							if(predictorItems.get(0)!=item)sb.append(',')
+							sb.append(mkValueInDoubleQuote(item.getColName()))
+						}
+					}else {
+						for(FormulaItem item : predictorItems) {
+							if(predictorItems.get(0)!=item)sb.append(',');
+							sb.append(item.getColumn());
+						}
+					}
+						
+				}
+				items = sb.toString(); 						
+				
+				csvSplit+="X <- read.csv(file="+mkValueInDoubleQuote(fileLocation)+", select=c("+items+") ,header=TRUE, sep="+mkValueInDoubleQuote(csv_separator)+")\n";
+				csvSplit+="y <- read.csv(file="+mkValueInDoubleQuote(fileLocation)+", select=c("+formuleItem.getColumn()+") ,header=TRUE, sep="+mkValueInDoubleQuote(csv_separator)+")\\n";
+			}else if(xformule instanceof AllVariables) {
+				csvSplit+="myFile <- read.csv(file="+mkValueInDoubleQuote(fileLocation)+",header=TRUE, sep="+mkValueInDoubleQuote(csv_separator)+")\n";
+				csvSplit+="h<-head(myFile)\nlastcol <- tail(h, n=1)\n";
+				csvSplit+="X <- read.csv(file="+mkValueInDoubleQuote(fileLocation)+", drop=c(lastcol) ,header=TRUE, sep="+mkValueInDoubleQuote(csv_separator)+")\n";
+				csvSplit+="y <- read.csv(file="+mkValueInDoubleQuote(fileLocation)+", select=c(lastcol) ,header=TRUE, sep="+mkValueInDoubleQuote(csv_separator)+")\n";
+			}
+		}else {
+			//if formule is null, all the fields are used to predict the last one
+			csvSplit+="myFile <- read.csv(file="+mkValueInDoubleQuote(fileLocation)+",header=TRUE, sep="+mkValueInDoubleQuote(csv_separator)+")\n";
+			csvSplit+="h<-head(myFile)\nlastcol <- tail(h, n=1)\n";
+			csvSplit+="X <- read.csv(file="+mkValueInDoubleQuote(fileLocation)+", drop=c(lastcol) ,header=TRUE, sep="+mkValueInDoubleQuote(csv_separator)+")\n";
+			csvSplit+="y <- read.csv(file="+mkValueInDoubleQuote(fileLocation)+", select=c(lastcol) ,header=TRUE, sep="+mkValueInDoubleQuote(csv_separator)+")\n";
+		}
 		
+		//algo
+		val algo = mlchoicealgo.getAlgorithm();
+		var algoDeclaration="";
+		if(algo instanceof SVR) {
+			//TODO complete with same template as DT below
+		}else if(algo instanceof DT) { //DecisionTree
+			rImport+="library(rpart)\n";
+			algoDeclaration = "fit <- rpart(survived~., data= data_train, method='class')\n";
+		}//TODO other algos
+		
+		//validation
+		val stratMethod = validation.getStratification();
+		val validMetrics = validation.getMetric();
+		val number = stratMethod.getNumber();
+		var validationPrint="";
+		validationPrint += "test_size = "+number+"\n";
+		validationPrint += "n_row = nrow(X)\n";
+		validationPrint += "total_row = test_size * n_row\n";
+		if(stratMethod instanceof CrossValidation){
+			//TODO equivalent à ci-dessous
+		}else if(stratMethod instanceof TrainingTest){
+			validationPrint+="X_train <- 1:total_row\n"; 
+			validationPrint+="X_train, X_test, y_train, y_test = train_test_split(X, y, test_size="+number+")"; 
+		}
+		validationPrint+="\n";
+		
+		//ValidationMetric
+		var metrics="";
+		var metricsResult="";
+		for(var i=0;i<validMetrics.size();i++) {
+			var metric = "";
+			/*switch(validMetrics.get(i).name()) {
+				case "MSE":
+					rImport+="from sklearn.metrics import mean_squared_error\n"
+					metric+="accuracy"+i+"=mean_squared_error(y_test, clf.predict(X_test))"
+				case "MAE":
+					rImport+="from sklearn.metrics import mean_absolute_error\n";
+					metric+="accuracy"+i+"=mean_absolute_error(y_test, clf.predict(X_test))"
+				case "MAPE":
+					rImport+="from sklearn.utils import check_arrays\n";
+					metric+="y_test, y_pred = check_arrays(y_test, clf.predict(X_test))";
+					metric+="accuracy"+i+"=np.mean(np.abs((y_test - y_pred) / y_test)) * 100";
+				default:
+			}*/
+			metricsResult+="print(accuracy"+i+")\n";
+			metrics+=metric+"\n";
+		}
+		
+		val pandasCode = rImport + csvSplit + algoDeclaration+ validationPrint+ metrics+metricsResult;
+		
+		return pandasCode;
 	}
 	
 	def String compileScikit(RFormula formule, String fileLocation, MLChoiceAlgorithm mlchoicealgo, Validation validation, String csv_separator) {
@@ -140,18 +242,30 @@ class MmlGenerator extends AbstractGenerator {
 		var metricsResult=""
 		for(var i=0;i<validMetrics.size();i++) {
 			var metric = "";
-			switch(validMetrics.get(i).name()) {
+			val metricName = validMetrics.get(i).name()
+			/*switch(validMetrics.get(i).name()) {
 				case "MSE":
-					//pythonImport+="from sklearn.metrics import mean_squared_error\n"
+					pythonImport+="from sklearn.metrics import mean_squared_error\n"
 					metric+="accuracy"+i+"=mean_squared_error(y_test, clf.predict(X_test))"
 				case "MAE":
 					pythonImport+="from sklearn.metrics import mean_absolute_error\n"
-					//metric+="accuracy"+i+"=mean_absolute_error(y_test, clf.predict(X_test))"
+					metric+="accuracy"+i+"=mean_absolute_error(y_test, clf.predict(X_test))"
 				case "MAPE":
-					//pythonImport+="from sklearn.utils import check_arrays\n"
+					pythonImport+="from sklearn.utils import check_arrays\n"
 					metric+="y_test, y_pred = check_arrays(y_test, clf.predict(X_test))"
-					//metric+="accuracy"+i+"=np.mean(np.abs((y_test - y_pred) / y_test)) * 100"
+					metric+="accuracy"+i+"=np.mean(np.abs((y_test - y_pred) / y_test)) * 100"
 				default:metric=''
+			}*/
+			if(metricName=="MSE"){
+				pythonImport+="from sklearn.metrics import mean_squared_error\n"
+				metric+="accuracy"+i+"=mean_squared_error(y_test, clf.predict(X_test))"
+			}else if(metricName=="MAE"){
+				pythonImport+="from sklearn.metrics import mean_absolute_error\n"
+				metric+="accuracy"+i+"=mean_absolute_error(y_test, clf.predict(X_test))"
+			}else if(metricName=="MAPE"){
+				pythonImport+="from sklearn.utils import check_arrays\n"
+				metric+="y_test, y_pred = check_arrays(y_test, clf.predict(X_test))"
+				metric+="accuracy"+i+"=np.mean(np.abs((y_test - y_pred) / y_test)) * 100"
 			}
 			metricsResult+="print(accuracy"+i+")\n"
 			metrics+=metric+"\n"
