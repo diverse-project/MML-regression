@@ -220,15 +220,7 @@ public class MmlParsingJavaTestBorisBastienFileInput {
 		return pandasCode;
 	}
 
-<<<<<<< HEAD
 	@SuppressWarnings("unused")
-=======
-	
-	
-	
-	
-	
->>>>>>> branch 'master' of https://github.com/Little6ix/MML-regression.git
 	private String compileScikit(RFormula formule, String fileLocation, MLChoiceAlgorithm mlchoicealgo, Validation validation, String csv_separator) {
 		
 		String pythonImport = "import pandas as pd\n"; 
