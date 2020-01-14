@@ -106,6 +106,8 @@ public class MmlFactoryImpl extends EFactoryImpl implements MmlFactory
         return createFrameworkLangFromString(eDataType, initialValue);
       case MmlPackage.SVM_KERNEL:
         return createSVMKernelFromString(eDataType, initialValue);
+      case MmlPackage.TYPE:
+        return createTYPEFromString(eDataType, initialValue);
       case MmlPackage.VALIDATION_METRIC:
         return createValidationMetricFromString(eDataType, initialValue);
       default:
@@ -129,6 +131,8 @@ public class MmlFactoryImpl extends EFactoryImpl implements MmlFactory
         return convertFrameworkLangToString(eDataType, instanceValue);
       case MmlPackage.SVM_KERNEL:
         return convertSVMKernelToString(eDataType, instanceValue);
+      case MmlPackage.TYPE:
+        return convertTYPEToString(eDataType, instanceValue);
       case MmlPackage.VALIDATION_METRIC:
         return convertValidationMetricToString(eDataType, instanceValue);
       default:
@@ -426,6 +430,28 @@ public class MmlFactoryImpl extends EFactoryImpl implements MmlFactory
    * @generated
    */
   public String convertSVMKernelToString(EDataType eDataType, Object instanceValue)
+  {
+    return instanceValue == null ? null : instanceValue.toString();
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public TYPE createTYPEFromString(EDataType eDataType, String initialValue)
+  {
+    TYPE result = TYPE.get(initialValue);
+    if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
+    return result;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  public String convertTYPEToString(EDataType eDataType, Object instanceValue)
   {
     return instanceValue == null ? null : instanceValue.toString();
   }

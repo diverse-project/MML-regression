@@ -42,6 +42,7 @@ public class MmlParser extends AbstractContentAssistParser {
 			builder.put(grammarAccess.getCSVSeparatorAccess().getAlternatives(), "rule__CSVSeparator__Alternatives");
 			builder.put(grammarAccess.getFrameworkLangAccess().getAlternatives(), "rule__FrameworkLang__Alternatives");
 			builder.put(grammarAccess.getSVMKernelAccess().getAlternatives(), "rule__SVMKernel__Alternatives");
+			builder.put(grammarAccess.getTYPEAccess().getAlternatives(), "rule__TYPE__Alternatives");
 			builder.put(grammarAccess.getValidationMetricAccess().getAlternatives(), "rule__ValidationMetric__Alternatives");
 			builder.put(grammarAccess.getMMLModelAccess().getGroup(), "rule__MMLModel__Group__0");
 			builder.put(grammarAccess.getDataInputAccess().getGroup(), "rule__DataInput__Group__0");
@@ -52,6 +53,9 @@ public class MmlParser extends AbstractContentAssistParser {
 			builder.put(grammarAccess.getSVRAccess().getGroup_3(), "rule__SVR__Group_3__0");
 			builder.put(grammarAccess.getDTAccess().getGroup(), "rule__DT__Group__0");
 			builder.put(grammarAccess.getRandomForestAccess().getGroup(), "rule__RandomForest__Group__0");
+			builder.put(grammarAccess.getRandomForestAccess().getGroup_1_1(), "rule__RandomForest__Group_1_1__0");
+			builder.put(grammarAccess.getRandomForestAccess().getGroup_2(), "rule__RandomForest__Group_2__0");
+			builder.put(grammarAccess.getRandomForestAccess().getGroup_3(), "rule__RandomForest__Group_3__0");
 			builder.put(grammarAccess.getSGDAccess().getGroup(), "rule__SGD__Group__0");
 			builder.put(grammarAccess.getGTBAccess().getGroup(), "rule__GTB__Group__0");
 			builder.put(grammarAccess.getFLOATAccess().getGroup(), "rule__FLOAT__Group__0");
@@ -74,6 +78,9 @@ public class MmlParser extends AbstractContentAssistParser {
 			builder.put(grammarAccess.getSVRAccess().getCAssignment_2_1(), "rule__SVR__CAssignment_2_1");
 			builder.put(grammarAccess.getSVRAccess().getKernelAssignment_3_1(), "rule__SVR__KernelAssignment_3_1");
 			builder.put(grammarAccess.getDTAccess().getMax_depthAssignment_2(), "rule__DT__Max_depthAssignment_2");
+			builder.put(grammarAccess.getRandomForestAccess().getTypeAssignment_1_1_1(), "rule__RandomForest__TypeAssignment_1_1_1");
+			builder.put(grammarAccess.getRandomForestAccess().getN_estimatorsAssignment_2_1(), "rule__RandomForest__N_estimatorsAssignment_2_1");
+			builder.put(grammarAccess.getRandomForestAccess().getMax_depthAssignment_3_1(), "rule__RandomForest__Max_depthAssignment_3_1");
 			builder.put(grammarAccess.getRFormulaAccess().getPredictiveAssignment_1_0(), "rule__RFormula__PredictiveAssignment_1_0");
 			builder.put(grammarAccess.getRFormulaAccess().getPredictorsAssignment_2(), "rule__RFormula__PredictorsAssignment_2");
 			builder.put(grammarAccess.getAllVariablesAccess().getAllAssignment(), "rule__AllVariables__AllAssignment");

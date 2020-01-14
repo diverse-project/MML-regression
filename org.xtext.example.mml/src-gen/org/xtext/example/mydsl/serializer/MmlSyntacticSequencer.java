@@ -23,7 +23,6 @@ public class MmlSyntacticSequencer extends AbstractSyntacticSequencer {
 	protected MmlGrammarAccess grammarAccess;
 	protected AbstractElementAlias match_DT_DTKeyword_1_0_or_DecisionTreeKeyword_1_1;
 	protected AbstractElementAlias match_GTB_GTBKeyword_1_1_or_GradientBoostingRegressorKeyword_1_0;
-	protected AbstractElementAlias match_RandomForest_RFKeyword_1_1_or_RandomForestKeyword_1_0;
 	protected AbstractElementAlias match_SGD_SGDKeyword_1_1_or_StochasticGradientDescentKeyword_1_0;
 	
 	@Inject
@@ -31,7 +30,6 @@ public class MmlSyntacticSequencer extends AbstractSyntacticSequencer {
 		grammarAccess = (MmlGrammarAccess) access;
 		match_DT_DTKeyword_1_0_or_DecisionTreeKeyword_1_1 = new AlternativeAlias(false, false, new TokenAlias(false, false, grammarAccess.getDTAccess().getDTKeyword_1_0()), new TokenAlias(false, false, grammarAccess.getDTAccess().getDecisionTreeKeyword_1_1()));
 		match_GTB_GTBKeyword_1_1_or_GradientBoostingRegressorKeyword_1_0 = new AlternativeAlias(false, false, new TokenAlias(false, false, grammarAccess.getGTBAccess().getGTBKeyword_1_1()), new TokenAlias(false, false, grammarAccess.getGTBAccess().getGradientBoostingRegressorKeyword_1_0()));
-		match_RandomForest_RFKeyword_1_1_or_RandomForestKeyword_1_0 = new AlternativeAlias(false, false, new TokenAlias(false, false, grammarAccess.getRandomForestAccess().getRFKeyword_1_1()), new TokenAlias(false, false, grammarAccess.getRandomForestAccess().getRandomForestKeyword_1_0()));
 		match_SGD_SGDKeyword_1_1_or_StochasticGradientDescentKeyword_1_0 = new AlternativeAlias(false, false, new TokenAlias(false, false, grammarAccess.getSGDAccess().getSGDKeyword_1_1()), new TokenAlias(false, false, grammarAccess.getSGDAccess().getStochasticGradientDescentKeyword_1_0()));
 	}
 	
@@ -51,8 +49,6 @@ public class MmlSyntacticSequencer extends AbstractSyntacticSequencer {
 				emit_DT_DTKeyword_1_0_or_DecisionTreeKeyword_1_1(semanticObject, getLastNavigableState(), syntaxNodes);
 			else if (match_GTB_GTBKeyword_1_1_or_GradientBoostingRegressorKeyword_1_0.equals(syntax))
 				emit_GTB_GTBKeyword_1_1_or_GradientBoostingRegressorKeyword_1_0(semanticObject, getLastNavigableState(), syntaxNodes);
-			else if (match_RandomForest_RFKeyword_1_1_or_RandomForestKeyword_1_0.equals(syntax))
-				emit_RandomForest_RFKeyword_1_1_or_RandomForestKeyword_1_0(semanticObject, getLastNavigableState(), syntaxNodes);
 			else if (match_SGD_SGDKeyword_1_1_or_StochasticGradientDescentKeyword_1_0.equals(syntax))
 				emit_SGD_SGDKeyword_1_1_or_StochasticGradientDescentKeyword_1_0(semanticObject, getLastNavigableState(), syntaxNodes);
 			else acceptNodes(getLastNavigableState(), syntaxNodes);
@@ -79,17 +75,6 @@ public class MmlSyntacticSequencer extends AbstractSyntacticSequencer {
 	 *     (rule start) (ambiguity) (rule start)
 	 */
 	protected void emit_GTB_GTBKeyword_1_1_or_GradientBoostingRegressorKeyword_1_0(EObject semanticObject, ISynNavigable transition, List<INode> nodes) {
-		acceptNodes(transition, nodes);
-	}
-	
-	/**
-	 * Ambiguous syntax:
-	 *     'RandomForest' | 'RF'
-	 *
-	 * This ambiguous syntax occurs at:
-	 *     (rule start) (ambiguity) (rule start)
-	 */
-	protected void emit_RandomForest_RFKeyword_1_1_or_RandomForestKeyword_1_0(EObject semanticObject, ISynNavigable transition, List<INode> nodes) {
 		acceptNodes(transition, nodes);
 	}
 	

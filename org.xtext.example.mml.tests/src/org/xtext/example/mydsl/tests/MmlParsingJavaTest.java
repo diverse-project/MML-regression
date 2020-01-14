@@ -3,6 +3,7 @@ package org.xtext.example.mydsl.tests;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.nio.file.Paths;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -43,7 +44,7 @@ public class MmlParsingJavaTest {
 	
 	@Test
 	public void compileDataInput() throws Exception {
-		MMLModel result = parseHelper.parse("datainput \"foo2.csv\" separator ;\n"
+		MMLModel result = parseHelper.parse("datainput \"foo.csv\"\n"
 				+ "mlframework scikit-learn\n"
 				+ "algorithm DT\n"
 				+ "TrainingTest { percentageTraining 70 }\n"

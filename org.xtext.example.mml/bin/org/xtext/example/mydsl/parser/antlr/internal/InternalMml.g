@@ -550,11 +550,80 @@ ruleRandomForest returns [EObject current=null]
 				newLeafNode(otherlv_1, grammarAccess.getRandomForestAccess().getRandomForestKeyword_1_0());
 			}
 			    |
-			otherlv_2='RF'
-			{
-				newLeafNode(otherlv_2, grammarAccess.getRandomForestAccess().getRFKeyword_1_1());
-			}
+			(
+				otherlv_2='RF'
+				{
+					newLeafNode(otherlv_2, grammarAccess.getRandomForestAccess().getRFKeyword_1_1_0());
+				}
+				(
+					(
+						{
+							newCompositeNode(grammarAccess.getRandomForestAccess().getTypeTYPEEnumRuleCall_1_1_1_0());
+						}
+						lv_type_3_0=ruleTYPE
+						{
+							if ($current==null) {
+								$current = createModelElementForParent(grammarAccess.getRandomForestRule());
+							}
+							set(
+								$current,
+								"type",
+								lv_type_3_0,
+								"org.xtext.example.mydsl.Mml.TYPE");
+							afterParserOrEnumRuleCall();
+						}
+					)
+				)
+			)
 		)
+		(
+			otherlv_4='n_estimators='
+			{
+				newLeafNode(otherlv_4, grammarAccess.getRandomForestAccess().getN_estimatorsKeyword_2_0());
+			}
+			(
+				(
+					lv_n_estimators_5_0=RULE_INT
+					{
+						newLeafNode(lv_n_estimators_5_0, grammarAccess.getRandomForestAccess().getN_estimatorsINTTerminalRuleCall_2_1_0());
+					}
+					{
+						if ($current==null) {
+							$current = createModelElement(grammarAccess.getRandomForestRule());
+						}
+						setWithLastConsumed(
+							$current,
+							"n_estimators",
+							lv_n_estimators_5_0,
+							"org.eclipse.xtext.common.Terminals.INT");
+					}
+				)
+			)
+		)?
+		(
+			otherlv_6='max_depth='
+			{
+				newLeafNode(otherlv_6, grammarAccess.getRandomForestAccess().getMax_depthKeyword_3_0());
+			}
+			(
+				(
+					lv_max_depth_7_0=RULE_INT
+					{
+						newLeafNode(lv_max_depth_7_0, grammarAccess.getRandomForestAccess().getMax_depthINTTerminalRuleCall_3_1_0());
+					}
+					{
+						if ($current==null) {
+							$current = createModelElement(grammarAccess.getRandomForestRule());
+						}
+						setWithLastConsumed(
+							$current,
+							"max_depth",
+							lv_max_depth_7_0,
+							"org.eclipse.xtext.common.Terminals.INT");
+					}
+				)
+			)
+		)?
 	)
 ;
 
@@ -1222,6 +1291,33 @@ ruleSVMKernel returns [Enumerator current=null]
 			{
 				$current = grammarAccess.getSVMKernelAccess().getRbfEnumLiteralDeclaration_2().getEnumLiteral().getInstance();
 				newLeafNode(enumLiteral_2, grammarAccess.getSVMKernelAccess().getRbfEnumLiteralDeclaration_2());
+			}
+		)
+	)
+;
+
+// Rule TYPE
+ruleTYPE returns [Enumerator current=null]
+@init {
+	enterRule();
+}
+@after {
+	leaveRule();
+}:
+	(
+		(
+			enumLiteral_0='Regressor'
+			{
+				$current = grammarAccess.getTYPEAccess().getRegressorEnumLiteralDeclaration_0().getEnumLiteral().getInstance();
+				newLeafNode(enumLiteral_0, grammarAccess.getTYPEAccess().getRegressorEnumLiteralDeclaration_0());
+			}
+		)
+		    |
+		(
+			enumLiteral_1='Classifier'
+			{
+				$current = grammarAccess.getTYPEAccess().getClassifierEnumLiteralDeclaration_1().getEnumLiteral().getInstance();
+				newLeafNode(enumLiteral_1, grammarAccess.getTYPEAccess().getClassifierEnumLiteralDeclaration_1());
 			}
 		)
 	)

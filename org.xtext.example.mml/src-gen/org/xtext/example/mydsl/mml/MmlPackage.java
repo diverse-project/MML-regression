@@ -310,13 +310,40 @@ public interface MmlPackage extends EPackage
   int RANDOM_FOREST = 7;
 
   /**
+   * The feature id for the '<em><b>Type</b></em>' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   * @ordered
+   */
+  int RANDOM_FOREST__TYPE = ML_ALGORITHM_FEATURE_COUNT + 0;
+
+  /**
+   * The feature id for the '<em><b>Nestimators</b></em>' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   * @ordered
+   */
+  int RANDOM_FOREST__NESTIMATORS = ML_ALGORITHM_FEATURE_COUNT + 1;
+
+  /**
+   * The feature id for the '<em><b>Max depth</b></em>' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   * @ordered
+   */
+  int RANDOM_FOREST__MAX_DEPTH = ML_ALGORITHM_FEATURE_COUNT + 2;
+
+  /**
    * The number of structural features of the '<em>Random Forest</em>' class.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
    * @generated
    * @ordered
    */
-  int RANDOM_FOREST_FEATURE_COUNT = ML_ALGORITHM_FEATURE_COUNT + 0;
+  int RANDOM_FOREST_FEATURE_COUNT = ML_ALGORITHM_FEATURE_COUNT + 3;
 
   /**
    * The meta object id for the '{@link org.xtext.example.mydsl.mml.impl.SGDImpl <em>SGD</em>}' class.
@@ -657,6 +684,16 @@ public interface MmlPackage extends EPackage
   int SVM_KERNEL = 21;
 
   /**
+   * The meta object id for the '{@link org.xtext.example.mydsl.mml.TYPE <em>TYPE</em>}' enum.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @see org.xtext.example.mydsl.mml.TYPE
+   * @see org.xtext.example.mydsl.mml.impl.MmlPackageImpl#getTYPE()
+   * @generated
+   */
+  int TYPE = 22;
+
+  /**
    * The meta object id for the '{@link org.xtext.example.mydsl.mml.ValidationMetric <em>Validation Metric</em>}' enum.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
@@ -664,7 +701,7 @@ public interface MmlPackage extends EPackage
    * @see org.xtext.example.mydsl.mml.impl.MmlPackageImpl#getValidationMetric()
    * @generated
    */
-  int VALIDATION_METRIC = 22;
+  int VALIDATION_METRIC = 23;
 
 
   /**
@@ -878,6 +915,39 @@ public interface MmlPackage extends EPackage
    * @generated
    */
   EClass getRandomForest();
+
+  /**
+   * Returns the meta object for the attribute '{@link org.xtext.example.mydsl.mml.RandomForest#getType <em>Type</em>}'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the meta object for the attribute '<em>Type</em>'.
+   * @see org.xtext.example.mydsl.mml.RandomForest#getType()
+   * @see #getRandomForest()
+   * @generated
+   */
+  EAttribute getRandomForest_Type();
+
+  /**
+   * Returns the meta object for the attribute '{@link org.xtext.example.mydsl.mml.RandomForest#getN_estimators <em>Nestimators</em>}'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the meta object for the attribute '<em>Nestimators</em>'.
+   * @see org.xtext.example.mydsl.mml.RandomForest#getN_estimators()
+   * @see #getRandomForest()
+   * @generated
+   */
+  EAttribute getRandomForest_N_estimators();
+
+  /**
+   * Returns the meta object for the attribute '{@link org.xtext.example.mydsl.mml.RandomForest#getMax_depth <em>Max depth</em>}'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the meta object for the attribute '<em>Max depth</em>'.
+   * @see org.xtext.example.mydsl.mml.RandomForest#getMax_depth()
+   * @see #getRandomForest()
+   * @generated
+   */
+  EAttribute getRandomForest_Max_depth();
 
   /**
    * Returns the meta object for class '{@link org.xtext.example.mydsl.mml.SGD <em>SGD</em>}'.
@@ -1119,6 +1189,16 @@ public interface MmlPackage extends EPackage
   EEnum getSVMKernel();
 
   /**
+   * Returns the meta object for enum '{@link org.xtext.example.mydsl.mml.TYPE <em>TYPE</em>}'.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the meta object for enum '<em>TYPE</em>'.
+   * @see org.xtext.example.mydsl.mml.TYPE
+   * @generated
+   */
+  EEnum getTYPE();
+
+  /**
    * Returns the meta object for enum '{@link org.xtext.example.mydsl.mml.ValidationMetric <em>Validation Metric</em>}'.
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
@@ -1326,6 +1406,30 @@ public interface MmlPackage extends EPackage
      * @generated
      */
     EClass RANDOM_FOREST = eINSTANCE.getRandomForest();
+
+    /**
+     * The meta object literal for the '<em><b>Type</b></em>' attribute feature.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    EAttribute RANDOM_FOREST__TYPE = eINSTANCE.getRandomForest_Type();
+
+    /**
+     * The meta object literal for the '<em><b>Nestimators</b></em>' attribute feature.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    EAttribute RANDOM_FOREST__NESTIMATORS = eINSTANCE.getRandomForest_N_estimators();
+
+    /**
+     * The meta object literal for the '<em><b>Max depth</b></em>' attribute feature.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @generated
+     */
+    EAttribute RANDOM_FOREST__MAX_DEPTH = eINSTANCE.getRandomForest_Max_depth();
 
     /**
      * The meta object literal for the '{@link org.xtext.example.mydsl.mml.impl.SGDImpl <em>SGD</em>}' class.
@@ -1538,6 +1642,16 @@ public interface MmlPackage extends EPackage
      * @generated
      */
     EEnum SVM_KERNEL = eINSTANCE.getSVMKernel();
+
+    /**
+     * The meta object literal for the '{@link org.xtext.example.mydsl.mml.TYPE <em>TYPE</em>}' enum.
+     * <!-- begin-user-doc -->
+     * <!-- end-user-doc -->
+     * @see org.xtext.example.mydsl.mml.TYPE
+     * @see org.xtext.example.mydsl.mml.impl.MmlPackageImpl#getTYPE()
+     * @generated
+     */
+    EEnum TYPE = eINSTANCE.getTYPE();
 
     /**
      * The meta object literal for the '{@link org.xtext.example.mydsl.mml.ValidationMetric <em>Validation Metric</em>}' enum.

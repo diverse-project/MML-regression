@@ -200,6 +200,13 @@ public class MmlPackageImpl extends EPackageImpl implements MmlPackage
    * <!-- end-user-doc -->
    * @generated
    */
+  private EEnum typeEEnum = null;
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
   private EEnum validationMetricEEnum = null;
 
   /**
@@ -491,6 +498,39 @@ public class MmlPackageImpl extends EPackageImpl implements MmlPackage
    * @generated
    */
   @Override
+  public EAttribute getRandomForest_Type()
+  {
+    return (EAttribute)randomForestEClass.getEStructuralFeatures().get(0);
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public EAttribute getRandomForest_N_estimators()
+  {
+    return (EAttribute)randomForestEClass.getEStructuralFeatures().get(1);
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public EAttribute getRandomForest_Max_depth()
+  {
+    return (EAttribute)randomForestEClass.getEStructuralFeatures().get(2);
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
   public EClass getSGD()
   {
     return sgdEClass;
@@ -744,6 +784,17 @@ public class MmlPackageImpl extends EPackageImpl implements MmlPackage
    * @generated
    */
   @Override
+  public EEnum getTYPE()
+  {
+    return typeEEnum;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
   public EEnum getValidationMetric()
   {
     return validationMetricEEnum;
@@ -807,6 +858,9 @@ public class MmlPackageImpl extends EPackageImpl implements MmlPackage
     createEAttribute(dtEClass, DT__MAX_DEPTH);
 
     randomForestEClass = createEClass(RANDOM_FOREST);
+    createEAttribute(randomForestEClass, RANDOM_FOREST__TYPE);
+    createEAttribute(randomForestEClass, RANDOM_FOREST__NESTIMATORS);
+    createEAttribute(randomForestEClass, RANDOM_FOREST__MAX_DEPTH);
 
     sgdEClass = createEClass(SGD);
 
@@ -843,6 +897,7 @@ public class MmlPackageImpl extends EPackageImpl implements MmlPackage
     csvSeparatorEEnum = createEEnum(CSV_SEPARATOR);
     frameworkLangEEnum = createEEnum(FRAMEWORK_LANG);
     svmKernelEEnum = createEEnum(SVM_KERNEL);
+    typeEEnum = createEEnum(TYPE);
     validationMetricEEnum = createEEnum(VALIDATION_METRIC);
   }
 
@@ -913,6 +968,9 @@ public class MmlPackageImpl extends EPackageImpl implements MmlPackage
     initEAttribute(getDT_Max_depth(), ecorePackage.getEInt(), "max_depth", null, 0, 1, org.xtext.example.mydsl.mml.DT.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
     initEClass(randomForestEClass, RandomForest.class, "RandomForest", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+    initEAttribute(getRandomForest_Type(), this.getTYPE(), "type", null, 0, 1, RandomForest.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEAttribute(getRandomForest_N_estimators(), ecorePackage.getEInt(), "n_estimators", null, 0, 1, RandomForest.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+    initEAttribute(getRandomForest_Max_depth(), ecorePackage.getEInt(), "max_depth", null, 0, 1, RandomForest.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
     initEClass(sgdEClass, org.xtext.example.mydsl.mml.SGD.class, "SGD", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
@@ -960,6 +1018,10 @@ public class MmlPackageImpl extends EPackageImpl implements MmlPackage
     addEEnumLiteral(svmKernelEEnum, SVMKernel.LINEAR);
     addEEnumLiteral(svmKernelEEnum, SVMKernel.POLY);
     addEEnumLiteral(svmKernelEEnum, SVMKernel.RBF);
+
+    initEEnum(typeEEnum, org.xtext.example.mydsl.mml.TYPE.class, "TYPE");
+    addEEnumLiteral(typeEEnum, org.xtext.example.mydsl.mml.TYPE.REGRESSOR);
+    addEEnumLiteral(typeEEnum, org.xtext.example.mydsl.mml.TYPE.CLASSIFIER);
 
     initEEnum(validationMetricEEnum, ValidationMetric.class, "ValidationMetric");
     addEEnumLiteral(validationMetricEEnum, ValidationMetric.MSE);

@@ -597,6 +597,22 @@ finally {
 	restoreStackSize(stackSize);
 }
 
+// Rule TYPE
+ruleTYPE
+	@init {
+		int stackSize = keepStackSize();
+	}
+:
+	(
+		{ before(grammarAccess.getTYPEAccess().getAlternatives()); }
+		(rule__TYPE__Alternatives)
+		{ after(grammarAccess.getTYPEAccess().getAlternatives()); }
+	)
+;
+finally {
+	restoreStackSize(stackSize);
+}
+
 // Rule ValidationMetric
 ruleValidationMetric
 	@init {
@@ -685,9 +701,9 @@ rule__RandomForest__Alternatives_1
 	)
 	|
 	(
-		{ before(grammarAccess.getRandomForestAccess().getRFKeyword_1_1()); }
-		'RF'
-		{ after(grammarAccess.getRandomForestAccess().getRFKeyword_1_1()); }
+		{ before(grammarAccess.getRandomForestAccess().getGroup_1_1()); }
+		(rule__RandomForest__Group_1_1__0)
+		{ after(grammarAccess.getRandomForestAccess().getGroup_1_1()); }
 	)
 ;
 finally {
@@ -874,6 +890,27 @@ rule__SVMKernel__Alternatives
 		{ before(grammarAccess.getSVMKernelAccess().getRbfEnumLiteralDeclaration_2()); }
 		('rbf')
 		{ after(grammarAccess.getSVMKernelAccess().getRbfEnumLiteralDeclaration_2()); }
+	)
+;
+finally {
+	restoreStackSize(stackSize);
+}
+
+rule__TYPE__Alternatives
+	@init {
+		int stackSize = keepStackSize();
+	}
+:
+	(
+		{ before(grammarAccess.getTYPEAccess().getRegressorEnumLiteralDeclaration_0()); }
+		('Regressor')
+		{ after(grammarAccess.getTYPEAccess().getRegressorEnumLiteralDeclaration_0()); }
+	)
+	|
+	(
+		{ before(grammarAccess.getTYPEAccess().getClassifierEnumLiteralDeclaration_1()); }
+		('Classifier')
+		{ after(grammarAccess.getTYPEAccess().getClassifierEnumLiteralDeclaration_1()); }
 	)
 ;
 finally {
@@ -1588,6 +1625,7 @@ rule__RandomForest__Group__1
 	}
 :
 	rule__RandomForest__Group__1__Impl
+	rule__RandomForest__Group__2
 ;
 finally {
 	restoreStackSize(stackSize);
@@ -1602,6 +1640,221 @@ rule__RandomForest__Group__1__Impl
 	{ before(grammarAccess.getRandomForestAccess().getAlternatives_1()); }
 	(rule__RandomForest__Alternatives_1)
 	{ after(grammarAccess.getRandomForestAccess().getAlternatives_1()); }
+)
+;
+finally {
+	restoreStackSize(stackSize);
+}
+
+rule__RandomForest__Group__2
+	@init {
+		int stackSize = keepStackSize();
+	}
+:
+	rule__RandomForest__Group__2__Impl
+	rule__RandomForest__Group__3
+;
+finally {
+	restoreStackSize(stackSize);
+}
+
+rule__RandomForest__Group__2__Impl
+	@init {
+		int stackSize = keepStackSize();
+	}
+:
+(
+	{ before(grammarAccess.getRandomForestAccess().getGroup_2()); }
+	(rule__RandomForest__Group_2__0)?
+	{ after(grammarAccess.getRandomForestAccess().getGroup_2()); }
+)
+;
+finally {
+	restoreStackSize(stackSize);
+}
+
+rule__RandomForest__Group__3
+	@init {
+		int stackSize = keepStackSize();
+	}
+:
+	rule__RandomForest__Group__3__Impl
+;
+finally {
+	restoreStackSize(stackSize);
+}
+
+rule__RandomForest__Group__3__Impl
+	@init {
+		int stackSize = keepStackSize();
+	}
+:
+(
+	{ before(grammarAccess.getRandomForestAccess().getGroup_3()); }
+	(rule__RandomForest__Group_3__0)?
+	{ after(grammarAccess.getRandomForestAccess().getGroup_3()); }
+)
+;
+finally {
+	restoreStackSize(stackSize);
+}
+
+
+rule__RandomForest__Group_1_1__0
+	@init {
+		int stackSize = keepStackSize();
+	}
+:
+	rule__RandomForest__Group_1_1__0__Impl
+	rule__RandomForest__Group_1_1__1
+;
+finally {
+	restoreStackSize(stackSize);
+}
+
+rule__RandomForest__Group_1_1__0__Impl
+	@init {
+		int stackSize = keepStackSize();
+	}
+:
+(
+	{ before(grammarAccess.getRandomForestAccess().getRFKeyword_1_1_0()); }
+	'RF'
+	{ after(grammarAccess.getRandomForestAccess().getRFKeyword_1_1_0()); }
+)
+;
+finally {
+	restoreStackSize(stackSize);
+}
+
+rule__RandomForest__Group_1_1__1
+	@init {
+		int stackSize = keepStackSize();
+	}
+:
+	rule__RandomForest__Group_1_1__1__Impl
+;
+finally {
+	restoreStackSize(stackSize);
+}
+
+rule__RandomForest__Group_1_1__1__Impl
+	@init {
+		int stackSize = keepStackSize();
+	}
+:
+(
+	{ before(grammarAccess.getRandomForestAccess().getTypeAssignment_1_1_1()); }
+	(rule__RandomForest__TypeAssignment_1_1_1)
+	{ after(grammarAccess.getRandomForestAccess().getTypeAssignment_1_1_1()); }
+)
+;
+finally {
+	restoreStackSize(stackSize);
+}
+
+
+rule__RandomForest__Group_2__0
+	@init {
+		int stackSize = keepStackSize();
+	}
+:
+	rule__RandomForest__Group_2__0__Impl
+	rule__RandomForest__Group_2__1
+;
+finally {
+	restoreStackSize(stackSize);
+}
+
+rule__RandomForest__Group_2__0__Impl
+	@init {
+		int stackSize = keepStackSize();
+	}
+:
+(
+	{ before(grammarAccess.getRandomForestAccess().getN_estimatorsKeyword_2_0()); }
+	'n_estimators='
+	{ after(grammarAccess.getRandomForestAccess().getN_estimatorsKeyword_2_0()); }
+)
+;
+finally {
+	restoreStackSize(stackSize);
+}
+
+rule__RandomForest__Group_2__1
+	@init {
+		int stackSize = keepStackSize();
+	}
+:
+	rule__RandomForest__Group_2__1__Impl
+;
+finally {
+	restoreStackSize(stackSize);
+}
+
+rule__RandomForest__Group_2__1__Impl
+	@init {
+		int stackSize = keepStackSize();
+	}
+:
+(
+	{ before(grammarAccess.getRandomForestAccess().getN_estimatorsAssignment_2_1()); }
+	(rule__RandomForest__N_estimatorsAssignment_2_1)
+	{ after(grammarAccess.getRandomForestAccess().getN_estimatorsAssignment_2_1()); }
+)
+;
+finally {
+	restoreStackSize(stackSize);
+}
+
+
+rule__RandomForest__Group_3__0
+	@init {
+		int stackSize = keepStackSize();
+	}
+:
+	rule__RandomForest__Group_3__0__Impl
+	rule__RandomForest__Group_3__1
+;
+finally {
+	restoreStackSize(stackSize);
+}
+
+rule__RandomForest__Group_3__0__Impl
+	@init {
+		int stackSize = keepStackSize();
+	}
+:
+(
+	{ before(grammarAccess.getRandomForestAccess().getMax_depthKeyword_3_0()); }
+	'max_depth='
+	{ after(grammarAccess.getRandomForestAccess().getMax_depthKeyword_3_0()); }
+)
+;
+finally {
+	restoreStackSize(stackSize);
+}
+
+rule__RandomForest__Group_3__1
+	@init {
+		int stackSize = keepStackSize();
+	}
+:
+	rule__RandomForest__Group_3__1__Impl
+;
+finally {
+	restoreStackSize(stackSize);
+}
+
+rule__RandomForest__Group_3__1__Impl
+	@init {
+		int stackSize = keepStackSize();
+	}
+:
+(
+	{ before(grammarAccess.getRandomForestAccess().getMax_depthAssignment_3_1()); }
+	(rule__RandomForest__Max_depthAssignment_3_1)
+	{ after(grammarAccess.getRandomForestAccess().getMax_depthAssignment_3_1()); }
 )
 ;
 finally {
@@ -2546,6 +2799,51 @@ rule__DT__Max_depthAssignment_2
 		{ before(grammarAccess.getDTAccess().getMax_depthINTTerminalRuleCall_2_0()); }
 		RULE_INT
 		{ after(grammarAccess.getDTAccess().getMax_depthINTTerminalRuleCall_2_0()); }
+	)
+;
+finally {
+	restoreStackSize(stackSize);
+}
+
+rule__RandomForest__TypeAssignment_1_1_1
+	@init {
+		int stackSize = keepStackSize();
+	}
+:
+	(
+		{ before(grammarAccess.getRandomForestAccess().getTypeTYPEEnumRuleCall_1_1_1_0()); }
+		ruleTYPE
+		{ after(grammarAccess.getRandomForestAccess().getTypeTYPEEnumRuleCall_1_1_1_0()); }
+	)
+;
+finally {
+	restoreStackSize(stackSize);
+}
+
+rule__RandomForest__N_estimatorsAssignment_2_1
+	@init {
+		int stackSize = keepStackSize();
+	}
+:
+	(
+		{ before(grammarAccess.getRandomForestAccess().getN_estimatorsINTTerminalRuleCall_2_1_0()); }
+		RULE_INT
+		{ after(grammarAccess.getRandomForestAccess().getN_estimatorsINTTerminalRuleCall_2_1_0()); }
+	)
+;
+finally {
+	restoreStackSize(stackSize);
+}
+
+rule__RandomForest__Max_depthAssignment_3_1
+	@init {
+		int stackSize = keepStackSize();
+	}
+:
+	(
+		{ before(grammarAccess.getRandomForestAccess().getMax_depthINTTerminalRuleCall_3_1_0()); }
+		RULE_INT
+		{ after(grammarAccess.getRandomForestAccess().getMax_depthINTTerminalRuleCall_3_1_0()); }
 	)
 ;
 finally {

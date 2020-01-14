@@ -297,28 +297,72 @@ public class MmlGrammarAccess extends AbstractGrammarElementFinder {
 		private final Action cRandomForestAction_0 = (Action)cGroup.eContents().get(0);
 		private final Alternatives cAlternatives_1 = (Alternatives)cGroup.eContents().get(1);
 		private final Keyword cRandomForestKeyword_1_0 = (Keyword)cAlternatives_1.eContents().get(0);
-		private final Keyword cRFKeyword_1_1 = (Keyword)cAlternatives_1.eContents().get(1);
+		private final Group cGroup_1_1 = (Group)cAlternatives_1.eContents().get(1);
+		private final Keyword cRFKeyword_1_1_0 = (Keyword)cGroup_1_1.eContents().get(0);
+		private final Assignment cTypeAssignment_1_1_1 = (Assignment)cGroup_1_1.eContents().get(1);
+		private final RuleCall cTypeTYPEEnumRuleCall_1_1_1_0 = (RuleCall)cTypeAssignment_1_1_1.eContents().get(0);
+		private final Group cGroup_2 = (Group)cGroup.eContents().get(2);
+		private final Keyword cN_estimatorsKeyword_2_0 = (Keyword)cGroup_2.eContents().get(0);
+		private final Assignment cN_estimatorsAssignment_2_1 = (Assignment)cGroup_2.eContents().get(1);
+		private final RuleCall cN_estimatorsINTTerminalRuleCall_2_1_0 = (RuleCall)cN_estimatorsAssignment_2_1.eContents().get(0);
+		private final Group cGroup_3 = (Group)cGroup.eContents().get(3);
+		private final Keyword cMax_depthKeyword_3_0 = (Keyword)cGroup_3.eContents().get(0);
+		private final Assignment cMax_depthAssignment_3_1 = (Assignment)cGroup_3.eContents().get(1);
+		private final RuleCall cMax_depthINTTerminalRuleCall_3_1_0 = (RuleCall)cMax_depthAssignment_3_1.eContents().get(0);
 		
 		//// TODO: additional hyperparameters
 		//// note: R-package CART: anova 
 		//RandomForest:
-		//	{RandomForest} ('RandomForest' | 'RF');
+		//	{RandomForest} ('RandomForest' | 'RF' type=TYPE) ('n_estimators=' n_estimators=INT)? ('max_depth=' max_depth=INT)?;
 		@Override public ParserRule getRule() { return rule; }
 		
-		//{RandomForest} ('RandomForest' | 'RF')
+		//{RandomForest} ('RandomForest' | 'RF' type=TYPE) ('n_estimators=' n_estimators=INT)? ('max_depth=' max_depth=INT)?
 		public Group getGroup() { return cGroup; }
 		
 		//{RandomForest}
 		public Action getRandomForestAction_0() { return cRandomForestAction_0; }
 		
-		//('RandomForest' | 'RF')
+		//('RandomForest' | 'RF' type=TYPE)
 		public Alternatives getAlternatives_1() { return cAlternatives_1; }
 		
 		//'RandomForest'
 		public Keyword getRandomForestKeyword_1_0() { return cRandomForestKeyword_1_0; }
 		
+		//'RF' type=TYPE
+		public Group getGroup_1_1() { return cGroup_1_1; }
+		
 		//'RF'
-		public Keyword getRFKeyword_1_1() { return cRFKeyword_1_1; }
+		public Keyword getRFKeyword_1_1_0() { return cRFKeyword_1_1_0; }
+		
+		//type=TYPE
+		public Assignment getTypeAssignment_1_1_1() { return cTypeAssignment_1_1_1; }
+		
+		//TYPE
+		public RuleCall getTypeTYPEEnumRuleCall_1_1_1_0() { return cTypeTYPEEnumRuleCall_1_1_1_0; }
+		
+		//('n_estimators=' n_estimators=INT)?
+		public Group getGroup_2() { return cGroup_2; }
+		
+		//'n_estimators='
+		public Keyword getN_estimatorsKeyword_2_0() { return cN_estimatorsKeyword_2_0; }
+		
+		//n_estimators=INT
+		public Assignment getN_estimatorsAssignment_2_1() { return cN_estimatorsAssignment_2_1; }
+		
+		//INT
+		public RuleCall getN_estimatorsINTTerminalRuleCall_2_1_0() { return cN_estimatorsINTTerminalRuleCall_2_1_0; }
+		
+		//('max_depth=' max_depth=INT)?
+		public Group getGroup_3() { return cGroup_3; }
+		
+		//'max_depth='
+		public Keyword getMax_depthKeyword_3_0() { return cMax_depthKeyword_3_0; }
+		
+		//max_depth=INT
+		public Assignment getMax_depthAssignment_3_1() { return cMax_depthAssignment_3_1; }
+		
+		//INT
+		public RuleCall getMax_depthINTTerminalRuleCall_3_1_0() { return cMax_depthINTTerminalRuleCall_3_1_0; }
 	}
 	public class SGDElements extends AbstractParserRuleElementFinder {
 		private final ParserRule rule = (ParserRule) GrammarUtil.findRuleForName(getGrammar(), "org.xtext.example.mydsl.Mml.SGD");
@@ -328,7 +372,6 @@ public class MmlGrammarAccess extends AbstractGrammarElementFinder {
 		private final Keyword cStochasticGradientDescentKeyword_1_0 = (Keyword)cAlternatives_1.eContents().get(0);
 		private final Keyword cSGDKeyword_1_1 = (Keyword)cAlternatives_1.eContents().get(1);
 		
-		//// TODO: hyperparameters?
 		//SGD:
 		//	{SGD} ('StochasticGradientDescent' | 'SGD');
 		@Override public ParserRule getRule() { return rule; }
@@ -769,6 +812,33 @@ public class MmlGrammarAccess extends AbstractGrammarElementFinder {
 		//'rbf'
 		public Keyword getRbfRbfKeyword_2_0() { return cRbfRbfKeyword_2_0; }
 	}
+	public class TYPEElements extends AbstractEnumRuleElementFinder {
+		private final EnumRule rule = (EnumRule) GrammarUtil.findRuleForName(getGrammar(), "org.xtext.example.mydsl.Mml.TYPE");
+		private final Alternatives cAlternatives = (Alternatives)rule.eContents().get(1);
+		private final EnumLiteralDeclaration cRegressorEnumLiteralDeclaration_0 = (EnumLiteralDeclaration)cAlternatives.eContents().get(0);
+		private final Keyword cRegressorRegressorKeyword_0_0 = (Keyword)cRegressorEnumLiteralDeclaration_0.eContents().get(0);
+		private final EnumLiteralDeclaration cClassifierEnumLiteralDeclaration_1 = (EnumLiteralDeclaration)cAlternatives.eContents().get(1);
+		private final Keyword cClassifierClassifierKeyword_1_0 = (Keyword)cClassifierEnumLiteralDeclaration_1.eContents().get(0);
+		
+		//enum TYPE:
+		//	regressor='Regressor' | classifier='Classifier';
+		public EnumRule getRule() { return rule; }
+		
+		//regressor='Regressor' | classifier='Classifier'
+		public Alternatives getAlternatives() { return cAlternatives; }
+		
+		//regressor='Regressor'
+		public EnumLiteralDeclaration getRegressorEnumLiteralDeclaration_0() { return cRegressorEnumLiteralDeclaration_0; }
+		
+		//'Regressor'
+		public Keyword getRegressorRegressorKeyword_0_0() { return cRegressorRegressorKeyword_0_0; }
+		
+		//classifier='Classifier'
+		public EnumLiteralDeclaration getClassifierEnumLiteralDeclaration_1() { return cClassifierEnumLiteralDeclaration_1; }
+		
+		//'Classifier'
+		public Keyword getClassifierClassifierKeyword_1_0() { return cClassifierClassifierKeyword_1_0; }
+	}
 	public class ValidationMetricElements extends AbstractEnumRuleElementFinder {
 		private final EnumRule rule = (EnumRule) GrammarUtil.findRuleForName(getGrammar(), "org.xtext.example.mydsl.Mml.ValidationMetric");
 		private final Alternatives cAlternatives = (Alternatives)rule.eContents().get(1);
@@ -816,6 +886,7 @@ public class MmlGrammarAccess extends AbstractGrammarElementFinder {
 	private final SVMKernelElements eSVMKernel;
 	private final DTElements pDT;
 	private final RandomForestElements pRandomForest;
+	private final TYPEElements eTYPE;
 	private final SGDElements pSGD;
 	private final GTBElements pGTB;
 	private final FLOATElements pFLOAT;
@@ -850,6 +921,7 @@ public class MmlGrammarAccess extends AbstractGrammarElementFinder {
 		this.eSVMKernel = new SVMKernelElements();
 		this.pDT = new DTElements();
 		this.pRandomForest = new RandomForestElements();
+		this.eTYPE = new TYPEElements();
 		this.pSGD = new SGDElements();
 		this.pGTB = new GTBElements();
 		this.pFLOAT = new FLOATElements();
@@ -1009,7 +1081,7 @@ public class MmlGrammarAccess extends AbstractGrammarElementFinder {
 	//// TODO: additional hyperparameters
 	//// note: R-package CART: anova 
 	//RandomForest:
-	//	{RandomForest} ('RandomForest' | 'RF');
+	//	{RandomForest} ('RandomForest' | 'RF' type=TYPE) ('n_estimators=' n_estimators=INT)? ('max_depth=' max_depth=INT)?;
 	public RandomForestElements getRandomForestAccess() {
 		return pRandomForest;
 	}
@@ -1018,7 +1090,16 @@ public class MmlGrammarAccess extends AbstractGrammarElementFinder {
 		return getRandomForestAccess().getRule();
 	}
 	
-	//// TODO: hyperparameters?
+	//enum TYPE:
+	//	regressor='Regressor' | classifier='Classifier';
+	public TYPEElements getTYPEAccess() {
+		return eTYPE;
+	}
+	
+	public EnumRule getTYPERule() {
+		return getTYPEAccess().getRule();
+	}
+	
 	//SGD:
 	//	{SGD} ('StochasticGradientDescent' | 'SGD');
 	public SGDElements getSGDAccess() {

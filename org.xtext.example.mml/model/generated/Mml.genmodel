@@ -21,6 +21,10 @@
       <genEnumLiterals ecoreEnumLiteral="Mml.ecore#//SVMKernel/poly"/>
       <genEnumLiterals ecoreEnumLiteral="Mml.ecore#//SVMKernel/rbf"/>
     </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="Mml.ecore#//TYPE">
+      <genEnumLiterals ecoreEnumLiteral="Mml.ecore#//TYPE/regressor"/>
+      <genEnumLiterals ecoreEnumLiteral="Mml.ecore#//TYPE/classifier"/>
+    </genEnums>
     <genEnums typeSafeEnumCompatible="false" ecoreEnum="Mml.ecore#//ValidationMetric">
       <genEnumLiterals ecoreEnumLiteral="Mml.ecore#//ValidationMetric/MSE"/>
       <genEnumLiterals ecoreEnumLiteral="Mml.ecore#//ValidationMetric/MAE"/>
@@ -51,7 +55,11 @@
     <genClasses ecoreClass="Mml.ecore#//DT">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Mml.ecore#//DT/max_depth"/>
     </genClasses>
-    <genClasses ecoreClass="Mml.ecore#//RandomForest"/>
+    <genClasses ecoreClass="Mml.ecore#//RandomForest">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Mml.ecore#//RandomForest/type"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Mml.ecore#//RandomForest/n_estimators"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Mml.ecore#//RandomForest/max_depth"/>
+    </genClasses>
     <genClasses ecoreClass="Mml.ecore#//SGD"/>
     <genClasses ecoreClass="Mml.ecore#//GTB"/>
     <genClasses ecoreClass="Mml.ecore#//RFormula">

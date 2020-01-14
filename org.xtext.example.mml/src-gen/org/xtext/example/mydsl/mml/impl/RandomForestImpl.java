@@ -3,20 +3,93 @@
  */
 package org.xtext.example.mydsl.mml.impl;
 
+import org.eclipse.emf.common.notify.Notification;
+
 import org.eclipse.emf.ecore.EClass;
+
+import org.eclipse.emf.ecore.impl.ENotificationImpl;
 
 import org.xtext.example.mydsl.mml.MmlPackage;
 import org.xtext.example.mydsl.mml.RandomForest;
+import org.xtext.example.mydsl.mml.TYPE;
 
 /**
  * <!-- begin-user-doc -->
  * An implementation of the model object '<em><b>Random Forest</b></em>'.
  * <!-- end-user-doc -->
+ * <p>
+ * The following features are implemented:
+ * </p>
+ * <ul>
+ *   <li>{@link org.xtext.example.mydsl.mml.impl.RandomForestImpl#getType <em>Type</em>}</li>
+ *   <li>{@link org.xtext.example.mydsl.mml.impl.RandomForestImpl#getN_estimators <em>Nestimators</em>}</li>
+ *   <li>{@link org.xtext.example.mydsl.mml.impl.RandomForestImpl#getMax_depth <em>Max depth</em>}</li>
+ * </ul>
  *
  * @generated
  */
 public class RandomForestImpl extends MLAlgorithmImpl implements RandomForest
 {
+  /**
+   * The default value of the '{@link #getType() <em>Type</em>}' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @see #getType()
+   * @generated
+   * @ordered
+   */
+  protected static final TYPE TYPE_EDEFAULT = TYPE.REGRESSOR;
+
+  /**
+   * The cached value of the '{@link #getType() <em>Type</em>}' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @see #getType()
+   * @generated
+   * @ordered
+   */
+  protected TYPE type = TYPE_EDEFAULT;
+
+  /**
+   * The default value of the '{@link #getN_estimators() <em>Nestimators</em>}' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @see #getN_estimators()
+   * @generated
+   * @ordered
+   */
+  protected static final int NESTIMATORS_EDEFAULT = 0;
+
+  /**
+   * The cached value of the '{@link #getN_estimators() <em>Nestimators</em>}' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @see #getN_estimators()
+   * @generated
+   * @ordered
+   */
+  protected int n_estimators = NESTIMATORS_EDEFAULT;
+
+  /**
+   * The default value of the '{@link #getMax_depth() <em>Max depth</em>}' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @see #getMax_depth()
+   * @generated
+   * @ordered
+   */
+  protected static final int MAX_DEPTH_EDEFAULT = 0;
+
+  /**
+   * The cached value of the '{@link #getMax_depth() <em>Max depth</em>}' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @see #getMax_depth()
+   * @generated
+   * @ordered
+   */
+  protected int max_depth = MAX_DEPTH_EDEFAULT;
+
   /**
    * <!-- begin-user-doc -->
    * <!-- end-user-doc -->
@@ -36,6 +109,188 @@ public class RandomForestImpl extends MLAlgorithmImpl implements RandomForest
   protected EClass eStaticClass()
   {
     return MmlPackage.Literals.RANDOM_FOREST;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public TYPE getType()
+  {
+    return type;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public void setType(TYPE newType)
+  {
+    TYPE oldType = type;
+    type = newType == null ? TYPE_EDEFAULT : newType;
+    if (eNotificationRequired())
+      eNotify(new ENotificationImpl(this, Notification.SET, MmlPackage.RANDOM_FOREST__TYPE, oldType, type));
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public int getN_estimators()
+  {
+    return n_estimators;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public void setN_estimators(int newN_estimators)
+  {
+    int oldN_estimators = n_estimators;
+    n_estimators = newN_estimators;
+    if (eNotificationRequired())
+      eNotify(new ENotificationImpl(this, Notification.SET, MmlPackage.RANDOM_FOREST__NESTIMATORS, oldN_estimators, n_estimators));
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public int getMax_depth()
+  {
+    return max_depth;
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public void setMax_depth(int newMax_depth)
+  {
+    int oldMax_depth = max_depth;
+    max_depth = newMax_depth;
+    if (eNotificationRequired())
+      eNotify(new ENotificationImpl(this, Notification.SET, MmlPackage.RANDOM_FOREST__MAX_DEPTH, oldMax_depth, max_depth));
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public Object eGet(int featureID, boolean resolve, boolean coreType)
+  {
+    switch (featureID)
+    {
+      case MmlPackage.RANDOM_FOREST__TYPE:
+        return getType();
+      case MmlPackage.RANDOM_FOREST__NESTIMATORS:
+        return getN_estimators();
+      case MmlPackage.RANDOM_FOREST__MAX_DEPTH:
+        return getMax_depth();
+    }
+    return super.eGet(featureID, resolve, coreType);
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public void eSet(int featureID, Object newValue)
+  {
+    switch (featureID)
+    {
+      case MmlPackage.RANDOM_FOREST__TYPE:
+        setType((TYPE)newValue);
+        return;
+      case MmlPackage.RANDOM_FOREST__NESTIMATORS:
+        setN_estimators((Integer)newValue);
+        return;
+      case MmlPackage.RANDOM_FOREST__MAX_DEPTH:
+        setMax_depth((Integer)newValue);
+        return;
+    }
+    super.eSet(featureID, newValue);
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public void eUnset(int featureID)
+  {
+    switch (featureID)
+    {
+      case MmlPackage.RANDOM_FOREST__TYPE:
+        setType(TYPE_EDEFAULT);
+        return;
+      case MmlPackage.RANDOM_FOREST__NESTIMATORS:
+        setN_estimators(NESTIMATORS_EDEFAULT);
+        return;
+      case MmlPackage.RANDOM_FOREST__MAX_DEPTH:
+        setMax_depth(MAX_DEPTH_EDEFAULT);
+        return;
+    }
+    super.eUnset(featureID);
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public boolean eIsSet(int featureID)
+  {
+    switch (featureID)
+    {
+      case MmlPackage.RANDOM_FOREST__TYPE:
+        return type != TYPE_EDEFAULT;
+      case MmlPackage.RANDOM_FOREST__NESTIMATORS:
+        return n_estimators != NESTIMATORS_EDEFAULT;
+      case MmlPackage.RANDOM_FOREST__MAX_DEPTH:
+        return max_depth != MAX_DEPTH_EDEFAULT;
+    }
+    return super.eIsSet(featureID);
+  }
+
+  /**
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @generated
+   */
+  @Override
+  public String toString()
+  {
+    if (eIsProxy()) return super.toString();
+
+    StringBuilder result = new StringBuilder(super.toString());
+    result.append(" (type: ");
+    result.append(type);
+    result.append(", n_estimators: ");
+    result.append(n_estimators);
+    result.append(", max_depth: ");
+    result.append(max_depth);
+    result.append(')');
+    return result.toString();
   }
 
 } //RandomForestImpl

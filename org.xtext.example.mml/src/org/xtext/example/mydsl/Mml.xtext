@@ -8,9 +8,6 @@ MMLModel:
 	formula=RFormula?
 	validation=Validation
 	;
-
-
-
 	
 /*
  * 
@@ -27,8 +24,6 @@ CSVParsingConfiguration:
 enum CSVSeparator : COMMA=',' | SEMI_COLON=";" ;
 
 
-
-
 /*
  * mini DSL to select the ML algorithm we want 
  * we include the choice of the targeted language/framework
@@ -40,7 +35,6 @@ MLChoiceAlgorithm:
 	'mlframework' framework = FrameworkLang
 	'algorithm' algorithm = MLAlgorithm
 ;
-
 
 enum FrameworkLang: SCIKIT="scikit-learn" | R="R" | JavaWeka="Weka" | XGBoost="xgboost";
 
@@ -61,8 +55,12 @@ DT:
 
 
 RandomForest: {RandomForest}
-	('RandomForest'|'RF')
+	('RandomForest'|'RF' type=TYPE) ('n_estimators=' n_estimators=INT)? ('max_depth=' max_depth=INT)?
 ; // TODO: hyperparameters?
+
+enum TYPE:
+	regressor = 'Regressor'|classifier ='Classifier'
+;
 
 SGD: {SGD}
 	('StochasticGradientDescent'|'SGD')
@@ -95,7 +93,6 @@ PredictorVariables :
 FormulaItem:
 	column=INT | colName=STRING
 ;
-
 
 /*
  * mini DSL for evaluation

@@ -28,6 +28,7 @@ import org.xtext.example.mydsl.mml.MLChoiceAlgorithm;
 import org.xtext.example.mydsl.mml.MMLModel;
 import org.xtext.example.mydsl.mml.PredictorVariables;
 import org.xtext.example.mydsl.mml.RFormula;
+import org.xtext.example.mydsl.mml.RandomForest;
 import org.xtext.example.mydsl.mml.SVR;
 import org.xtext.example.mydsl.mml.StratificationMethod;
 import org.xtext.example.mydsl.mml.TrainingTest;
@@ -125,6 +126,7 @@ public class MmlParsingJavaTestBorisBastienFileInput {
 		return null;
 	}
 
+	@SuppressWarnings("unused")
 	private String compileScikit(RFormula formule, String fileLocation, MLChoiceAlgorithm mlchoicealgo, Validation validation, String csv_separator) {
 		
 		String pythonImport = "import pandas as pd\n"; 
@@ -170,11 +172,45 @@ public class MmlParsingJavaTestBorisBastienFileInput {
 		MLAlgorithm algo = mlchoicealgo.getAlgorithm();
 		String algoDeclaration="";
 		if(algo instanceof SVR) {
-			//TODO complete with same template as DT below
+			pythonImport += "from sklearn.svm import SVR";
+			algoDeclaration = "clf = SVR(";
+			if (!((SVR)algo).getKernel().equals(null)) {
+				algoDeclaration += "kernel = " + ((SVR)algo).getKernel();
+			}
+			if (!((SVR)algo).getC().equals(null)) {
+				if (!((SVR)algo).getKernel().equals(null)) {
+					algoDeclaration += ",";
+				}
+				algoDeclaration += " C = " + ((SVR)algo).getC() + ")";
+			} else {
+				algoDeclaration += ")";
+			}
+			
 		}else if(algo instanceof DT) { //DecisionTree
 			pythonImport+="from sklearn import tree\n";
 			algoDeclaration = "clf = tree.DecisionTreeRegressor()\n";
-		}//TODO other algos
+		}else if(algo instanceof RandomForest) {
+			if (((RandomForest)algo).getType().toString().equals("Regressor")){
+				pythonImport += "from sklearn.ensemble import RandomForestRegressor";
+				algoDeclaration = "clf = RandomForestRegressor(";
+				if ((((Integer) ((RandomForest)algo).getN_estimators())) != null) {
+					algoDeclaration += "n_estimators = " + ((RandomForest)algo).getN_estimators();
+				}
+				if ((((Integer) ((RandomForest)algo).getMax_depth())) != null) {
+					if ((((Integer) ((RandomForest)algo).getN_estimators())) != null) {
+						algoDeclaration += ",";
+					}
+					algoDeclaration += " max_depth = " + ((RandomForest)algo).getMax_depth() + ")";
+				} else {
+					algoDeclaration += ")";
+				}
+			}
+			if (((RandomForest)algo).getType().toString().equals("Classifier")){
+				pythonImport += "from sklearn.ensemble import RandomForestClassifier";
+			}
+
+		}
+		//TODO other algos
 		
 		//validation
 		StratificationMethod stratMethod = validation.getStratification();

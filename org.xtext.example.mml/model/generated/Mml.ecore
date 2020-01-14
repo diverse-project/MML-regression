@@ -47,7 +47,15 @@
   <eClassifiers xsi:type="ecore:EClass" name="DT" eSuperTypes="#//MLAlgorithm">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="max_depth" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="RandomForest" eSuperTypes="#//MLAlgorithm"/>
+  <eClassifiers xsi:type="ecore:EClass" name="RandomForest" eSuperTypes="#//MLAlgorithm">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="type" eType="#//TYPE"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="n_estimators" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="max_depth" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="TYPE">
+    <eLiterals name="regressor" literal="Regressor"/>
+    <eLiterals name="classifier" value="1" literal="Classifier"/>
+  </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="SGD" eSuperTypes="#//MLAlgorithm"/>
   <eClassifiers xsi:type="ecore:EClass" name="GTB" eSuperTypes="#//MLAlgorithm"/>
   <eClassifiers xsi:type="ecore:EClass" name="RFormula">

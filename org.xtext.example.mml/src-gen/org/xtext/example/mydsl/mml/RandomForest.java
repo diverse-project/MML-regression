@@ -9,6 +9,14 @@ package org.xtext.example.mydsl.mml;
  * A representation of the model object '<em><b>Random Forest</b></em>'.
  * <!-- end-user-doc -->
  *
+ * <p>
+ * The following features are supported:
+ * </p>
+ * <ul>
+ *   <li>{@link org.xtext.example.mydsl.mml.RandomForest#getType <em>Type</em>}</li>
+ *   <li>{@link org.xtext.example.mydsl.mml.RandomForest#getN_estimators <em>Nestimators</em>}</li>
+ *   <li>{@link org.xtext.example.mydsl.mml.RandomForest#getMax_depth <em>Max depth</em>}</li>
+ * </ul>
  *
  * @see org.xtext.example.mydsl.mml.MmlPackage#getRandomForest()
  * @model
@@ -16,4 +24,73 @@ package org.xtext.example.mydsl.mml;
  */
 public interface RandomForest extends MLAlgorithm
 {
+  /**
+   * Returns the value of the '<em><b>Type</b></em>' attribute.
+   * The literals are from the enumeration {@link org.xtext.example.mydsl.mml.TYPE}.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the value of the '<em>Type</em>' attribute.
+   * @see org.xtext.example.mydsl.mml.TYPE
+   * @see #setType(TYPE)
+   * @see org.xtext.example.mydsl.mml.MmlPackage#getRandomForest_Type()
+   * @model
+   * @generated
+   */
+  TYPE getType();
+
+  /**
+   * Sets the value of the '{@link org.xtext.example.mydsl.mml.RandomForest#getType <em>Type</em>}' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @param value the new value of the '<em>Type</em>' attribute.
+   * @see org.xtext.example.mydsl.mml.TYPE
+   * @see #getType()
+   * @generated
+   */
+  void setType(TYPE value);
+
+  /**
+   * Returns the value of the '<em><b>Nestimators</b></em>' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the value of the '<em>Nestimators</em>' attribute.
+   * @see #setN_estimators(int)
+   * @see org.xtext.example.mydsl.mml.MmlPackage#getRandomForest_N_estimators()
+   * @model
+   * @generated
+   */
+  int getN_estimators();
+
+  /**
+   * Sets the value of the '{@link org.xtext.example.mydsl.mml.RandomForest#getN_estimators <em>Nestimators</em>}' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @param value the new value of the '<em>Nestimators</em>' attribute.
+   * @see #getN_estimators()
+   * @generated
+   */
+  void setN_estimators(int value);
+
+  /**
+   * Returns the value of the '<em><b>Max depth</b></em>' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @return the value of the '<em>Max depth</em>' attribute.
+   * @see #setMax_depth(int)
+   * @see org.xtext.example.mydsl.mml.MmlPackage#getRandomForest_Max_depth()
+   * @model
+   * @generated
+   */
+  int getMax_depth();
+
+  /**
+   * Sets the value of the '{@link org.xtext.example.mydsl.mml.RandomForest#getMax_depth <em>Max depth</em>}' attribute.
+   * <!-- begin-user-doc -->
+   * <!-- end-user-doc -->
+   * @param value the new value of the '<em>Max depth</em>' attribute.
+   * @see #getMax_depth()
+   * @generated
+   */
+  void setMax_depth(int value);
+
 } // RandomForest

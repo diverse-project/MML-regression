@@ -270,7 +270,7 @@ public class MmlSemanticSequencer extends AbstractDelegatingSemanticSequencer {
 	 *     RandomForest returns RandomForest
 	 *
 	 * Constraint:
-	 *     {RandomForest}
+	 *     (type=TYPE? n_estimators=INT? max_depth=INT?)
 	 */
 	protected void sequence_RandomForest(ISerializationContext context, RandomForest semanticObject) {
 		genericSequencer.createSequence(context, semanticObject);
