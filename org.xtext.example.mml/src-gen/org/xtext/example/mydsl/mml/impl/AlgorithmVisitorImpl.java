@@ -11,7 +11,7 @@ public class AlgorithmVisitorImpl implements AlgorithmVisitor<String> {
 
 	@Override
 	public String visit(DT dt) {
-		return "decision_tree";
+		return "DecisionTree";
 	}
 
 	@Override
