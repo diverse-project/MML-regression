@@ -61,7 +61,7 @@ public class RCompilateur implements Compilateur {
 		CSVParsingConfiguration parsingInstruction = input.getParsingInstruction();
 		String separateur = parsingInstruction != null ? parsingInstruction.getSep().toString() : ",";
 		
-		code_.add(String.format("mml_data <- read.csv(file='%s' header=TRUE,sep='%s')", input.getFilelocation(), separateur));
+		code_.add(String.format("mml_data <- read.csv(file='%s', header=TRUE, sep='%s')", input.getFilelocation(), separateur));
 		
 		return new Pair<>(import_, code_);
 	}
@@ -111,7 +111,9 @@ public class RCompilateur implements Compilateur {
 		}
 		
 		code_.add("X_names <- c(names(X))");
-		code_.add("formula <- as.formula(paste(Y_name, paste(X_names, collapse=' + '), sep' ~ '))");
+		code_.add("formula <- as.formula(paste(Y_name, paste(X_names, collapse=' + '), sep=' ~ '))");
+		
+		import_.add("library(caret)");
 		
 		return new Pair<>(import_, code_);
 	}
@@ -120,5 +122,4 @@ public class RCompilateur implements Compilateur {
 	public String commandLine(String file) {
 		return String.format("R -q --vanilla < %s", file);
 	}
-
 }

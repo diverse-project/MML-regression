@@ -23,8 +23,6 @@ public class ValidationCompiler {
 		List<String> import_ = new LinkedList<>();
 		List<String> code_ = new LinkedList<>();
 		
-		import_.add("library(caret)");
-		
 		if(metrics != null) {
 			int cv = 5;
 			if(stratificationMethod.getNumber() != 0)
@@ -120,5 +118,4 @@ public class ValidationCompiler {
 		
 		return new Pair<>(import_, code_);
 	}
-	
 }
