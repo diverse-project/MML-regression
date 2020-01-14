@@ -3,6 +3,9 @@
  */
 package org.xtext.example.mydsl.mml.impl;
 
+import java.util.List;
+import java.util.Map;
+
 import org.eclipse.emf.common.notify.Notification;
 
 import org.eclipse.emf.ecore.EClass;
@@ -166,7 +169,7 @@ public class DTImpl extends MinimalEObjectImpl.Container implements DT,MLAlgorit
 	}
 
 	@Override
-	public String accept(AlgorithmVisitor<String> v) {
+	public Map<String,List<String>> accept(AlgorithmVisitor<Map<String,List<String>>> v) {
 		return v.visit(this);
 	}
 
