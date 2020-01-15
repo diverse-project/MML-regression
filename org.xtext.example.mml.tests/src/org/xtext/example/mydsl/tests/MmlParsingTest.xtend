@@ -5,8 +5,11 @@ package org.xtext.example.mydsl.tests
 
 import com.google.common.io.Files
 import com.google.inject.Inject
+import java.io.BufferedReader
 import java.io.File
+import java.io.InputStreamReader
 import java.util.List
+import java.util.Map
 import org.eclipse.xtext.testing.InjectWith
 import org.eclipse.xtext.testing.extensions.InjectionExtension
 import org.eclipse.xtext.testing.util.ParseHelper
@@ -21,9 +24,7 @@ import org.xtext.example.mydsl.mml.MMLModel
 import org.xtext.example.mydsl.mml.StratificationMethod
 import org.xtext.example.mydsl.mml.Validation
 import org.xtext.example.mydsl.mml.ValidationMetric
-import java.util.stream.DoubleStream.Builder
-import java.io.BufferedReader
-import java.io.InputStreamReader
+import org.xtext.example.mydsl.mml.impl.AlgorithmVisitorImpl
 
 @ExtendWith(InjectionExtension)
 @InjectWith(MmlInjectorProvider)
@@ -63,6 +64,12 @@ class MmlParsingTest {
 		val DataInput dataInput = result.input;
 		val String fileLocation = dataInput.filelocation;
 		
+		//Algorithm
+		val MLChoiceAlgorithm mlChoiceAlgorithm = result.algorithm;
+		val FrameworkLang frameworklang = mlChoiceAlgorithm.framework;
+		val MLAlgorithm mlAlgorithm = mlChoiceAlgorithm.algorithm;
+		val Map<String,List<String>> map = mlAlgorithm.accept(new AlgorithmVisitorImpl("DT"));
+		
 		//TrainningTest
 		val Validation validation = result.validation;
 		val StratificationMethod stratification = validation.stratification;
@@ -76,20 +83,13 @@ class MmlParsingTest {
 		val String validationMetric = metrics.get(0).literal.toString();
 		val String trainning = "train_test_split";
 		
+		// start of Python generation
 		var String pythonImport = "import pandas as pd\n";
+		for(String input:map.get("inputs")){
+			pythonImport += input+"\n";
+		}
 		pythonImport += "from sklearn.model_selection import "+trainning+"\n";
-		pythonImport += "from sklearn import *\n";
 		pythonImport += "from sklearn.metrics import "+validationMetric+"\n";
-		val String DEFAULT_COLUMN_SEPARATOR = ","; // by default
-		val String csv_separator = DEFAULT_COLUMN_SEPARATOR;
-		
-		val MLChoiceAlgorithm mlChoiceAlgorithm = result.algorithm;
-		val FrameworkLang frameworklang = mlChoiceAlgorithm.framework;
-		val MLAlgorithm mlAlgorithm = mlChoiceAlgorithm.algorithm;
-		
-		val String SCIKIT = "scikit-learn";
-		val String test = "";
-		val String pythonAlgorithm = "DecisionTree";
 		
 		
 		/*
@@ -98,17 +98,17 @@ class MmlParsingTest {
 			csv_separator = parsingInstruction.getSep().toString();
 		}
 		*/
-		val String	csvReading = "mml_data = pd.read_csv(\""+ fileLocation + "\")";
+		val String	csvReading = "\nmml_data = pd.read_csv(\""+ fileLocation + "\")";
 		var String	pandasCode = pythonImport + csvReading;
 		val String column = "column = mml_data.columns[-1]";
 		pandasCode += "\n"+column+" \nX = mml_data.drop(columns=[column]) \n";
 		pandasCode += "\ny = mml_data[column] \n";
 		pandasCode += "\ntest_size = "+ percentageTest +" \n";
 		pandasCode += "\nX_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size) \n";
-		pandasCode += "\nclf = tree.DecisionTreeRegressor() \n";
+		pandasCode += "\nclf = "+map.get("body").get(0)+" \n";
 		pandasCode += "\nclf.fit(X_train, y_train) \n";
 		pandasCode += "\naccuracy = "+validationMetric+"(y_test, clf.predict(X_test)) \n";
-		pandasCode += "\nprint(accuracy) \n";
+		pandasCode += "\nprint(accuracy)";
 		
 		Files.write(pandasCode.getBytes(), new File("mml.py"));
 		// end of Python generation
@@ -129,10 +129,17 @@ class MmlParsingTest {
 			System.out.println(line);
 		}
 	/*
-	private String mkValueInSingleQuote
-	(String val){
-		return "'" +
-	val + "'";
-}*/
+		private String mkValueInSingleQuote
+		(String val){
+			return "'" +
+		val + "'";
+		}
+		val String DEFAULT_COLUMN_SEPARATOR = ","; // by default
+		val String csv_separator = DEFAULT_COLUMN_SEPARATOR;
+		val String SCIKIT = "scikit-learn";
+		val String test = "";
+		val String pythonAlgorithm = "DecisionTree";
+		
+		*/
 	}
 }

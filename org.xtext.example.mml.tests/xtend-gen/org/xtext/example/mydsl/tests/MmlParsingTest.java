@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
+import java.util.Map;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtend2.lib.StringConcatenation;
@@ -29,6 +30,7 @@ import org.xtext.example.mydsl.mml.MMLModel;
 import org.xtext.example.mydsl.mml.StratificationMethod;
 import org.xtext.example.mydsl.mml.Validation;
 import org.xtext.example.mydsl.mml.ValidationMetric;
+import org.xtext.example.mydsl.mml.impl.AlgorithmVisitorImpl;
 import org.xtext.example.mydsl.tests.MmlInjectorProvider;
 
 @ExtendWith(InjectionExtension.class)
@@ -104,6 +106,11 @@ public class MmlParsingTest {
       final MMLModel result = this.parseHelper.parse(_builder);
       final DataInput dataInput = result.getInput();
       final String fileLocation = dataInput.getFilelocation();
+      final MLChoiceAlgorithm mlChoiceAlgorithm = result.getAlgorithm();
+      final FrameworkLang frameworklang = mlChoiceAlgorithm.getFramework();
+      final MLAlgorithm mlAlgorithm = mlChoiceAlgorithm.getAlgorithm();
+      AlgorithmVisitorImpl _algorithmVisitorImpl = new AlgorithmVisitorImpl("DT");
+      final Map<String, List<String>> map = mlAlgorithm.accept(_algorithmVisitorImpl);
       final Validation validation = result.getValidation();
       final StratificationMethod stratification = validation.getStratification();
       final List<ValidationMetric> metrics = validation.getMetric();
@@ -113,21 +120,16 @@ public class MmlParsingTest {
       final String validationMetric = metrics.get(0).getLiteral().toString();
       final String trainning = "train_test_split";
       String pythonImport = "import pandas as pd\n";
-      String _pythonImport = pythonImport;
-      pythonImport = (_pythonImport + (("from sklearn.model_selection import " + trainning) + "\n"));
+      List<String> _get = map.get("inputs");
+      for (final String input : _get) {
+        String _pythonImport = pythonImport;
+        pythonImport = (_pythonImport + (input + "\n"));
+      }
       String _pythonImport_1 = pythonImport;
-      pythonImport = (_pythonImport_1 + "from sklearn import *\n");
+      pythonImport = (_pythonImport_1 + (("from sklearn.model_selection import " + trainning) + "\n"));
       String _pythonImport_2 = pythonImport;
       pythonImport = (_pythonImport_2 + (("from sklearn.metrics import " + validationMetric) + "\n"));
-      final String DEFAULT_COLUMN_SEPARATOR = ",";
-      final String csv_separator = DEFAULT_COLUMN_SEPARATOR;
-      final MLChoiceAlgorithm mlChoiceAlgorithm = result.getAlgorithm();
-      final FrameworkLang frameworklang = mlChoiceAlgorithm.getFramework();
-      final MLAlgorithm mlAlgorithm = mlChoiceAlgorithm.getAlgorithm();
-      final String SCIKIT = "scikit-learn";
-      final String test = "";
-      final String pythonAlgorithm = "DecisionTree";
-      final String csvReading = (("mml_data = pd.read_csv(\"" + fileLocation) + "\")");
+      final String csvReading = (("\nmml_data = pd.read_csv(\"" + fileLocation) + "\")");
       String pandasCode = (pythonImport + csvReading);
       final String column = "column = mml_data.columns[-1]";
       String _pandasCode = pandasCode;
@@ -139,13 +141,16 @@ public class MmlParsingTest {
       String _pandasCode_3 = pandasCode;
       pandasCode = (_pandasCode_3 + "\nX_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size) \n");
       String _pandasCode_4 = pandasCode;
-      pandasCode = (_pandasCode_4 + "\nclf = tree.DecisionTreeRegressor() \n");
+      String _get_1 = map.get("body").get(0);
+      String _plus = ("\nclf = " + _get_1);
+      String _plus_1 = (_plus + " \n");
+      pandasCode = (_pandasCode_4 + _plus_1);
       String _pandasCode_5 = pandasCode;
       pandasCode = (_pandasCode_5 + "\nclf.fit(X_train, y_train) \n");
       String _pandasCode_6 = pandasCode;
       pandasCode = (_pandasCode_6 + (("\naccuracy = " + validationMetric) + "(y_test, clf.predict(X_test)) \n"));
       String _pandasCode_7 = pandasCode;
-      pandasCode = (_pandasCode_7 + "\nprint(accuracy) \n");
+      pandasCode = (_pandasCode_7 + "\nprint(accuracy)");
       byte[] _bytes = pandasCode.getBytes();
       File _file = new File("mml.py");
       Files.write(_bytes, _file);

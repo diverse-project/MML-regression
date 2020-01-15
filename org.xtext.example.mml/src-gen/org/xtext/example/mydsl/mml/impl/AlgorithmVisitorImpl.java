@@ -1,5 +1,6 @@
 package org.xtext.example.mydsl.mml.impl;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,8 @@ public class AlgorithmVisitorImpl implements AlgorithmVisitor<Map<String,List<St
 	@Override
 	public Map<String,List<String>> visit(DT dt) {
 		Map<String,List<String>> result = new HashMap<String, List<String>>();
+		result.put("inputs", Arrays.asList("from sklearn import tree"));
+		result.put("body", Arrays.asList("tree.DecisionTreeRegressor()"));
 		return result;
 	}
 

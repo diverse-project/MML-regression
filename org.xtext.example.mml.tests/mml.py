@@ -1,7 +1,8 @@
 import pandas as pd
+from sklearn import tree
 from sklearn.model_selection import train_test_split
-from sklearn import *
 from sklearn.metrics import mean_absolute_error
+
 mml_data = pd.read_csv("boston.csv")
 column = mml_data.columns[-1] 
 X = mml_data.drop(columns=[column]) 
