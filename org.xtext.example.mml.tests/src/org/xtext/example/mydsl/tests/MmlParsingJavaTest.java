@@ -4,14 +4,22 @@ import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.eclipse.emf.common.util.EList;
@@ -77,9 +85,8 @@ public class MmlParsingJavaTest {
 		Assertions.assertNotNull(result);
 		EList<Resource.Diagnostic> errors = result.eResource().getErrors();
 		Assertions.assertTrue(errors.isEmpty(), "Unexpected errors");
-		Assertions.assertEquals(
-				"/home/nico/IdeaProjects/idm_project/MML-regression/runtimeXText/boston/BostonHousing.csv",
-				result.getInput().getFilelocation());
+		// Assertions.assertEquals("/home/nico/IdeaProjects/idm_project/MML-regression/runtimeXText/boston/*.csv",
+		// result.getInput().getFilelocation());
 
 	}
 
@@ -131,78 +138,158 @@ public class MmlParsingJavaTest {
 			System.out.println(String.format("Time elapsed for %s : %s ns", filename, timeElapsed));
 		}
 
-		EList<ValidationMetric> metrics = result.getValidation().getMetric();
-		Map<String, Map<String, Double>> scoreResult = new HashMap<>();
-
 		for (Map.Entry<String, StringBuilder> entry : files_code.entrySet()) {
-			Map<String, Double> metricsScore = new HashMap<>();
-
 			File file = new File(entry.getKey());
 			Files.write(entry.getValue().toString().getBytes(), file);
 			file.setExecutable(true, false);
 			file.setReadable(true, false);
 			file.setWritable(true, false);
-
-			/*
-			 * Calling generated Python script (basic solution through systems call) we
-			 * assume that "python" is in the path
-			 */
-			long start = System.currentTimeMillis();
-
-			Process p = Runtime.getRuntime().exec("python " + entry.getKey());
-			BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			String line;
-			System.out.println(entry.getKey() + " : ");
-			int i = 0;
-			while ((line = in.readLine()) != null) {
-				metricsScore.put(metrics.get(i).getName(), Double.valueOf(line));
-				System.out.println(metrics.get(i).getName() + " : " + Double.valueOf(line));
-				i++;
-			}
-			long finish = System.currentTimeMillis();
-			long timeElapsed = finish - start;
-			metricsScore.put("Execution_Time", (double) timeElapsed);
-			scoreResult.put(entry.getKey(), metricsScore);
-			System.out.println(String.format("Time elapsed for %s : %s ms", entry.getKey(), timeElapsed));
-			System.out.println("");
 		}
+		int cpu_cores = Runtime.getRuntime().availableProcessors();
+		int nbIte = 16;
+		System.out.println("CPU cores available : " + cpu_cores);
+		System.out.println("Number of iteration : " + nbIte);
 
+		long start = System.currentTimeMillis();
 		System.out.println("Score comparison...");
+		EList<ValidationMetric> metrics = result.getValidation().getMetric();
 
-		for (ValidationMetric metric : metrics) {
-			Map<String, Double> metricComparison = new HashMap<>();
+		List<Future<Map<String, Map<String, Double>>>> futureList = new ArrayList<>();
+		List<Map<String, Map<String, Double>>> threadResults = new ArrayList<>();
+
+		ExecutorService executor = Executors.newFixedThreadPool(cpu_cores);
+		for (int i = 0; i < nbIte; i++) {
+			futureList.add(executor.submit(new ProgramExecution(files_code.keySet(), metrics)));
+		}
+		int tNb = 0;
+		for (Future<Map<String, Map<String, Double>>> thread : futureList) {
+			printProgress(0, nbIte, tNb);
+			threadResults.add(thread.get());
+			tNb++;
+		}
+		printProgress(0, nbIte, nbIte);
+		System.out.println();
+
+		Map<String, Map<String, Double>> finalScoreResult = initScoreResultMap(metrics);
+		Map<String, Map<String, Double>> scoreResult;
+
+		Set<String> statsValName = finalScoreResult.entrySet().iterator().next().getValue().keySet();
+		System.out.println("Gathering results...");
+
+		for (int i = 0; i < nbIte; i++) {
+
+			scoreResult = threadResults.get(i);
 
 			for (Entry<String, Map<String, Double>> entry : scoreResult.entrySet()) {
-				metricComparison.put(entry.getKey(), entry.getValue().get(metric.getName()));
+				Map<String, Double> metricComparison = new HashMap<>(entry.getValue());
+				Map<String, Double> oldMetricValue = new HashMap<>(finalScoreResult.get(entry.getKey()));
+				String fileName = entry.getKey();
+
+				for (String metric : statsValName) {
+					Double oldValue = oldMetricValue.get(metric);
+					Double newValue = metricComparison.get(metric);
+					metricComparison.put(metric, (newValue + oldValue));
+					finalScoreResult.put(entry.getKey(), metricComparison);
+				}
+				oldMetricValue = new HashMap<>(finalScoreResult.get(fileName));
 			}
-
-			metricComparison = metricComparison.entrySet().stream().sorted(Map.Entry.comparingByValue()).collect(
-					Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
-			printTop3(metric.getName(), metricComparison, "score");
 		}
+		System.out.println("Done !");
+		long finish = System.currentTimeMillis();
+		long timeElapsed = finish - start;
+		System.out.println("Took : " + getDurationBreakdown(timeElapsed) + "\n");
+		finalScoreResult = meanMetrics(finalScoreResult, nbIte);
 
-		Map<String, Double> executionTimeComparison = new HashMap<>();
-
-		for (Entry<String, Map<String, Double>> entry : scoreResult.entrySet()) {
-			executionTimeComparison.put(entry.getKey(), entry.getValue().get("Execution_Time"));
-		}
-
-		executionTimeComparison = executionTimeComparison.entrySet().stream().sorted(Map.Entry.comparingByValue())
-				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
-		printTop3("Execution_Time", executionTimeComparison, "ms");
-
+		printTop3(finalScoreResult);
+		executor.shutdown();
 	}
 
-	private void printTop3(String metricName, Map<String, Double> metricComparison, String unit) {
-		int i = 1;
-		System.out.println(metricName + " rating : ");
-		for (Entry<String, Double> entry : metricComparison.entrySet()) {
-			System.out.println(String.format("n°%d : %s with %s %s", i, entry.getKey(), entry.getValue(), unit));
-			i++;
-			if (i == 4)
-				break;
+	private Map<String, Map<String, Double>> meanMetrics(Map<String, Map<String, Double>> finalScoreResult, int nbIte) {
+		Map<String, Map<String, Double>> meanMap = new HashMap<>();
+		for (Entry<String, Map<String, Double>> entry : finalScoreResult.entrySet()) {
+			Map<String, Double> newMetricComparison = entry.getValue();
+			newMetricComparison.replaceAll((metricName, metricSum) -> metricSum /= nbIte);
+			meanMap.put(entry.getKey(), newMetricComparison);
 		}
-		System.out.println("");
+		return meanMap;
+	}
+
+	private Map<String, Map<String, Double>> initScoreResultMap(EList<ValidationMetric> metrics) {
+		Map<String, Map<String, Double>> initMap = new HashMap<>();
+		Map<String, Double> emptyMap = new HashMap<>();
+		for (ValidationMetric metric : metrics)
+			emptyMap.put(metric.getName(), 0.0);
+
+		emptyMap.put("Execution_Time", 0.0);
+
+		for (String entry : files_code.keySet())
+			initMap.put(entry, emptyMap);
+
+		return initMap;
+	}
+
+	private void printTop3(Map<String, Map<String, Double>> finalScoreResult) {
+		System.out.print("Results : ");
+		Set<String> statsValName = finalScoreResult.entrySet().iterator().next().getValue().keySet();
+		for (String statName : statsValName) {
+			int i = 1;
+			System.out.println("\n" + statName + " rating : ");
+			Map<String, Double> fileValueMap = finalScoreResult.entrySet().stream()
+					.collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get(statName))).entrySet()
+					.stream().sorted(Map.Entry.comparingByValue()).collect(Collectors.toMap(Map.Entry::getKey,
+							Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+
+			for (Entry<String, Double> entry : fileValueMap.entrySet()) {
+				System.out.println(String.format("n°%d : %s with %s %s", i, entry.getKey(), entry.getValue(),
+						(statName.equals("Execution_Time")) ? "ms" : "score"));
+				i++;
+
+				if (i == 4)
+					break;
+
+			}
+		}
+	}
+
+	public static String getDurationBreakdown(long millis) {
+		if (millis < 0) {
+			throw new IllegalArgumentException("Duration must be greater than zero!");
+		}
+
+		long days = TimeUnit.MILLISECONDS.toDays(millis);
+		millis -= TimeUnit.DAYS.toMillis(days);
+		long hours = TimeUnit.MILLISECONDS.toHours(millis);
+		millis -= TimeUnit.HOURS.toMillis(hours);
+		long minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
+		millis -= TimeUnit.MINUTES.toMillis(minutes);
+		long seconds = TimeUnit.MILLISECONDS.toSeconds(millis);
+
+		StringBuilder sb = new StringBuilder(64);
+		sb.append(days);
+		sb.append(" Days ");
+		sb.append(hours);
+		sb.append(" Hours ");
+		sb.append(minutes);
+		sb.append(" Minutes ");
+		sb.append(seconds);
+		sb.append(" Seconds");
+
+		return (sb.toString());
+	}
+
+	private static void printProgress(long startTime, long total, long current) {
+		StringBuilder string = new StringBuilder(140);
+		int percent = (int) (current * 100 / total);
+		string.append('\r')
+				.append(String.join("", Collections.nCopies(percent == 0 ? 2 : 2 - (int) (Math.log10(percent)), " ")))
+				.append(String.format(" %d%% [", percent)).append(String.join("", Collections.nCopies(percent, "=")))
+				.append('>').append(String.join("", Collections.nCopies(100 - percent, " "))).append(']')
+				.append(String.join("",
+						Collections.nCopies(current == 0 ? (int) (Math.log10(total))
+								: (int) (Math.log10(total)) - (int) (Math.log10(current)), " ")))
+				.append(String.format(" %d/%d", current, total));
+
+		System.out.print(string);
 	}
 
 	public String getName(MLAlgorithm MLalgo) {

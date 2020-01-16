@@ -9,7 +9,17 @@ mlframework scikit-learn
 algorithm SGD
 mlframework scikit-learn
 algorithm GTB
-formula 4~0+1+2+3+"nox"+5+"tax"
+mlframework xgboost
+algorithm SVR kernel=linear
+mlframework xgboost
+algorithm DT
+mlframework xgboost
+algorithm RandomForest
+mlframework xgboost
+algorithm SGD
+mlframework xgboost
+algorithm GTB
+formula "medv"~.
 CrossValidation {
     numRepetitionCross 5
 }

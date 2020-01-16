@@ -10,9 +10,8 @@ import warnings
 df = pd.read_csv('/home/nico/IdeaProjects/idm_project/MML-regression/runtimeXText/boston/BostonHousing.csv', sep=',')
 warnings.filterwarnings("ignore")
 
-coltokeep = [df.columns[0], df.columns[1], df.columns[2], df.columns[3], 'nox', df.columns[5], 'tax']
-X = df[coltokeep]
-y = df[df.columns[4]]
+X = df.drop(['medv'], axis=1)
+y = df['medv']
 
 clf = SVR(kernel='linear',epsilon=0.2)
 
