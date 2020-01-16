@@ -1,6 +1,6 @@
 # MML-regression
 
-Authors : Picard Michaël
+Authors : Picard Michaël, Pavy Myriam, Petit Valentin
 
 ## Code
 
@@ -13,7 +13,7 @@ The **Weka** compilator is complete and running, but lack the one feature and is
 
 The **R** compilator is *TODO*. You need to install the system package `r-base` and `r-base-dev` (for ubuntu), along with the some R library : `caret`, `rpart`, `gbm`, `randomForest`, `e1071`, `kernlab` and `sgd`.
 
-The **XGBoost** compilator (with **Python**) is TODO
+The **XGBoost** compilator (with **Python**) is *TODO*. You need the same dependencies as **Scikit-Learn** compilator with also `xgboost` python package.
 
 ### Testing and experiment
 

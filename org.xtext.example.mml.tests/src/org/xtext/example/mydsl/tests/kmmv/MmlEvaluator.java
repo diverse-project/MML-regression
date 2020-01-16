@@ -41,7 +41,7 @@ public class MmlEvaluator {
 				lastline = line;
 		    }
 			String split[] = lastline.split(" ");
-			lastline = split[split.length - 1]; 
+			lastline = split[split.length - 1];
 			Long elapsedTime = System.nanoTime() - startTime;
 			
 			try {
@@ -56,7 +56,7 @@ public class MmlEvaluator {
 						elapsedTime/1000000000.0);
 			} catch (Exception e) {
 				System.err.println(String.format(
-						"Error while running or compiling %s %s with %s .",
+						"Error while running %s %s with %s .",
 						model.getAlgorithms().get(i).getFramework().toString(),
 						Utils.algorithmName(model.getAlgorithms().get(i).getAlgorithm()),
 						fileLocation));
