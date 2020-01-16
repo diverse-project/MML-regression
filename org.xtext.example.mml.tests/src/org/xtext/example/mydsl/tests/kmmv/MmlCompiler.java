@@ -67,11 +67,11 @@ public class MmlCompiler {
 					break;
 				case XG_BOOST:
 					filename = xgboost.fileName(input, algorithm, validation, compteur++);
-//					Files.write(
-//							xgboost.compile(input, algorithm, formula, validation, tmp).getBytes(),
-//							new File(filename)
-//					);
-//					commandLines.add(xgboost.commandLine(filename));
+					Files.write(
+							xgboost.compile(input, algorithm, formula, validation, tmp).getBytes(),
+							new File(filename)
+					);
+				commandLines.add(xgboost.commandLine(filename));
 					break;
 				default:
 					break;
