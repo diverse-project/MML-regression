@@ -1,5 +1,7 @@
 # MML Project
 
+###### Hugues Leboulanger - Alexis Esnault
+
 ### Structure of the project 
 
 To generate different machine learning program and to be able to add new frameworks or features easily, 
@@ -39,10 +41,14 @@ To use this program we must create .mml file
 and change the variable ``path`` with the path to our .mml in the class ``MmlParsgingJavaTest`` (package org.xtext.example.mml.tests).
 Then the program will parse the .mml and generate all desired programs.
 Every results are then print in the console. Sorted from smallest to largest and with the exectution time for each program. 
+
 The files containing these programs are put in the directory ``prog-gen`` (at the root of org.xtext.example.mml.tests) in a directory named with the current date.
 
 Some program used for our tests are in a file named ``programmeMML``.
 
+Result in the console of eclipse : 
+
+![alt text](images/Console.png "console")
 
 ### Results
 
