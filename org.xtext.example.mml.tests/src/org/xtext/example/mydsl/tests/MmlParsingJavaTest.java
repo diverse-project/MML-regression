@@ -161,7 +161,7 @@ public class MmlParsingJavaTest {
 			}
 			long finish = System.currentTimeMillis();
 			long timeElapsed = finish - start;
-			metricsScore.put("timeElapsed", (double) timeElapsed);
+			metricsScore.put("Execution_Time", (double) timeElapsed);
 			scoreResult.put(entry.getKey(), metricsScore);
 			System.out.println(String.format("Time elapsed for %s : %s ms", entry.getKey(), timeElapsed));
 			System.out.println("");
@@ -178,16 +178,26 @@ public class MmlParsingJavaTest {
 
 			metricComparison = metricComparison.entrySet().stream().sorted(Map.Entry.comparingByValue()).collect(
 					Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
-			printTop3(metric.getName(), metricComparison);
+			printTop3(metric.getName(), metricComparison, "score");
 		}
+
+		Map<String, Double> executionTimeComparison = new HashMap<>();
+
+		for (Entry<String, Map<String, Double>> entry : scoreResult.entrySet()) {
+			executionTimeComparison.put(entry.getKey(), entry.getValue().get("Execution_Time"));
+		}
+
+		executionTimeComparison = executionTimeComparison.entrySet().stream().sorted(Map.Entry.comparingByValue())
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+		printTop3("Execution_Time", executionTimeComparison, "ms");
 
 	}
 
-	private void printTop3(String metricName, Map<String, Double> metricComparison) {
+	private void printTop3(String metricName, Map<String, Double> metricComparison, String unit) {
 		int i = 1;
 		System.out.println(metricName + " rating : ");
 		for (Entry<String, Double> entry : metricComparison.entrySet()) {
-			System.out.println(String.format("n°%d : %s with %s score", i, entry.getKey(), entry.getValue()));
+			System.out.println(String.format("n°%d : %s with %s %s", i, entry.getKey(), entry.getValue(), unit));
 			i++;
 			if (i == 4)
 				break;

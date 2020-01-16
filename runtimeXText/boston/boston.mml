@@ -1,14 +1,4 @@
 datainput "/home/nico/IdeaProjects/idm_project/MML-regression/runtimeXText/boston/BostonHousing.csv" separator ,
-mlframework xgboost
-algorithm SVR kernel=linear
-mlframework xgboost
-algorithm DT
-mlframework xgboost
-algorithm RandomForest
-mlframework xgboost
-algorithm SGD
-mlframework xgboost
-algorithm GTB
 mlframework scikit-learn
 algorithm SVR kernel=linear
 mlframework scikit-learn
