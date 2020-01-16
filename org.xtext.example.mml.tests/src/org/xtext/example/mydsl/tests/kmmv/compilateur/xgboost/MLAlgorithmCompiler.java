@@ -60,7 +60,7 @@ public class MLAlgorithmCompiler {
 		
 		import_.add("from xgboost import XGBClassifier");
 		
-		code_.add("clf = xgb.XGBClassifier()");
+		code_.add("clf = XGBClassifier()");
 		
 		return new Pair<>(import_, code_);
 	}
