@@ -14,5 +14,10 @@ datainput "boston.csv" separator ,
 	mlframework R algorithm SVR kernel=poly
 	mlframework R algorithm SGD
 	mlframework R algorithm GTB
+	mlframework xgboost algorithm DT
+	mlframework xgboost algorithm RF
+	mlframework xgboost algorithm SVR kernel=poly
+	mlframework xgboost algorithm SGD
+	mlframework xgboost algorithm GTB
 CrossValidation { numRepetitionCross 5 }
 mean_absolute_error
