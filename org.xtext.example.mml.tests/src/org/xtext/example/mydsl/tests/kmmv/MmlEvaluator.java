@@ -40,6 +40,8 @@ public class MmlEvaluator {
 			while ((line = in.readLine()) != null) {
 				lastline = line;
 		    }
+			String split[] = lastline.split(" ");
+			lastline = split[split.length - 1]; 
 			Long elapsedTime = System.nanoTime() - startTime;
 			
 			try {

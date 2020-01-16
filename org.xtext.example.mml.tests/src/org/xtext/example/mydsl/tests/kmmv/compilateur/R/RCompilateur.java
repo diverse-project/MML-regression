@@ -120,6 +120,6 @@ public class RCompilateur implements Compilateur {
 		
 	@Override
 	public String commandLine(String file) {
-		return String.format("R -q --vanilla < %s", file);
+		return String.format("Rscript %s", file);
 	}
 }
