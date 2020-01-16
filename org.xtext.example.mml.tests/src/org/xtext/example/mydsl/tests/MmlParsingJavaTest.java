@@ -35,7 +35,7 @@ public class MmlParsingJavaTest {
 	ParseHelper<MMLModel> parseHelper;
 	
 	//Path to the mml to compile
-	String path = "/home/hugues/Documents/eclipse/workspace/MML-regression/org.xtext.example.mml.tests/programmeMML/myprogram3.mml";
+	String path = "/home/hugues/Documents/eclipse/workspace/MML-regression/org.xtext.example.mml.tests/programmeMML/SVRLinear_CrossValid.mml";
 	String csvPath = "";
 	File program;	
 	String lang;

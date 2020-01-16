@@ -82,8 +82,8 @@ public class ModelScikit extends TemplateModel{
 				ret += "from sklearn.metrics import mean_absolute_error \n";
 			}
 			
-			if(metric.equals("mean_absolute_percentage_error")) {
-				ret.concat("");
+			if(metric.getLiteral().contains("mean_absolute_percentage_error")) {
+				ret += "from sklearn.metrics import median_absolute_error";
 			}
 		}
 		return ret;
@@ -217,7 +217,12 @@ public class ModelScikit extends TemplateModel{
 		// TODO Auto-generated method stub
 		String res = "\n";		
 		for(ValidationMetric item : model.getValidation().getMetric()) {
-			res += "print '"+item.getLiteral()+": {}'.format("+item.getLiteral()+"(y, y_test))" + "\n";
+			if(item.getLiteral().equals("mean_absolute_percentage_error")) {
+				res += "print '"+item.getLiteral()+": {}'.format(median_absolute_error(y, y_test))" + "\n";
+			}
+			else {
+				res += "print '"+item.getLiteral()+": {}'.format("+item.getLiteral()+"(y, y_test))" + "\n";
+			}
 		}
 		return res;
 	}

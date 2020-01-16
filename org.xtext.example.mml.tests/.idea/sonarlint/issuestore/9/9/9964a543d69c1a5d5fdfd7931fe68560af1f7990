@@ -1,0 +1,9 @@
+
+3squid:S1643—"Use a StringBuilder instead.(æÁÄ
+9squid:S1643˜"Use a StringBuilder instead.(ýÑúÖýÿÿÿÿ
+9squid:S1643¸"Use a StringBuilder instead.(É’³«ùÿÿÿÿ
+Ksquid:S1066="/Merge this if statement with the enclosing one.(ø§—Æÿÿÿÿÿ
+Lsquid:S1066‘"/Merge this if statement with the enclosing one.(¤ö•ëüÿÿÿÿ
+jsquid:UselessImportCheck"ARemove this unused import 'org.xtext.example.mydsl.mml.MMLModel'.(Ñö±Üùÿÿÿÿ
+isquid:S3776["RRefactor this method to reduce its Cognitive Complexity from 43 to the 15 allowed.(Å¦¶˜
+gsquid:CommentedOutCodeLine#"<This block of commented-out lines of code should be removed.(œüÇÚÿÿÿÿÿ

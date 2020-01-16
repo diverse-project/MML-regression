@@ -1,0 +1,7 @@
+datainput "/home/hugues/Documents/eclipse/runtime-EclipseXtext/testmml/src/Boston.csv" separator ,
+mlframework scikit-learn algorithm SVR kernel=linear
+mlframework xgboost algorithm SVR kernel=linear
+mlframework R algorithm SVR kernel=linear
+formula "medv"~ .
+TrainingTest { percentageTraining 3 }
+mean_absolute_error mean_squared_error mean_absolute_percentage_error

@@ -3,7 +3,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor 
 from sklearn.metrics import mean_squared_error 
 from sklearn.metrics import mean_absolute_error 
-
+from sklearn.metrics import median_absolute_error
 df = pd.read_csv('/home/hugues/Documents/eclipse/workspace/MML-regression/org.xtext.example.mml.tests/programmeMML/Boston.csv')
 X = df.drop(columns=['medv'])
 y = df['medv']
@@ -16,3 +16,4 @@ y = clf.predict(X_test)
 
 print 'mean_squared_error: {}'.format(mean_squared_error(y, y_test))
 print 'mean_absolute_error: {}'.format(mean_absolute_error(y, y_test))
+print 'mean_absolute_percentage_error: {}'.format(median_absolute_error(y, y_test))
