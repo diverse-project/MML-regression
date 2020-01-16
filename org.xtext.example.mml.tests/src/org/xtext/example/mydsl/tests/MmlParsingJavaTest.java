@@ -8,7 +8,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtext.testing.InjectWith;
@@ -28,6 +33,7 @@ import org.xtext.example.mydsl.mml.MMLModel;
 import org.xtext.example.mydsl.mml.RandomForest;
 import org.xtext.example.mydsl.mml.SGD;
 import org.xtext.example.mydsl.mml.SVR;
+import org.xtext.example.mydsl.mml.ValidationMetric;
 import org.xtext.example.mydsl.tests.algoList.PythonCode;
 import org.xtext.example.mydsl.tests.algoList.XgboostCode;
 import org.xtext.example.mydsl.tests.templateMethod.CodeGenerator;
@@ -110,10 +116,12 @@ public class MmlParsingJavaTest {
 				break;
 			default:
 				System.err.println(String.format("\"%s\" is not implemented yet.", filename));
-				filename += String.format("_%s_%s.unimplementedformat", stratificationName, getName(algo.getAlgorithm()));;
+				filename += String.format("_%s_%s.unimplementedformat", stratificationName,
+						getName(algo.getAlgorithm()));
+				;
 				break;
 			}
-			
+
 			StringBuilder program = gen.generate(csv_separator, algo, result);
 
 			files_code.putIfAbsent(filename, program);
@@ -123,25 +131,68 @@ public class MmlParsingJavaTest {
 			System.out.println(String.format("Time elapsed for %s : %s ns", filename, timeElapsed));
 		}
 
+		EList<ValidationMetric> metrics = result.getValidation().getMetric();
+		Map<String, Map<String, Double>> scoreResult = new HashMap<>();
+
 		for (Map.Entry<String, StringBuilder> entry : files_code.entrySet()) {
+			Map<String, Double> metricsScore = new HashMap<>();
+
 			File file = new File(entry.getKey());
 			Files.write(entry.getValue().toString().getBytes(), file);
 			file.setExecutable(true, false);
 			file.setReadable(true, false);
 			file.setWritable(true, false);
-		}
-		// end of Python generation
 
-		/*
-		 * Calling generated Python script (basic solution through systems call) we
-		 * assume that "python" is in the path
-		 */
-		Process p = Runtime.getRuntime().exec("python mml.py");
-		BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-		String line;
-		while ((line = in.readLine()) != null) {
-			System.out.println(line);
+			/*
+			 * Calling generated Python script (basic solution through systems call) we
+			 * assume that "python" is in the path
+			 */
+			long start = System.currentTimeMillis();
+
+			Process p = Runtime.getRuntime().exec("python " + entry.getKey());
+			BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			String line;
+			System.out.println(entry.getKey() + " : ");
+			int i = 0;
+			while ((line = in.readLine()) != null) {
+				metricsScore.put(metrics.get(i).getName(), Double.valueOf(line));
+				System.out.println(metrics.get(i).getName() + " : " + Double.valueOf(line));
+				i++;
+			}
+			long finish = System.currentTimeMillis();
+			long timeElapsed = finish - start;
+			metricsScore.put("timeElapsed", (double) timeElapsed);
+			scoreResult.put(entry.getKey(), metricsScore);
+			System.out.println(String.format("Time elapsed for %s : %s ms", entry.getKey(), timeElapsed));
+			System.out.println("");
 		}
+
+		System.out.println("Score comparison...");
+
+		for (ValidationMetric metric : metrics) {
+			Map<String, Double> metricComparison = new HashMap<>();
+
+			for (Entry<String, Map<String, Double>> entry : scoreResult.entrySet()) {
+				metricComparison.put(entry.getKey(), entry.getValue().get(metric.getName()));
+			}
+
+			metricComparison = metricComparison.entrySet().stream().sorted(Map.Entry.comparingByValue()).collect(
+					Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+			printTop3(metric.getName(), metricComparison);
+		}
+
+	}
+
+	private void printTop3(String metricName, Map<String, Double> metricComparison) {
+		int i = 1;
+		System.out.println(metricName + " rating : ");
+		for (Entry<String, Double> entry : metricComparison.entrySet()) {
+			System.out.println(String.format("n°%d : %s with %s score", i, entry.getKey(), entry.getValue()));
+			i++;
+			if (i == 4)
+				break;
+		}
+		System.out.println("");
 	}
 
 	public String getName(MLAlgorithm MLalgo) {

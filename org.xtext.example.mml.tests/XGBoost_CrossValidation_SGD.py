@@ -16,11 +16,10 @@ y = df[df.columns[4]]
 
 xgb_model = xgb.XGBRegressor()
 
-accuracy = cross_validate(xgb_model, X, y, cv=4)
-y_pred = cross_val_predict(xgb_model, X, y, cv=4)
+accuracy = cross_validate(xgb_model, X, y, cv=5)
+y_pred = cross_val_predict(xgb_model, X, y, cv=5)
 y_test = y
-print("accuracy : " + str(accuracy))
-print('mean_squared_error : ' + str(mean_squared_error(y_test, y_pred)))
-print('mean_absolute_error : ' + str(mean_absolute_error(y_test, y_pred)))
-print('median_absolute_error : ' + str(median_absolute_error(y_test, y_pred)))
+print(mean_squared_error(y_test, y_pred))
+print(mean_absolute_error(y_test, y_pred))
+print(median_absolute_error(y_test, y_pred))
 

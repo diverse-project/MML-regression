@@ -129,7 +129,7 @@ public class PythonCode extends CodeGenerator {
 			validation.append("accuracy = cross_validate(clf, X, y, cv=" + crossVal.getNumber() + ")\n");
 			validation.append("y_pred = cross_val_predict(clf, X, y, cv=" + crossVal.getNumber() + ")\n");
 			validation.append("y_test = y\n");
-			validation.append("print(\"accuracy : \" + str(accuracy))\n");
+			// validation.append("print(\"accuracy : \" + str(accuracy))\n");
 		} else {
 			TrainingTest training = (TrainingTest) stratification;
 			imports.insert(0, "from sklearn.model_selection import train_test_split\n");
@@ -140,8 +140,7 @@ public class PythonCode extends CodeGenerator {
 		}
 		for (ValidationMetric metric : result.getValidation().getMetric()) {
 			imports.insert(0, "from sklearn.metrics import " + metric.getLiteral() + "\n");
-			validation.append(
-					"print(\'" + metric.getLiteral() + " : \' + str(" + metric.getLiteral() + "(y_test, y_pred)))\n");
+			validation.append("print(" + metric.getLiteral() + "(y_test, y_pred))\n");
 		}
 
 		validation.append("\n");
