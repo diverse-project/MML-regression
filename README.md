@@ -72,7 +72,7 @@ But, in Training test, Xgboost has the best execution time (less than 1 second) 
 
 #####Results with SVR RBF :
 
-![alt text](images/SVRRBBF.png "SVR RBF results")
+![alt text](images/SVR_RBF.png "SVR RBF results")
 
 We can notice that Scikit has, in ``Training Test``, the best execution time (less than 1 second) but gets the worst values. 
 Where XGBoost has the best results except for ``Mean squared error`` where R is better.
