@@ -1,4 +1,4 @@
-package org.xtext.example.mydsl.tests
+package org.xtext.example.mydsl.tests.bobo_abdellah_sabrina_charaf
 
 class MmlCompilateurScikitLearn {
 	

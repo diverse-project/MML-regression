@@ -1,5 +1,6 @@
 package org.xtext.example.mydsl.mml.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +36,11 @@ public class AlgorithmVisitorImpl implements AlgorithmVisitor<Map<String,List<St
 				break;
 		}
 		result.put("inputs", Arrays.asList("from sklearn import tree"));
-		result.put("body", Arrays.asList("tree.DecisionTreeRegressor()"));
+		List<String> containsBody = new ArrayList<String>();
+		containsBody.add("clf = tree.DecisionTreeRegressor()");
+		containsBody.add("clf.fit(X_train, y_train)");
+		containsBody.add("y_pred =  clf.predict(X_test)");
+		result.put("body", containsBody);
 		return result;
 	}
 
@@ -48,6 +53,15 @@ public class AlgorithmVisitorImpl implements AlgorithmVisitor<Map<String,List<St
 	@Override
 	public Map<String,List<String>> visit(RandomForest randomForest) {
 		Map<String,List<String>> result = new HashMap<String, List<String>>();
+		List<String> containsInputs = new ArrayList<String>();
+		containsInputs.add("import numpy as np");
+		containsInputs.add("from sklearn.ensemble import RandomForestRegressor");
+		result.put("inputs", containsInputs);
+		List<String> containsBody = new ArrayList<String>();
+		containsBody.add("regressor = RandomForestRegressor()");
+		containsBody.add("regressor.fit(X_train, y_train)");
+		containsBody.add("y_pred = regressor.predict(X_test)");
+		result.put("body", containsBody);
 		return result;
 	}
 
