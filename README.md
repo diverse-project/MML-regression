@@ -51,7 +51,7 @@ For our test with R we only use the dataset Boston.csv because x264.csv causes e
 During this tests to properly compare Scikit, Xgboost and Caret (R) we only used the algorithm Random Forst and SVR (with linear and rbf options).
 
 
-#####Results with Random Forest : 
+#### Results with Random Forest : 
 
 ![alt text](images/randomForest.png "random Forest results")
  
@@ -61,7 +61,7 @@ But we can notice that R also needs a bigger execution time to work especially i
 XGBoost and Scikit have approximately the same execution time but XGBoost has better results mainly for ``Mean square error`` where its 8% against 11%.
  
 
-#####Results with SVR Linear : 
+#### Results with SVR Linear : 
 
 ![alt text](images/SVRLinear.png "SVR Linear results")
 
@@ -70,7 +70,7 @@ Here, we can see that R has also the best results (in ``Cross validation`` or ``
 We can also notice a pretty long time of execution for scikit and Xgboost in cross validation : 35s where R took only 4s.
 But, in Training test, Xgboost has the best execution time (less than 1 second) where R took 3s and Scikit 9s.
 
-#####Results with SVR RBF :
+#### Results with SVR RBF :
 
 ![alt text](images/SVR_RBF.png "SVR RBF results")
 
