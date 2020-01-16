@@ -25,6 +25,8 @@ import org.xtext.example.mydsl.mml.StratificationMethod
 import org.xtext.example.mydsl.mml.Validation
 import org.xtext.example.mydsl.mml.ValidationMetric
 import org.xtext.example.mydsl.mml.impl.AlgorithmVisitorImpl
+import org.xtext.example.mydsl.mml.DT
+import org.xtext.example.mydsl.mml.RandomForest
 
 @ExtendWith(InjectionExtension)
 @InjectWith(MmlInjectorProvider)
@@ -64,12 +66,23 @@ class MmlParsingTest {
 		val DataInput dataInput = result.input;
 		val String fileLocation = dataInput.filelocation;
 		
+		// start of Python generation
+		var String pythonImport = "import pandas as pd\n";
+		
 		//Algorithm
 		val MLChoiceAlgorithm mlChoiceAlgorithm = result.algorithm;
 		val FrameworkLang frameworklang = mlChoiceAlgorithm.framework;
 		val MLAlgorithm mlAlgorithm = mlChoiceAlgorithm.algorithm;
-		val Map<String,List<String>> map = mlAlgorithm.accept(new AlgorithmVisitorImpl("DT"));
-		
+
+		var String body = "";
+		switch mlAlgorithm {
+			case DT: {
+				pythonImport += "from sklearn import tree\n";
+				body = "tree.DecisionTreeRegressor()";
+			}
+			case RandomForest: println("It's some string.")
+			default: println("It's another short string.")
+		}
 		//TrainningTest
 		val Validation validation = result.validation;
 		val StratificationMethod stratification = validation.stratification;
@@ -83,13 +96,10 @@ class MmlParsingTest {
 		val String validationMetric = metrics.get(0).literal.toString();
 		val String trainning = "train_test_split";
 		
-		// start of Python generation
-		var String pythonImport = "import pandas as pd\n";
-		for(String input:map.get("inputs")){
-			pythonImport += input+"\n";
-		}
+		
 		pythonImport += "from sklearn.model_selection import "+trainning+"\n";
 		pythonImport += "from sklearn.metrics import "+validationMetric+"\n";
+		
 		
 		
 		/*
@@ -105,7 +115,7 @@ class MmlParsingTest {
 		pandasCode += "\ny = mml_data[column] \n";
 		pandasCode += "\ntest_size = "+ percentageTest +" \n";
 		pandasCode += "\nX_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size) \n";
-		pandasCode += "\nclf = "+map.get("body").get(0)+" \n";
+		pandasCode += "\nclf = "+body+" \n";
 		pandasCode += "\nclf.fit(X_train, y_train) \n";
 		pandasCode += "\naccuracy = "+validationMetric+"(y_test, clf.predict(X_test)) \n";
 		pandasCode += "\nprint(accuracy)";

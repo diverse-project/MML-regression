@@ -14,14 +14,26 @@ import org.xtext.example.mydsl.mml.SVR;
 
 public class AlgorithmVisitorImpl implements AlgorithmVisitor<Map<String,List<String>>> {
 
-	private String langageName;
+	private String frameworkLang;
 	
-	public AlgorithmVisitorImpl(String langageName) {
-		this.langageName = langageName;
+	public AlgorithmVisitorImpl(String frameworkLang) {
+		this.frameworkLang = frameworkLang;
 	}
 	@Override
 	public Map<String,List<String>> visit(DT dt) {
 		Map<String,List<String>> result = new HashMap<String, List<String>>();
+		switch(this.frameworkLang) {
+			case "R":
+				break;
+			case "scikit-learn":
+				break;
+			case "Weka":
+				break;
+			case "xgboost":
+				break;
+			default:
+				break;
+		}
 		result.put("inputs", Arrays.asList("from sklearn import tree"));
 		result.put("body", Arrays.asList("tree.DecisionTreeRegressor()"));
 		return result;

@@ -3,6 +3,7 @@
  */
 package org.xtext.example.mydsl.tests;
 
+import com.google.common.base.Objects;
 import com.google.common.io.Files;
 import com.google.inject.Inject;
 import java.io.BufferedReader;
@@ -10,7 +11,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
-import java.util.Map;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtend2.lib.StringConcatenation;
@@ -18,19 +18,21 @@ import org.eclipse.xtext.testing.InjectWith;
 import org.eclipse.xtext.testing.extensions.InjectionExtension;
 import org.eclipse.xtext.testing.util.ParseHelper;
 import org.eclipse.xtext.xbase.lib.Exceptions;
+import org.eclipse.xtext.xbase.lib.InputOutput;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.xtext.example.mydsl.mml.DT;
 import org.xtext.example.mydsl.mml.DataInput;
 import org.xtext.example.mydsl.mml.FrameworkLang;
 import org.xtext.example.mydsl.mml.MLAlgorithm;
 import org.xtext.example.mydsl.mml.MLChoiceAlgorithm;
 import org.xtext.example.mydsl.mml.MMLModel;
+import org.xtext.example.mydsl.mml.RandomForest;
 import org.xtext.example.mydsl.mml.StratificationMethod;
 import org.xtext.example.mydsl.mml.Validation;
 import org.xtext.example.mydsl.mml.ValidationMetric;
-import org.xtext.example.mydsl.mml.impl.AlgorithmVisitorImpl;
 import org.xtext.example.mydsl.tests.MmlInjectorProvider;
 
 @ExtendWith(InjectionExtension.class)
@@ -106,11 +108,27 @@ public class MmlParsingTest {
       final MMLModel result = this.parseHelper.parse(_builder);
       final DataInput dataInput = result.getInput();
       final String fileLocation = dataInput.getFilelocation();
+      String pythonImport = "import pandas as pd\n";
       final MLChoiceAlgorithm mlChoiceAlgorithm = result.getAlgorithm();
       final FrameworkLang frameworklang = mlChoiceAlgorithm.getFramework();
       final MLAlgorithm mlAlgorithm = mlChoiceAlgorithm.getAlgorithm();
-      AlgorithmVisitorImpl _algorithmVisitorImpl = new AlgorithmVisitorImpl("DT");
-      final Map<String, List<String>> map = mlAlgorithm.accept(_algorithmVisitorImpl);
+      String body = "";
+      boolean _matched = false;
+      if (Objects.equal(mlAlgorithm, DT.class)) {
+        _matched=true;
+        String _pythonImport = pythonImport;
+        pythonImport = (_pythonImport + "from sklearn import tree\n");
+        body = "tree.DecisionTreeRegressor()";
+      }
+      if (!_matched) {
+        if (Objects.equal(mlAlgorithm, RandomForest.class)) {
+          _matched=true;
+          InputOutput.<String>println("It\'s some string.");
+        }
+      }
+      if (!_matched) {
+        InputOutput.<String>println("It\'s another short string.");
+      }
       final Validation validation = result.getValidation();
       final StratificationMethod stratification = validation.getStratification();
       final List<ValidationMetric> metrics = validation.getMetric();
@@ -119,12 +137,6 @@ public class MmlParsingTest {
       final double percentageTest = (1.0 - percentageTraining);
       final String validationMetric = metrics.get(0).getLiteral().toString();
       final String trainning = "train_test_split";
-      String pythonImport = "import pandas as pd\n";
-      List<String> _get = map.get("inputs");
-      for (final String input : _get) {
-        String _pythonImport = pythonImport;
-        pythonImport = (_pythonImport + (input + "\n"));
-      }
       String _pythonImport_1 = pythonImport;
       pythonImport = (_pythonImport_1 + (("from sklearn.model_selection import " + trainning) + "\n"));
       String _pythonImport_2 = pythonImport;
@@ -141,10 +153,7 @@ public class MmlParsingTest {
       String _pandasCode_3 = pandasCode;
       pandasCode = (_pandasCode_3 + "\nX_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size) \n");
       String _pandasCode_4 = pandasCode;
-      String _get_1 = map.get("body").get(0);
-      String _plus = ("\nclf = " + _get_1);
-      String _plus_1 = (_plus + " \n");
-      pandasCode = (_pandasCode_4 + _plus_1);
+      pandasCode = (_pandasCode_4 + (("\nclf = " + body) + " \n"));
       String _pandasCode_5 = pandasCode;
       pandasCode = (_pandasCode_5 + "\nclf.fit(X_train, y_train) \n");
       String _pandasCode_6 = pandasCode;

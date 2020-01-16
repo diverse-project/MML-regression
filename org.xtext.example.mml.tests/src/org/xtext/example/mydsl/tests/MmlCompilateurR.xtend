@@ -70,9 +70,13 @@ class MmlCompilateurR {
 		}
 
 		val MLAlgorithm mlA = MLCAlgorithm.algorithm;
-		val Map<String,List<String>> map = mlA.accept(new AlgorithmVisitorImpl("R"));
-		//visitor.visit(mlA);		
-
+		switch mlA {
+			case DT: println("a long string.")
+			case RandomForest: println("It's some string.")
+			default: println("It's another short string.")
+		}
+		val Map<String, List<String>> map = mlA.accept(new AlgorithmVisitorImpl("R"));
+		// visitor.visit(mlA);		
 		/*
 		 * read.csv("https://raw.githubusercontent.com/acherm/teaching-MDE1920/master/boston/boston.csv")->df
 		 * View(df)
@@ -110,5 +114,5 @@ class MmlCompilateurR {
 		 */
 		Files.write(rasCode.getBytes(), new File("mml.R"));
 	}
-	
+
 }
