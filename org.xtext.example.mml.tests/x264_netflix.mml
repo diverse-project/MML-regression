@@ -9,5 +9,10 @@ datainput "x264_netflix.csv" separator ,
 	mlframework Weka algorithm SVR kernel=poly
 	mlframework Weka algorithm SGD
 	mlframework Weka algorithm GTB
+	mlframework R algorithm DT
+	mlframework R algorithm RF
+	mlframework R algorithm SVR kernel=poly
+	mlframework R algorithm SGD
+	mlframework R algorithm GTB
 CrossValidation { numRepetitionCross 5 }
 mean_absolute_error
