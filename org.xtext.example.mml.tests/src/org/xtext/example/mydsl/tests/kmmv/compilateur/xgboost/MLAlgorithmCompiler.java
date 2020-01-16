@@ -33,12 +33,12 @@ public class MLAlgorithmCompiler {
 		List<String> import_ = new LinkedList<>();
 		List<String> code_ = new LinkedList<>();
 		
-//		import_.add("from sklearn.tree import DecisionTreeRegressor");
-//		
-//		if(algorithm.getMax_depth() != 0)
-//			code_.add(String.format("clf = DecisionTreeRegressor(max_depth=%d)",algorithm.getMax_depth()));
-//		else
-//			code_.add("clf = DecisionTreeRegressor()");
+		import_.add("from sklearn.tree import DecisionTreeRegressor");
+		
+		if(algorithm.getMax_depth() != 0)
+			code_.add(String.format("clf = DecisionTreeRegressor(max_depth=%d)",algorithm.getMax_depth()));
+		else
+			code_.add("clf = DecisionTreeRegressor()");	
 		
 		return new Pair<>(import_, code_);
 	}
@@ -47,9 +47,9 @@ public class MLAlgorithmCompiler {
 		List<String> import_ = new LinkedList<>();
 		List<String> code_ = new LinkedList<>();
 		
-//		import_.add("from sklearn.ensemble import GradientBoostingRegressor");
-//		
-//		code_.add("clf = GradientBoostingRegressor()");
+		import_.add("from sklearn.ensemble import GradientBoostingRegressor");
+		
+		code_.add("clf = GradientBoostingRegressor()");
 		
 		return new Pair<>(import_, code_);
 	}
@@ -58,9 +58,9 @@ public class MLAlgorithmCompiler {
 		List<String> import_ = new LinkedList<>();
 		List<String> code_ = new LinkedList<>();
 		
-//		import_.add("from sklearn.ensemble import RandomForestRegressor");
-//		
-//		code_.add("clf = RandomForestRegressor()");
+		import_.add("from xgboost import XGBClassifier");
+		
+		code_.add("clf = xgb.XGBClassifier()");
 		
 		return new Pair<>(import_, code_);
 	}
@@ -69,9 +69,9 @@ public class MLAlgorithmCompiler {
 		List<String> import_ = new LinkedList<>();
 		List<String> code_ = new LinkedList<>();
 		
-//		import_.add("from sklearn.linear_model import SGDRegressor");
-//		
-//		code_.add("clf = SGDRegressor()");
+		import_.add("from sklearn.linear_model import SGDRegressor");
+		
+		code_.add("clf = SGDRegressor()");
 		
 		return new Pair<>(import_, code_);
 	}
@@ -80,16 +80,16 @@ public class MLAlgorithmCompiler {
 		List<String> import_ = new LinkedList<>();
 		List<String> code_ = new LinkedList<>();
 		
-//		import_.add("from sklearn.svm import SVR");
-//		
-//		if(algorithm.getC() != null && algorithm.getKernel() != null)
-//			code_.add(String.format("clf = SVR(kernel='%s', C=%s)", algorithm.getKernel().toString(), algorithm.getC()));
-//		else if(algorithm.getC() == null && algorithm.getKernel() != null)
-//			code_.add(String.format("clf = SVR(kernel='%s')", algorithm.getKernel().toString()));
-//		else if(algorithm.getC() != null)
-//			code_.add(String.format("clf = SVR(C=%s)", algorithm.getC()));
-//		else
-//			code_.add("clf = SVR()");
+		import_.add("from sklearn.svm import SVR");
+		
+		if(algorithm.getC() != null && algorithm.getKernel() != null)
+			code_.add(String.format("clf = SVR(kernel='%s', C=%s)", algorithm.getKernel().toString(), algorithm.getC()));
+		else if(algorithm.getC() == null && algorithm.getKernel() != null)
+			code_.add(String.format("clf = SVR(kernel='%s')", algorithm.getKernel().toString()));
+		else if(algorithm.getC() != null)
+			code_.add(String.format("clf = SVR(C=%s)", algorithm.getC()));
+		else
+			code_.add("clf = SVR()");
 		
 		
 		return new Pair<>(import_, code_);
