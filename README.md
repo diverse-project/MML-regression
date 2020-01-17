@@ -241,6 +241,18 @@ Result order by time :
 
 ### Interpretation
 
-TODO
+We can observe few things :
+- scikit-learn is usually the fastest framework, regardling of the data file or the algorithm, except for some exception, where XGBoost outperform it. So Python's framework where globally faster.
+- On each csv file, the RandomForest algorithm have perform the best, with R as the best framework in term of overall result.
+- SGD and SVR efficiency is really weird in some cases.
+- All files are equivalent in term of evaluation time, but in term of efficiency, x264 yield the best efficiency and boston the worst.
+- Each framework is pretty equivalent to others in terms of efficiency, except in some weird cases.
 
--> SGD is really bad, inadapted to our data or our implementation is really bad?
+Overall, we advise to use either Python's frameworks or R' one, because on how natural and easy to use these languages are. But if you have to choose between all, it will be better to use sklearn as a beginner, since it provide a lot of usefull documentation, when other can be quite obscure to understand.
+
+## Feedback
+
+Although the project can be quite interesting, the lack of context or knowledge of machine learning held us back to really make an accurate implementation and to really try to improve.
+In fact, it's showing with the weird behaviour of SVR and SGD in some case : are they inappropriate or we haven't choose the correct implementation or even tune it in the good way? We can't decide on it.
+
+Also, it was a quite a huge project to work with, when we already have a lot of other big project to work on in other courses.
