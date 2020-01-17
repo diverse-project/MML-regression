@@ -111,6 +111,7 @@ Top 3 by result :
 - Weka RF with x264.csv elapsed 3.569256242 with 0.05739139542533088 MAPE
 
 Result order by efficiency : 
+
 | Data | Algorithm | Framework | Execution Time (sec) | MAPE (%) |
 |---|---|---|---|---|
 | x264.csv | RF | R | 33.22749568 | 0.047949 |
@@ -177,6 +178,7 @@ Top 3 by time :
 - scikit-learn SGD with x264_netflix.csv elapsed 0.741845317 with 2.520699417380451E23 MAPE
 
 Result order by time : 
+
 | Data | Algorithm | Framework | Execution Time (sec) | MAPE (%) |
 |---|---|---|---|---|
 | boston.csv | SGD | scikit-learn | 0.721721155 | 1.1622960588844716E14 |
