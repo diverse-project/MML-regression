@@ -114,8 +114,8 @@ public class MmlParsingTest {
       final MMLModel result = this.parseHelper.parse(_builder);
       final DataInput dataInput = result.getInput();
       final String fileLocation = dataInput.getFilelocation();
-      final MLChoiceAlgorithm mlChoiceAlgorithm = result.getAlgorithm();
-      final MLAlgorithm mlAlgorithm = mlChoiceAlgorithm.getAlgorithm();
+      final List<MLChoiceAlgorithm> mlChoiceAlgorithms = result.getAlgorithms();
+      final MLAlgorithm mlAlgorithm = mlChoiceAlgorithms.get(0).getAlgorithm();
       String algorithmImport = "";
       String algorithmBody = "";
       InputOutput.<String>print(mlAlgorithm.getClass().getSimpleName());
@@ -313,8 +313,8 @@ public class MmlParsingTest {
       final MMLModel result = this.parseHelper.parse(_builder);
       final DataInput dataInput = result.getInput();
       final String fileLocation = dataInput.getFilelocation();
-      final MLChoiceAlgorithm mlChoiceAlgorithm = result.getAlgorithm();
-      final MLAlgorithm mlAlgorithm = mlChoiceAlgorithm.getAlgorithm();
+      final List<MLChoiceAlgorithm> mlChoiceAlgorithms = result.getAlgorithms();
+      final MLAlgorithm mlAlgorithm = mlChoiceAlgorithms.get(0).getAlgorithm();
       String algorithmImport = "";
       String algorithmBody = "";
       InputOutput.<String>print(mlAlgorithm.getClass().getSimpleName());

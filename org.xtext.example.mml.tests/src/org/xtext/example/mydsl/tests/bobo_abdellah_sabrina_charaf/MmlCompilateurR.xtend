@@ -44,7 +44,7 @@ class MmlCompilateurR {
 		val String csv_separator = DEFAULT_COLUMN_SEPARATOR;
 		var String rasCode = "read.csv(\"" + fileLocation + ",head = TRUE, sep=\"" + csv_separator + "\"\")->df" +
 			"\n" + importDPLYR + "\n";
-		val MLChoiceAlgorithm MLCAlgorithm = result.algorithm
+		val MLChoiceAlgorithm MLCAlgorithm = result.algorithms.get(0)
 
 		val RFormula formula = result.formula;
 		if (formula === null) {

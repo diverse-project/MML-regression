@@ -69,9 +69,9 @@ class MmlParsingTest {
 		val String fileLocation = dataInput.filelocation;
 		
 		//Algorithm
-		val MLChoiceAlgorithm mlChoiceAlgorithm = result.algorithm;
+		val List<MLChoiceAlgorithm> mlChoiceAlgorithms = result.algorithms;
 		//val FrameworkLang frameworklang = mlChoiceAlgorithm.framework;
-		val MLAlgorithm mlAlgorithm = mlChoiceAlgorithm.algorithm;
+		val MLAlgorithm mlAlgorithm = mlChoiceAlgorithms.get(0).algorithm;
 		var String algorithmImport="";
 		var String algorithmBody="";
 		print(mlAlgorithm.class.simpleName)
@@ -223,9 +223,9 @@ class MmlParsingTest {
 		val String fileLocation = dataInput.filelocation;
 		
 		//Algorithm
-		val MLChoiceAlgorithm mlChoiceAlgorithm = result.algorithm;
+		val List<MLChoiceAlgorithm> mlChoiceAlgorithms = result.algorithms;
 		//val FrameworkLang frameworklang = mlChoiceAlgorithm.framework;
-		val MLAlgorithm mlAlgorithm = mlChoiceAlgorithm.algorithm;
+		val MLAlgorithm mlAlgorithm = mlChoiceAlgorithms.get(0).algorithm;
 		var String algorithmImport="";
 		var String algorithmBody="";
 		print(mlAlgorithm.class.simpleName)

@@ -116,7 +116,7 @@ public class test {
       String _plus_2 = (_plus_1 + _mkValueInSingleQuote_1);
       final String csvReading = (_plus_2 + ")");
       String pandasCode = (pythonImport + csvReading);
-      final MLChoiceAlgorithm algo = result.getAlgorithm();
+      final MLChoiceAlgorithm algo = result.getAlgorithms().get(0);
       this.algorithmTreatment(algo);
       String _pandasCode = pandasCode;
       pandasCode = (_pandasCode + "\nprint (mml_data)\n");

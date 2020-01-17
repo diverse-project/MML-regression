@@ -56,7 +56,7 @@ public class MmlCompilateurR {
       final String csv_separator = DEFAULT_COLUMN_SEPARATOR;
       String rasCode = ((((((("read.csv(\"" + fileLocation) + ",head = TRUE, sep=\"") + csv_separator) + "\"\")->df") + 
         "\n") + importDPLYR) + "\n");
-      final MLChoiceAlgorithm MLCAlgorithm = result.getAlgorithm();
+      final MLChoiceAlgorithm MLCAlgorithm = result.getAlgorithms().get(0);
       final RFormula formula = result.getFormula();
       if ((formula == null)) {
         String _rasCode = rasCode;
