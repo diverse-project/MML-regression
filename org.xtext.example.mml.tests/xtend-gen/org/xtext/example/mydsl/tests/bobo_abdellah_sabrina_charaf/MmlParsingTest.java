@@ -3,14 +3,7 @@
  */
 package org.xtext.example.mydsl.tests.bobo_abdellah_sabrina_charaf;
 
-import com.google.common.io.Files;
 import com.google.inject.Inject;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.List;
-import java.util.Map;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtend2.lib.StringConcatenation;
@@ -22,15 +15,7 @@ import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.xtext.example.mydsl.mml.DataInput;
-import org.xtext.example.mydsl.mml.FrameworkLang;
-import org.xtext.example.mydsl.mml.MLAlgorithm;
-import org.xtext.example.mydsl.mml.MLChoiceAlgorithm;
 import org.xtext.example.mydsl.mml.MMLModel;
-import org.xtext.example.mydsl.mml.StratificationMethod;
-import org.xtext.example.mydsl.mml.Validation;
-import org.xtext.example.mydsl.mml.ValidationMetric;
-import org.xtext.example.mydsl.mml.impl.AlgorithmVisitorImpl;
 import org.xtext.example.mydsl.tests.MmlInjectorProvider;
 
 @ExtendWith(InjectionExtension.class)
@@ -81,101 +66,13 @@ public class MmlParsingTest {
   
   @Test
   public void compileDataInput() {
-    try {
-      StringConcatenation _builder = new StringConcatenation();
-      _builder.append("datainput \"boston.csv\" separator ;");
-      _builder.newLine();
-      _builder.append("\t");
-      _builder.append("mlframework scikit-learn");
-      _builder.newLine();
-      _builder.append("\t");
-      _builder.append("algorithm DT");
-      _builder.newLine();
-      _builder.append("\t");
-      _builder.append("TrainingTest { ");
-      _builder.newLine();
-      _builder.append("\t\t");
-      _builder.append("percentageTraining 70");
-      _builder.newLine();
-      _builder.append("\t");
-      _builder.append("}");
-      _builder.newLine();
-      _builder.append("\t");
-      _builder.append("mean_absolute_error");
-      _builder.newLine();
-      final MMLModel result = this.parseHelper.parse(_builder);
-      final DataInput dataInput = result.getInput();
-      final String fileLocation = dataInput.getFilelocation();
-      final MLChoiceAlgorithm mlChoiceAlgorithm = result.getAlgorithm();
-      final FrameworkLang frameworklang = mlChoiceAlgorithm.getFramework();
-      final MLAlgorithm mlAlgorithm = mlChoiceAlgorithm.getAlgorithm();
-      AlgorithmVisitorImpl _algorithmVisitorImpl = new AlgorithmVisitorImpl("DT");
-      final Map<String, List<String>> map = mlAlgorithm.accept(_algorithmVisitorImpl);
-      final Validation validation = result.getValidation();
-      final StratificationMethod stratification = validation.getStratification();
-      final List<ValidationMetric> metrics = validation.getMetric();
-      int _number = stratification.getNumber();
-      final double percentageTraining = (((double) _number) / 100.0);
-      final double percentageTest = (1.0 - percentageTraining);
-      final String trainning = "train_test_split";
-      String pythonImport = "import pandas as pd\n";
-      List<String> _get = map.get("inputs");
-      for (final String input : _get) {
-        String _pythonImport = pythonImport;
-        pythonImport = (_pythonImport + (input + "\n"));
-      }
-      for (final ValidationMetric validationMetric : metrics) {
-        String _pythonImport_1 = pythonImport;
-        String _string = validationMetric.getLiteral().toString();
-        String _plus = ("from sklearn.metrics import " + _string);
-        String _plus_1 = (_plus + "\n");
-        pythonImport = (_pythonImport_1 + _plus_1);
-      }
-      String _pythonImport_2 = pythonImport;
-      pythonImport = (_pythonImport_2 + (("from sklearn.model_selection import " + trainning) + "\n"));
-      final String csvReading = (("\nmml_data = pd.read_csv(\"" + fileLocation) + "\")");
-      String pandasCode = (pythonImport + csvReading);
-      final String column = "\ncolumn = mml_data.columns[-1]";
-      String _pandasCode = pandasCode;
-      pandasCode = (_pandasCode + (("\n" + column) + " \nX = mml_data.drop(columns=[column]) "));
-      String _pandasCode_1 = pandasCode;
-      pandasCode = (_pandasCode_1 + "\ny = mml_data[column] ");
-      String _pandasCode_2 = pandasCode;
-      pandasCode = (_pandasCode_2 + ("\ntest_size = " + Double.valueOf(percentageTest)));
-      String _pandasCode_3 = pandasCode;
-      pandasCode = (_pandasCode_3 + "\nX_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size) ");
-      List<String> _get_1 = map.get("body");
-      for (final String body : _get_1) {
-        String _pandasCode_4 = pandasCode;
-        pandasCode = (_pandasCode_4 + ("\n" + body));
-      }
-      for (final ValidationMetric validationMetric_1 : metrics) {
-        {
-          String _pandasCode_5 = pandasCode;
-          String _string_1 = validationMetric_1.getLiteral().toString();
-          String _plus_2 = ("\naccuracy = " + _string_1);
-          String _plus_3 = (_plus_2 + "(y_test, y_pred)");
-          pandasCode = (_pandasCode_5 + _plus_3);
-          String _pandasCode_6 = pandasCode;
-          String _string_2 = validationMetric_1.getLiteral().toString();
-          String _plus_4 = ("\nprint(\'" + _string_2);
-          String _plus_5 = (_plus_4 + ":\', accuracy)");
-          pandasCode = (_pandasCode_6 + _plus_5);
-        }
-      }
-      byte[] _bytes = pandasCode.getBytes();
-      File _file = new File("mml.py");
-      Files.write(_bytes, _file);
-      final Process p = Runtime.getRuntime().exec("python mml.py");
-      InputStream _inputStream = p.getInputStream();
-      InputStreamReader _inputStreamReader = new InputStreamReader(_inputStream);
-      final BufferedReader in = new BufferedReader(_inputStreamReader);
-      String line = null;
-      while (((line = in.readLine()) != null)) {
-        System.out.println(line);
-      }
-    } catch (Throwable _e) {
-      throw Exceptions.sneakyThrow(_e);
-    }
+    throw new Error("Unresolved compilation problems:"
+      + "\nThe method or field algorithms is undefined for the type MMLModel");
+  }
+  
+  @Test
+  public void compileDataInput_1() {
+    throw new Error("Unresolved compilation problems:"
+      + "\nThe method or field algorithms is undefined for the type MMLModel");
   }
 }

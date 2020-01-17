@@ -52,7 +52,7 @@ class MmlCompilateurR {
 		''')
 
 		val DataInput dataInput = result.input;
-		val MLChoiceAlgorithm MLCAlgorithm = result.algorithm
+		val EList<MLChoiceAlgorithm> mlA = result.algorithms
 		val RFormula formula = result.formula;
 		val Validation validation = result.validation;
 		
@@ -117,7 +117,6 @@ class MmlCompilateurR {
 		rasCode += "train<-subset(df,split_index==T)" + "\n";
 		rasCode += "test<-subset(df,split_index==F)" + "\n";
 
-		val MLAlgorithm mlA = MLCAlgorithm.algorithm;
 		switch mlA {
 			DT: {
 				imports += "library(rpart)\n";
