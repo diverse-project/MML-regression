@@ -15,7 +15,6 @@ import org.xtext.example.mydsl.mml.MLAlgorithm
 import org.xtext.example.mydsl.mml.MLChoiceAlgorithm
 import org.xtext.example.mydsl.mml.MMLModel
 import org.xtext.example.mydsl.mml.RFormula
-import org.xtext.example.mydsl.mml.impl.AlgorithmVisitorImpl
 import org.xtext.example.mydsl.tests.MmlInjectorProvider
 
 @ExtendWith(InjectionExtension)
@@ -62,9 +61,7 @@ class MmlCompilateurR {
 		}
 
 		val MLAlgorithm mlA = MLCAlgorithm.algorithm;
-		val Map<String,List<String>> map = mlA.accept(new AlgorithmVisitorImpl("R"));
-		//visitor.visit(mlA);		
-
+		// visitor.visit(mlA);		
 		/*
 		 * read.csv("https://raw.githubusercontent.com/acherm/teaching-MDE1920/master/boston/boston.csv")->df
 		 * View(df)
@@ -102,5 +99,5 @@ class MmlCompilateurR {
 		 */
 		Files.write(rasCode.getBytes(), new File("mml.R"));
 	}
-	
+
 }

@@ -3,8 +3,6 @@ package org.xtext.example.mydsl.tests.bobo_abdellah_sabrina_charaf;
 import com.google.common.io.Files;
 import com.google.inject.Inject;
 import java.io.File;
-import java.util.List;
-import java.util.Map;
 import org.eclipse.xtend2.lib.StringConcatenation;
 import org.eclipse.xtext.testing.InjectWith;
 import org.eclipse.xtext.testing.extensions.InjectionExtension;
@@ -17,7 +15,6 @@ import org.xtext.example.mydsl.mml.MLAlgorithm;
 import org.xtext.example.mydsl.mml.MLChoiceAlgorithm;
 import org.xtext.example.mydsl.mml.MMLModel;
 import org.xtext.example.mydsl.mml.RFormula;
-import org.xtext.example.mydsl.mml.impl.AlgorithmVisitorImpl;
 import org.xtext.example.mydsl.tests.MmlInjectorProvider;
 
 @ExtendWith(InjectionExtension.class)
@@ -76,8 +73,6 @@ public class MmlCompilateurR {
         }
       }
       final MLAlgorithm mlA = MLCAlgorithm.getAlgorithm();
-      AlgorithmVisitorImpl _algorithmVisitorImpl = new AlgorithmVisitorImpl("R");
-      final Map<String, List<String>> map = mlA.accept(_algorithmVisitorImpl);
       byte[] _bytes = rasCode.getBytes();
       File _file = new File("mml.R");
       Files.write(_bytes, _file);
