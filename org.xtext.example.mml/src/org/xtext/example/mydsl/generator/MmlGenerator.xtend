@@ -61,7 +61,7 @@ class MmlGenerator extends AbstractGenerator {
 			default:type=""
 		}
         fsa.generateFile(
-           'test.'+type, code
+           resource.URI.lastSegment.replace("mml",type), code
         )
         
 	}
@@ -205,23 +205,36 @@ class MmlGenerator extends AbstractGenerator {
 				csvSplit+="y = df[columns = [df.columns["+formuleItem.getColumn()+"]]]\n";
 			}else if(xformule instanceof AllVariables) {
 				csvSplit+="X = df.drop(columns = [df.columns[-1]])\n";
-				csvSplit+="y = df[columns = [df.columns[-1]]]\n";
+				csvSplit+="y = df[[df.columns[-1]]]\n";
 			}
 		}else {
 			//if formule is null, all the fields are used to predict the last one
 			csvSplit+="X = df.drop(columns = [df.columns[-1]])\n";
-			csvSplit+="y = df[columns = [df.columns[-1]]]\n";
+			csvSplit+="y = df[[df.columns[-1]]]\n";
 		}
 		
 		//algo
 		var algo = mlchoicealgo.getAlgorithm();
 		var algoDeclaration="";
 		if(algo instanceof SVR) {
-			//TODO complete with same template as DT below
+			pythonImport+="from sklearn.svm import SVR\n";
+			algoDeclaration = "clf = SVR("+ (algo.c!==null?"C="+algo.c+",":"") + (algo.kernel!==null?"kernel='"+algo.kernel+"'":"") +")\n";
 		}else if(algo instanceof DT) { //DecisionTree
 			pythonImport+="from sklearn import tree\n";
-			algoDeclaration = "clf = tree.DecisionTreeRegressor()\n";
-		}//TODO other algos
+			algoDeclaration = "clf = tree.DecisionTreeRegressor(max_depth="+algo.max_depth+")\n";
+		}else if(algo instanceof SGD){
+			pythonImport+="from sklearn.linear_model import SGDClassifier\n";
+			algoDeclaration = "clf = tree.SGDClassifier()\n";
+		}else if(algo instanceof GTB){
+			pythonImport+="from sklearn import ensemble\n";
+			algoDeclaration = "clf = ensemble.GradientBoostingRegressor()\n";
+		}else if(algo instanceof RandomForest){
+			pythonImport+="from sklearn import ensemble\n";
+			algoDeclaration = "clf = ensemble.RandomForest"+(algo.type==TYPE.CLASSIFIER?"Classifier":"Regressor")
+						+ "(max_depth="+ algo.max_depth 
+						+ ", n_estimators=" + algo.n_estimators
+						+ ")\n";
+		}
 		
 		//validation
 		var stratMethod = validation.getStratification()
@@ -230,6 +243,8 @@ class MmlGenerator extends AbstractGenerator {
 		var validationPrint=""
 		validationPrint += "test_size = "+number+"\n"
 		if(stratMethod instanceof CrossValidation){
+			pythonImport+="from sklearn.model_selection import cross_validate\n"
+			validationPrint+="X_train, X_test, y_train, y_test = (X, y, test_size="+number+")"
 			//TODO equivalent à ci-dessous
 		}else if(stratMethod instanceof TrainingTest){
 			pythonImport+="from sklearn.model_selection import train_test_split\n"
@@ -237,25 +252,15 @@ class MmlGenerator extends AbstractGenerator {
 		}
 		validationPrint+="\n"
 		
+		//Fit
+		var fit="clf.fit(X_train, y_train)\n"
+		
 		//ValidationMetric
 		var metrics=""
 		var metricsResult=""
 		for(var i=0;i<validMetrics.size();i++) {
 			var metric = "";
 			val metricName = validMetrics.get(i).name()
-			/*switch(validMetrics.get(i).name()) {
-				case "MSE":
-					pythonImport+="from sklearn.metrics import mean_squared_error\n"
-					metric+="accuracy"+i+"=mean_squared_error(y_test, clf.predict(X_test))"
-				case "MAE":
-					pythonImport+="from sklearn.metrics import mean_absolute_error\n"
-					metric+="accuracy"+i+"=mean_absolute_error(y_test, clf.predict(X_test))"
-				case "MAPE":
-					pythonImport+="from sklearn.utils import check_arrays\n"
-					metric+="y_test, y_pred = check_arrays(y_test, clf.predict(X_test))"
-					metric+="accuracy"+i+"=np.mean(np.abs((y_test - y_pred) / y_test)) * 100"
-				default:metric=''
-			}*/
 			if(metricName=="MSE"){
 				pythonImport+="from sklearn.metrics import mean_squared_error\n"
 				metric+="accuracy"+i+"=mean_squared_error(y_test, clf.predict(X_test))"
@@ -263,15 +268,15 @@ class MmlGenerator extends AbstractGenerator {
 				pythonImport+="from sklearn.metrics import mean_absolute_error\n"
 				metric+="accuracy"+i+"=mean_absolute_error(y_test, clf.predict(X_test))"
 			}else if(metricName=="MAPE"){
-				pythonImport+="from sklearn.utils import check_arrays\n"
-				metric+="y_test, y_pred = check_arrays(y_test, clf.predict(X_test))"
+				pythonImport+="import numpy as np\n"
+				metric+="y_test, y_pred = np.array(y_true), np.array(clf.predict(X_test))\n"
 				metric+="accuracy"+i+"=np.mean(np.abs((y_test - y_pred) / y_test)) * 100"
 			}
 			metricsResult+="print(accuracy"+i+")\n"
 			metrics+=metric+"\n"
 		}
 		
-		var pandasCode = pythonImport + csvReading + csvSplit + algoDeclaration+ validationPrint+ metrics+metricsResult
+		var pandasCode = pythonImport + csvReading + csvSplit + algoDeclaration+ validationPrint+ fit +metrics+metricsResult
 		return pandasCode
 	}
 	
