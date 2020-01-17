@@ -90,7 +90,7 @@ public class MmlEvaluator {
 		System.out.println("Top 3 by result : ");
 		List<MmlResult.Element> resultTop = result.getResults();
 		for(int i = 0; i < 3 && i < resultTop.size(); ++i)
-			System.out.println(Utils.tab() + resultTop.get(i));
+			System.out.println("- " + resultTop.get(i));
 		System.out.println("");
 		System.out.println("Result order by efficiency : ");
 		System.out.println(result.toMarkdown());
@@ -99,7 +99,7 @@ public class MmlEvaluator {
 		System.out.println("Top 3 by time : ");
 		List<MmlResult.Element> resultTime = result.getResults();
 		for(int i = 0; i < 3 && i < resultTime.size(); ++i)
-			System.out.println(Utils.tab() + resultTime.get(i));
+			System.out.println("- " + resultTime.get(i));
 		System.out.println("");
 		System.out.println("Result order by time : ");
 		System.out.println(result.toMarkdown());
