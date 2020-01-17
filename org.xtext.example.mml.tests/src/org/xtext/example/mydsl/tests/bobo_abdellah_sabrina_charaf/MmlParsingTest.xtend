@@ -15,6 +15,8 @@ import org.eclipse.xtext.testing.util.ParseHelper
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.^extension.ExtendWith
+import org.xtext.example.mydsl.mml.AllVariables
+import org.xtext.example.mydsl.mml.DT
 import org.xtext.example.mydsl.mml.DataInput
 import org.xtext.example.mydsl.mml.FormulaItem
 import org.xtext.example.mydsl.mml.MLAlgorithm
@@ -22,6 +24,7 @@ import org.xtext.example.mydsl.mml.MLChoiceAlgorithm
 import org.xtext.example.mydsl.mml.MMLModel
 import org.xtext.example.mydsl.mml.PredictorVariables
 import org.xtext.example.mydsl.mml.RFormula
+import org.xtext.example.mydsl.mml.RandomForest
 import org.xtext.example.mydsl.mml.StratificationMethod
 import org.xtext.example.mydsl.mml.Validation
 import org.xtext.example.mydsl.mml.ValidationMetric
@@ -70,13 +73,12 @@ class MmlParsingTest {
 		
 		//Algorithm
 		val List<MLChoiceAlgorithm> mlChoiceAlgorithms = result.algorithms;
-		//val FrameworkLang frameworklang = mlChoiceAlgorithm.framework;
 		val MLAlgorithm mlAlgorithm = mlChoiceAlgorithms.get(0).algorithm;
 		var String algorithmImport="";
 		var String algorithmBody="";
-		print(mlAlgorithm.class.simpleName)
-		switch mlAlgorithm.class.simpleName {
-			case 'DTImpl': {
+		//je taime <3
+		switch mlAlgorithm {
+			DT: {
 				algorithmImport += "\nfrom sklearn import tree";
 				algorithmBody += "\nclf = tree.DecisionTreeRegressor()";
 				algorithmBody += "\nclf.fit(X_train, y_train)";
@@ -84,7 +86,7 @@ class MmlParsingTest {
 			
 			}
 			
-			case 'RandomForestImpl': {
+			RandomForest: {
 				algorithmImport += "\nimport numpy as np";
 				algorithmImport += "\nfrom sklearn.ensemble import RandomForestRegressor";
 				algorithmBody += "\nregressor = RandomForestRegressor()";
@@ -156,8 +158,8 @@ class MmlParsingTest {
 				pandasCode += "\ny = mml_data[column] ";
 			}
 			val XFormula xformula = formula.predictors;
-			switch xformula.class.simpleName{
-				case 'AllVariablesImpl':{
+			switch xformula{
+				AllVariables:{
 					if (predictiveColumn !== 0){
 						pandasCode += "X = mml_data.iloc[:, 0:"+predictiveColumn+"].values";
 					}else if(predictiveColName !== null){
@@ -169,7 +171,7 @@ class MmlParsingTest {
 						pandasCode += "\n"+column+" \nX = mml_data.drop(columns=[column]) ";
 					}
 				}
-				case 'PredictorVariablesImpl':{
+				PredictorVariables:{
 					var PredictorVariables	predictorsVariables =  formula.predictors as PredictorVariables;
 					val List<FormulaItem> predictorsList = predictorsVariables.vars
 				}	
@@ -229,8 +231,8 @@ class MmlParsingTest {
 		var String algorithmImport="";
 		var String algorithmBody="";
 		print(mlAlgorithm.class.simpleName)
-		switch mlAlgorithm.class.simpleName {
-			case 'DTImpl': {
+		switch mlAlgorithm {
+			DT: {
 				algorithmImport += "\nfrom sklearn import tree";
 				algorithmBody += "\nclf = tree.DecisionTreeRegressor()";
 				algorithmBody += "\nclf.fit(X_train, y_train)";
@@ -238,7 +240,7 @@ class MmlParsingTest {
 			
 			}
 			
-			case 'RandomForestImpl': {
+			RandomForest: {
 				algorithmImport += "\nimport numpy as np";
 				algorithmImport += "\nfrom sklearn.ensemble import RandomForestRegressor";
 				algorithmBody += "\nregressor = RandomForestRegressor()";
@@ -310,8 +312,8 @@ class MmlParsingTest {
 				pandasCode += "\ny = mml_data[column] ";
 			}
 			val XFormula xformula = formula.predictors;
-			switch xformula.class.simpleName{
-				case 'AllVariablesImpl':{
+			switch xformula{
+				AllVariables:{
 					if (predictiveColumn !== 0){
 						pandasCode += "X = mml_data.iloc[:, 0:"+predictiveColumn+"].values";
 					}else if(predictiveColName !== null){
@@ -323,7 +325,7 @@ class MmlParsingTest {
 						pandasCode += "\n"+column+" \nX = mml_data.drop(columns=[column]) ";
 					}
 				}
-				case 'PredictorVariablesImpl':{
+				PredictorVariables:{
 					var PredictorVariables	predictorsVariables =  formula.predictors as PredictorVariables;
 					val List<FormulaItem> predictorsList = predictorsVariables.vars
 				}	
