@@ -6,14 +6,16 @@ Authors : Picard Michaël, Pavy Myriam, Petit Valentin
 
 Disclaimer : we are novice in machine learning field, so we couldn't grasp the whole understanding needed to look back and judge our work. So, our implementation and interpretation can be mistaken.
 
+The project is divided in a primary package, which provide the API for compiling and testing. In this package, you can found the `compilateur` package, which provide Utilities class and Interface used by all compilators.
+
 ### Compilators
 The **Scikit-Learn** compilator is complete and running. You need to have **python3** and two python's package, `pandas` and `sklearn` to use it.
 
-The **Weka** compilator is complete and running, but lack the one feature and is could be unstable. `SVR` kernel option can't be set to `Linear`, since it's not implemented in **Weka**, so if `Linear` is selected, an error message will tell the user about it and select `Poly` instead. You need to have at least **Java 8** to use it.
+The **Weka** compilator is complete and running, but lack the one feature and is could be unstable. `SVR` kernel option can't be set to `Linear`, since it's not implemented in **Weka**, so if `Linear` is selected, an error message will tell the user about it and then the program will stop. You need to have at least **Java 8** to use it.
 
-The **R** compilator is *TODO*. You need to install the system package `r-base` and `r-base-dev` (for ubuntu), along with the some R library : `caret`, `rpart`, `gbm`, `randomForest`, `e1071`, `kernlab` and `sgd`.
+The **R** compilator is complete and running, but lack the cross validation on SGD, since it does not exist. You need to install the system package `r-base` and `r-base-dev` (for ubuntu), along with the some R library : `caret`, `rpart`, `gbm`, `randomForest`, `e1071`, `kernlab` and `sgd`.
 
-The **XGBoost** compilator (with **Python**) is *TODO*. You need the same dependencies as **Scikit-Learn** compilator with also `xgboost` python package.
+The **XGBoost** compilator (with **Python**) is particulary difficult to work with. In fact, he could be called complete since XGBoost is already selecting the best method for you, ignoring your parameter. Or we haven't grasp the understanding of it. We don't know. You need the same dependencies as **Scikit-Learn** compilator with also `xgboost` python package.
 
 ### Testing and experiment
 

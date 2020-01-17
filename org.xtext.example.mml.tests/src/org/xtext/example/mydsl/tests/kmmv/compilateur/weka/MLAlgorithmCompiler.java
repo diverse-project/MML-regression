@@ -96,7 +96,8 @@ public class MLAlgorithmCompiler {
 				import_.add("import weka.classifiers.functions.supportVector.PolyKernel;");
 				code_.add("clf.setKernel(new PolyKernel());");
 			} else if(algorithm.getKernel().toString().equals("linear")) {
-				System.err.println("WEKA SVR linear kernel not supported. Poly used instead.");
+				System.err.println("WEKA SVR linear kernel not supported.");
+				code_.add("System.exit(-1);");
 			} else if(algorithm.getKernel().toString().equals("rbf")) {
 				import_.add("import weka.classifiers.functions.supportVector.RBFKernel;");
 				code_.add("clf.setKernel(new RBFKernel());");
