@@ -1,6 +1,6 @@
 # MML-regression
 
-Authors : Picard Michaël, Pavy Myriam, Petit Valentin
+Authors : Picard Michaël, Pavy Myriam, Petit Valentin, Chertier Kevin
 
 ## Code
 
