@@ -10,7 +10,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
-import java.util.Map;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtend2.lib.StringConcatenation;
@@ -18,19 +17,22 @@ import org.eclipse.xtext.testing.InjectWith;
 import org.eclipse.xtext.testing.extensions.InjectionExtension;
 import org.eclipse.xtext.testing.util.ParseHelper;
 import org.eclipse.xtext.xbase.lib.Exceptions;
+import org.eclipse.xtext.xbase.lib.InputOutput;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.xtext.example.mydsl.mml.DataInput;
-import org.xtext.example.mydsl.mml.FrameworkLang;
+import org.xtext.example.mydsl.mml.FormulaItem;
 import org.xtext.example.mydsl.mml.MLAlgorithm;
 import org.xtext.example.mydsl.mml.MLChoiceAlgorithm;
 import org.xtext.example.mydsl.mml.MMLModel;
+import org.xtext.example.mydsl.mml.PredictorVariables;
+import org.xtext.example.mydsl.mml.RFormula;
 import org.xtext.example.mydsl.mml.StratificationMethod;
 import org.xtext.example.mydsl.mml.Validation;
 import org.xtext.example.mydsl.mml.ValidationMetric;
-import org.xtext.example.mydsl.mml.impl.AlgorithmVisitorImpl;
+import org.xtext.example.mydsl.mml.XFormula;
 import org.xtext.example.mydsl.tests.MmlInjectorProvider;
 
 @ExtendWith(InjectionExtension.class)
@@ -92,6 +94,9 @@ public class MmlParsingTest {
       _builder.append("algorithm DT");
       _builder.newLine();
       _builder.append("\t");
+      _builder.append("formula .");
+      _builder.newLine();
+      _builder.append("\t");
       _builder.append("TrainingTest { ");
       _builder.newLine();
       _builder.append("\t\t");
@@ -101,16 +106,51 @@ public class MmlParsingTest {
       _builder.append("}");
       _builder.newLine();
       _builder.append("\t");
+      _builder.append("mean_squared_error");
+      _builder.newLine();
+      _builder.append("\t");
       _builder.append("mean_absolute_error");
       _builder.newLine();
       final MMLModel result = this.parseHelper.parse(_builder);
       final DataInput dataInput = result.getInput();
       final String fileLocation = dataInput.getFilelocation();
       final MLChoiceAlgorithm mlChoiceAlgorithm = result.getAlgorithm();
-      final FrameworkLang frameworklang = mlChoiceAlgorithm.getFramework();
       final MLAlgorithm mlAlgorithm = mlChoiceAlgorithm.getAlgorithm();
-      AlgorithmVisitorImpl _algorithmVisitorImpl = new AlgorithmVisitorImpl("DT");
-      final Map<String, List<String>> map = mlAlgorithm.accept(_algorithmVisitorImpl);
+      String algorithmImport = "";
+      String algorithmBody = "";
+      InputOutput.<String>print(mlAlgorithm.getClass().getSimpleName());
+      String _simpleName = mlAlgorithm.getClass().getSimpleName();
+      if (_simpleName != null) {
+        switch (_simpleName) {
+          case "DTImpl":
+            String _algorithmImport = algorithmImport;
+            algorithmImport = (_algorithmImport + "\nfrom sklearn import tree");
+            String _algorithmBody = algorithmBody;
+            algorithmBody = (_algorithmBody + "\nclf = tree.DecisionTreeRegressor()");
+            String _algorithmBody_1 = algorithmBody;
+            algorithmBody = (_algorithmBody_1 + "\nclf.fit(X_train, y_train)");
+            String _algorithmBody_2 = algorithmBody;
+            algorithmBody = (_algorithmBody_2 + "\ny_pred =  clf.predict(X_test)");
+            break;
+          case "RandomForestImpl":
+            String _algorithmImport_1 = algorithmImport;
+            algorithmImport = (_algorithmImport_1 + "\nimport numpy as np");
+            String _algorithmImport_2 = algorithmImport;
+            algorithmImport = (_algorithmImport_2 + "\nfrom sklearn.ensemble import RandomForestRegressor");
+            String _algorithmBody_3 = algorithmBody;
+            algorithmBody = (_algorithmBody_3 + "\nregressor = RandomForestRegressor()");
+            String _algorithmBody_4 = algorithmBody;
+            algorithmBody = (_algorithmBody_4 + "\nregressor.fit(X_train, y_train)");
+            String _algorithmBody_5 = algorithmBody;
+            algorithmBody = (_algorithmBody_5 + "\ny_pred = regressor.predict(X_test)");
+            break;
+          default:
+            InputOutput.<String>print("default");
+            break;
+        }
+      } else {
+        InputOutput.<String>print("default");
+      }
       final Validation validation = result.getValidation();
       final StratificationMethod stratification = validation.getStratification();
       final List<ValidationMetric> metrics = validation.getMetric();
@@ -119,11 +159,8 @@ public class MmlParsingTest {
       final double percentageTest = (1.0 - percentageTraining);
       final String trainning = "train_test_split";
       String pythonImport = "import pandas as pd\n";
-      List<String> _get = map.get("inputs");
-      for (final String input : _get) {
-        String _pythonImport = pythonImport;
-        pythonImport = (_pythonImport + (input + "\n"));
-      }
+      String _pythonImport = pythonImport;
+      pythonImport = (_pythonImport + (algorithmImport + "\n"));
       for (final ValidationMetric validationMetric : metrics) {
         String _pythonImport_1 = pythonImport;
         String _string = validationMetric.getLiteral().toString();
@@ -135,32 +172,295 @@ public class MmlParsingTest {
       pythonImport = (_pythonImport_2 + (("from sklearn.model_selection import " + trainning) + "\n"));
       final String csvReading = (("\nmml_data = pd.read_csv(\"" + fileLocation) + "\")");
       String pandasCode = (pythonImport + csvReading);
-      final String column = "\ncolumn = mml_data.columns[-1]";
-      String _pandasCode = pandasCode;
-      pandasCode = (_pandasCode + (("\n" + column) + " \nX = mml_data.drop(columns=[column]) "));
-      String _pandasCode_1 = pandasCode;
-      pandasCode = (_pandasCode_1 + "\ny = mml_data[column] ");
-      String _pandasCode_2 = pandasCode;
-      pandasCode = (_pandasCode_2 + ("\ntest_size = " + Double.valueOf(percentageTest)));
-      String _pandasCode_3 = pandasCode;
-      pandasCode = (_pandasCode_3 + "\nX_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size) ");
-      List<String> _get_1 = map.get("body");
-      for (final String body : _get_1) {
-        String _pandasCode_4 = pandasCode;
-        pandasCode = (_pandasCode_4 + ("\n" + body));
+      final RFormula formula = result.getFormula();
+      if ((formula == null)) {
+        String column = "\ncolumn = mml_data.columns[-1]";
+        String _pandasCode = pandasCode;
+        pandasCode = (_pandasCode + (("\n" + column) + " \nX = mml_data.drop(columns=[column]) "));
+        String _pandasCode_1 = pandasCode;
+        pandasCode = (_pandasCode_1 + "\ny = mml_data[column] ");
+      } else {
+        int predictiveColumn = 0;
+        String predictiveColName = null;
+        FormulaItem _predictive = formula.getPredictive();
+        boolean _tripleNotEquals = (_predictive != null);
+        if (_tripleNotEquals) {
+          final FormulaItem predictive = formula.getPredictive();
+          InputOutput.<String>println(("predictive = " + predictive));
+          int _column = predictive.getColumn();
+          boolean _tripleNotEquals_1 = (_column != 0);
+          if (_tripleNotEquals_1) {
+            predictiveColumn = predictive.getColumn();
+            String _pandasCode_2 = pandasCode;
+            pandasCode = (_pandasCode_2 + (("y = mml_data.iloc[:, " + Integer.valueOf(predictiveColumn)) + "].values"));
+          } else {
+            String _colName = predictive.getColName();
+            boolean _tripleNotEquals_2 = (_colName != null);
+            if (_tripleNotEquals_2) {
+              predictiveColName = formula.getPredictive().getColName();
+              String _pandasCode_3 = pandasCode;
+              pandasCode = (_pandasCode_3 + (("\ny = mml_data[\'" + predictiveColName) + "\'] "));
+            }
+          }
+        } else {
+          InputOutput.<String>print("Here");
+          String column_1 = "\ncolumn = mml_data.columns[-1]";
+          String _pandasCode_4 = pandasCode;
+          pandasCode = (_pandasCode_4 + ("\n" + column_1));
+          String _pandasCode_5 = pandasCode;
+          pandasCode = (_pandasCode_5 + "\ny = mml_data[column] ");
+        }
+        final XFormula xformula = formula.getPredictors();
+        String _simpleName_1 = xformula.getClass().getSimpleName();
+        if (_simpleName_1 != null) {
+          switch (_simpleName_1) {
+            case "AllVariablesImpl":
+              if ((predictiveColumn != 0)) {
+                String _pandasCode_6 = pandasCode;
+                pandasCode = (_pandasCode_6 + (("X = mml_data.iloc[:, 0:" + Integer.valueOf(predictiveColumn)) + "].values"));
+              } else {
+                if ((predictiveColName != null)) {
+                  String _pandasCode_7 = pandasCode;
+                  pandasCode = (_pandasCode_7 + (("\ncolumn = \"" + predictiveColName) + "\""));
+                  String _pandasCode_8 = pandasCode;
+                  pandasCode = (_pandasCode_8 + "\nX = mml_data.drop(columns=[column]) ");
+                } else {
+                  String column_2 = "\ncolumn = mml_data.columns[-1]";
+                  String _pandasCode_9 = pandasCode;
+                  pandasCode = (_pandasCode_9 + (("\n" + column_2) + " \nX = mml_data.drop(columns=[column]) "));
+                }
+              }
+              break;
+            case "PredictorVariablesImpl":
+              XFormula _predictors = formula.getPredictors();
+              PredictorVariables predictorsVariables = ((PredictorVariables) _predictors);
+              final List<FormulaItem> predictorsList = predictorsVariables.getVars();
+              break;
+            default:
+              InputOutput.<String>print("default");
+              break;
+          }
+        } else {
+          InputOutput.<String>print("default");
+        }
       }
+      String _pandasCode_10 = pandasCode;
+      pandasCode = (_pandasCode_10 + ("\ntest_size = " + Double.valueOf(percentageTest)));
+      String _pandasCode_11 = pandasCode;
+      pandasCode = (_pandasCode_11 + "\nX_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size) ");
+      String _pandasCode_12 = pandasCode;
+      pandasCode = (_pandasCode_12 + ("\n" + algorithmBody));
       for (final ValidationMetric validationMetric_1 : metrics) {
         {
-          String _pandasCode_5 = pandasCode;
+          String _pandasCode_13 = pandasCode;
           String _string_1 = validationMetric_1.getLiteral().toString();
           String _plus_2 = ("\naccuracy = " + _string_1);
           String _plus_3 = (_plus_2 + "(y_test, y_pred)");
-          pandasCode = (_pandasCode_5 + _plus_3);
-          String _pandasCode_6 = pandasCode;
+          pandasCode = (_pandasCode_13 + _plus_3);
+          String _pandasCode_14 = pandasCode;
           String _string_2 = validationMetric_1.getLiteral().toString();
           String _plus_4 = ("\nprint(\'" + _string_2);
           String _plus_5 = (_plus_4 + ":\', accuracy)");
-          pandasCode = (_pandasCode_6 + _plus_5);
+          pandasCode = (_pandasCode_14 + _plus_5);
+        }
+      }
+      byte[] _bytes = pandasCode.getBytes();
+      File _file = new File("mml.py");
+      Files.write(_bytes, _file);
+      final Process p = Runtime.getRuntime().exec("python mml.py");
+      InputStream _inputStream = p.getInputStream();
+      InputStreamReader _inputStreamReader = new InputStreamReader(_inputStream);
+      final BufferedReader in = new BufferedReader(_inputStreamReader);
+      String line = null;
+      while (((line = in.readLine()) != null)) {
+        System.out.println(line);
+      }
+    } catch (Throwable _e) {
+      throw Exceptions.sneakyThrow(_e);
+    }
+  }
+  
+  @Test
+  public void compileDataInput_1() {
+    try {
+      StringConcatenation _builder = new StringConcatenation();
+      _builder.append("datainput \"boston.csv\" separator ;");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("mlframework scikit-learn");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("algorithm RandomForest");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("formula .");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("TrainingTest { ");
+      _builder.newLine();
+      _builder.append("\t\t");
+      _builder.append("percentageTraining 70");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("}");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("mean_squared_error");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("mean_absolute_error");
+      _builder.newLine();
+      final MMLModel result = this.parseHelper.parse(_builder);
+      final DataInput dataInput = result.getInput();
+      final String fileLocation = dataInput.getFilelocation();
+      final MLChoiceAlgorithm mlChoiceAlgorithm = result.getAlgorithm();
+      final MLAlgorithm mlAlgorithm = mlChoiceAlgorithm.getAlgorithm();
+      String algorithmImport = "";
+      String algorithmBody = "";
+      InputOutput.<String>print(mlAlgorithm.getClass().getSimpleName());
+      String _simpleName = mlAlgorithm.getClass().getSimpleName();
+      if (_simpleName != null) {
+        switch (_simpleName) {
+          case "DTImpl":
+            String _algorithmImport = algorithmImport;
+            algorithmImport = (_algorithmImport + "\nfrom sklearn import tree");
+            String _algorithmBody = algorithmBody;
+            algorithmBody = (_algorithmBody + "\nclf = tree.DecisionTreeRegressor()");
+            String _algorithmBody_1 = algorithmBody;
+            algorithmBody = (_algorithmBody_1 + "\nclf.fit(X_train, y_train)");
+            String _algorithmBody_2 = algorithmBody;
+            algorithmBody = (_algorithmBody_2 + "\ny_pred =  clf.predict(X_test)");
+            break;
+          case "RandomForestImpl":
+            String _algorithmImport_1 = algorithmImport;
+            algorithmImport = (_algorithmImport_1 + "\nimport numpy as np");
+            String _algorithmImport_2 = algorithmImport;
+            algorithmImport = (_algorithmImport_2 + "\nfrom sklearn.ensemble import RandomForestRegressor");
+            String _algorithmBody_3 = algorithmBody;
+            algorithmBody = (_algorithmBody_3 + "\nregressor = RandomForestRegressor()");
+            String _algorithmBody_4 = algorithmBody;
+            algorithmBody = (_algorithmBody_4 + "\nregressor.fit(X_train, y_train)");
+            String _algorithmBody_5 = algorithmBody;
+            algorithmBody = (_algorithmBody_5 + "\ny_pred = regressor.predict(X_test)");
+            break;
+          default:
+            InputOutput.<String>print("default");
+            break;
+        }
+      } else {
+        InputOutput.<String>print("default");
+      }
+      final Validation validation = result.getValidation();
+      final StratificationMethod stratification = validation.getStratification();
+      final List<ValidationMetric> metrics = validation.getMetric();
+      int _number = stratification.getNumber();
+      final double percentageTraining = (((double) _number) / 100.0);
+      final double percentageTest = (1.0 - percentageTraining);
+      final String trainning = "train_test_split";
+      String pythonImport = "import pandas as pd\n";
+      String _pythonImport = pythonImport;
+      pythonImport = (_pythonImport + (algorithmImport + "\n"));
+      for (final ValidationMetric validationMetric : metrics) {
+        String _pythonImport_1 = pythonImport;
+        String _string = validationMetric.getLiteral().toString();
+        String _plus = ("from sklearn.metrics import " + _string);
+        String _plus_1 = (_plus + "\n");
+        pythonImport = (_pythonImport_1 + _plus_1);
+      }
+      String _pythonImport_2 = pythonImport;
+      pythonImport = (_pythonImport_2 + (("from sklearn.model_selection import " + trainning) + "\n"));
+      final String csvReading = (("\nmml_data = pd.read_csv(\"" + fileLocation) + "\")");
+      String pandasCode = (pythonImport + csvReading);
+      final RFormula formula = result.getFormula();
+      if ((formula == null)) {
+        String column = "\ncolumn = mml_data.columns[-1]";
+        String _pandasCode = pandasCode;
+        pandasCode = (_pandasCode + (("\n" + column) + " \nX = mml_data.drop(columns=[column]) "));
+        String _pandasCode_1 = pandasCode;
+        pandasCode = (_pandasCode_1 + "\ny = mml_data[column] ");
+      } else {
+        int predictiveColumn = 0;
+        String predictiveColName = null;
+        FormulaItem _predictive = formula.getPredictive();
+        boolean _tripleNotEquals = (_predictive != null);
+        if (_tripleNotEquals) {
+          final FormulaItem predictive = formula.getPredictive();
+          InputOutput.<String>println(("predictive = " + predictive));
+          int _column = predictive.getColumn();
+          boolean _tripleNotEquals_1 = (_column != 0);
+          if (_tripleNotEquals_1) {
+            predictiveColumn = predictive.getColumn();
+            String _pandasCode_2 = pandasCode;
+            pandasCode = (_pandasCode_2 + (("y = mml_data.iloc[:, " + Integer.valueOf(predictiveColumn)) + "].values"));
+          } else {
+            String _colName = predictive.getColName();
+            boolean _tripleNotEquals_2 = (_colName != null);
+            if (_tripleNotEquals_2) {
+              predictiveColName = formula.getPredictive().getColName();
+              String _pandasCode_3 = pandasCode;
+              pandasCode = (_pandasCode_3 + (("\ny = mml_data[\'" + predictiveColName) + "\'] "));
+            }
+          }
+        } else {
+          InputOutput.<String>print("Here");
+          String column_1 = "\ncolumn = mml_data.columns[-1]";
+          String _pandasCode_4 = pandasCode;
+          pandasCode = (_pandasCode_4 + ("\n" + column_1));
+          String _pandasCode_5 = pandasCode;
+          pandasCode = (_pandasCode_5 + "\ny = mml_data[column] ");
+        }
+        final XFormula xformula = formula.getPredictors();
+        String _simpleName_1 = xformula.getClass().getSimpleName();
+        if (_simpleName_1 != null) {
+          switch (_simpleName_1) {
+            case "AllVariablesImpl":
+              if ((predictiveColumn != 0)) {
+                String _pandasCode_6 = pandasCode;
+                pandasCode = (_pandasCode_6 + (("X = mml_data.iloc[:, 0:" + Integer.valueOf(predictiveColumn)) + "].values"));
+              } else {
+                if ((predictiveColName != null)) {
+                  String _pandasCode_7 = pandasCode;
+                  pandasCode = (_pandasCode_7 + (("\ncolumn = \"" + predictiveColName) + "\""));
+                  String _pandasCode_8 = pandasCode;
+                  pandasCode = (_pandasCode_8 + "\nX = mml_data.drop(columns=[column]) ");
+                } else {
+                  String column_2 = "\ncolumn = mml_data.columns[-1]";
+                  String _pandasCode_9 = pandasCode;
+                  pandasCode = (_pandasCode_9 + (("\n" + column_2) + " \nX = mml_data.drop(columns=[column]) "));
+                }
+              }
+              break;
+            case "PredictorVariablesImpl":
+              XFormula _predictors = formula.getPredictors();
+              PredictorVariables predictorsVariables = ((PredictorVariables) _predictors);
+              final List<FormulaItem> predictorsList = predictorsVariables.getVars();
+              break;
+            default:
+              InputOutput.<String>print("default");
+              break;
+          }
+        } else {
+          InputOutput.<String>print("default");
+        }
+      }
+      String _pandasCode_10 = pandasCode;
+      pandasCode = (_pandasCode_10 + ("\ntest_size = " + Double.valueOf(percentageTest)));
+      String _pandasCode_11 = pandasCode;
+      pandasCode = (_pandasCode_11 + "\nX_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size) ");
+      String _pandasCode_12 = pandasCode;
+      pandasCode = (_pandasCode_12 + ("\n" + algorithmBody));
+      for (final ValidationMetric validationMetric_1 : metrics) {
+        {
+          String _pandasCode_13 = pandasCode;
+          String _string_1 = validationMetric_1.getLiteral().toString();
+          String _plus_2 = ("\naccuracy = " + _string_1);
+          String _plus_3 = (_plus_2 + "(y_test, y_pred)");
+          pandasCode = (_pandasCode_13 + _plus_3);
+          String _pandasCode_14 = pandasCode;
+          String _string_2 = validationMetric_1.getLiteral().toString();
+          String _plus_4 = ("\nprint(\'" + _string_2);
+          String _plus_5 = (_plus_4 + ":\', accuracy)");
+          pandasCode = (_pandasCode_14 + _plus_5);
         }
       }
       byte[] _bytes = pandasCode.getBytes();

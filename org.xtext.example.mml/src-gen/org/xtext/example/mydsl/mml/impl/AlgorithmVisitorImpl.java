@@ -23,12 +23,15 @@ public class AlgorithmVisitorImpl implements AlgorithmVisitor<Map<String,List<St
 	@Override
 	public Map<String,List<String>> visit(DT dt) {
 		Map<String,List<String>> result = new HashMap<String, List<String>>();
-		result.put("inputs", Arrays.asList("from sklearn import tree"));
+		
+		//Scki-learn Python
+		result.put("inputsPython", Arrays.asList("from sklearn import tree"));
 		List<String> containsBody = new ArrayList<String>();
 		containsBody.add("clf = tree.DecisionTreeRegressor()");
 		containsBody.add("clf.fit(X_train, y_train)");
 		containsBody.add("y_pred =  clf.predict(X_test)");
-		result.put("body", containsBody);
+		result.put("bodyPython", containsBody);
+		//End Python
 		return result;
 	}
 
@@ -41,15 +44,19 @@ public class AlgorithmVisitorImpl implements AlgorithmVisitor<Map<String,List<St
 	@Override
 	public Map<String,List<String>> visit(RandomForest randomForest) {
 		Map<String,List<String>> result = new HashMap<String, List<String>>();
+		
+		//Scki-learn Python
 		List<String> containsInputs = new ArrayList<String>();
 		containsInputs.add("import numpy as np");
 		containsInputs.add("from sklearn.ensemble import RandomForestRegressor");
-		result.put("inputs", containsInputs);
+		result.put("inputsPython", containsInputs);
 		List<String> containsBody = new ArrayList<String>();
 		containsBody.add("regressor = RandomForestRegressor()");
 		containsBody.add("regressor.fit(X_train, y_train)");
 		containsBody.add("y_pred = regressor.predict(X_test)");
-		result.put("body", containsBody);
+		result.put("bodyPython", containsBody);
+		//End Python
+		
 		return result;
 	}
 

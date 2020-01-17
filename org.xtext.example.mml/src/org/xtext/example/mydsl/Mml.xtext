@@ -85,7 +85,7 @@ RFormula:
 XFormula: (AllVariables | PredictorVariables);
 
 AllVariables : all='.';
-PredictorVariables : 
+PredictorVariables :
 	(vars+=FormulaItem ("+" vars+=FormulaItem)*)
 ;
 
