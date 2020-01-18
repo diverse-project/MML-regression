@@ -1,5 +1,6 @@
 package org.xtext.example.mydsl.tests.bobo_abdellah_sabrina_charaf;
 
+import java.util.Map;
 import org.xtext.example.mydsl.mml.FrameworkLang;
 import org.xtext.example.mydsl.mml.MLAlgorithm;
 import org.xtext.example.mydsl.mml.ValidationMetric;
@@ -12,9 +13,7 @@ public class Output {
   
   private String fileLocation;
   
-  private double result;
-  
   private double timestamp;
   
-  private ValidationMetric validationMetric;
+  private Map<ValidationMetric, Double> validationMetric_result;
 }
