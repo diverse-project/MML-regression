@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.UniqueEList;
+import org.eclipse.xtext.xbase.lib.InputOutput;
 import org.xtext.example.mydsl.mml.FrameworkLang;
 import org.xtext.example.mydsl.mml.MLAlgorithm;
 import org.xtext.example.mydsl.mml.MLChoiceAlgorithm;
 import org.xtext.example.mydsl.mml.MMLModel;
 import org.xtext.example.mydsl.tests.bobo_abdellah_sabrina_charaf.MmlCompilateurR;
+import org.xtext.example.mydsl.tests.bobo_abdellah_sabrina_charaf.MmlCompilateurScikitLearn;
 import org.xtext.example.mydsl.tests.bobo_abdellah_sabrina_charaf.Output;
 
 @SuppressWarnings("all")
@@ -63,10 +65,13 @@ public class MmlCompilateur {
         if (framework != null) {
           switch (framework) {
             case SCIKIT:
+              MLAlgorithm _algorithm = item.getAlgorithm();
+              final MmlCompilateurScikitLearn mmCompilateurScikitLearn = new MmlCompilateurScikitLearn(this.mmlModel, _algorithm);
+              outputList.add(mmCompilateurScikitLearn.compile());
               break;
             case R:
-              MLAlgorithm _algorithm = item.getAlgorithm();
-              final MmlCompilateurR mmlCompilateurR = new MmlCompilateurR(this.mmlModel, _algorithm);
+              MLAlgorithm _algorithm_1 = item.getAlgorithm();
+              final MmlCompilateurR mmlCompilateurR = new MmlCompilateurR(this.mmlModel, _algorithm_1);
               outputList.add(mmlCompilateurR.compile());
               break;
             default:
@@ -75,6 +80,9 @@ public class MmlCompilateur {
         } else {
         }
       }
+    }
+    for (final Output output : outputList) {
+      InputOutput.<String>println(output.toString());
     }
     return result;
   }

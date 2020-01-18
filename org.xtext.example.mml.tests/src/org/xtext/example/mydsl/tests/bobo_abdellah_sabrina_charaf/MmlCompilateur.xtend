@@ -47,7 +47,9 @@ class MmlCompilateur {
 			val FrameworkLang framework = item.framework;
 			switch framework {
 				case FrameworkLang.SCIKIT: {
-							
+					val MmlCompilateurScikitLearn mmCompilateurScikitLearn = new MmlCompilateurScikitLearn(mmlModel,item.algorithm);
+					outputList.add(mmCompilateurScikitLearn.compile);
+					
 				}
 				case FrameworkLang.R: {
 					val MmlCompilateurR mmlCompilateurR = new MmlCompilateurR(mmlModel,item.algorithm);
@@ -56,6 +58,9 @@ class MmlCompilateur {
 				default: {
 				}
 			}
+		}
+		for(Output output:outputList){
+			println(output.toString());
 		}
 		return result;
 	}
