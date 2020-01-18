@@ -1,22 +1,18 @@
 package org.xtext.example.mydsl.tests.bobo_abdellah_sabrina_charaf;
 
 import com.google.common.io.Files;
-import com.google.inject.Inject;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
-import org.eclipse.xtext.testing.InjectWith;
-import org.eclipse.xtext.testing.extensions.InjectionExtension;
-import org.eclipse.xtext.testing.util.ParseHelper;
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.UniqueEList;
 import org.eclipse.xtext.xbase.lib.Exceptions;
 import org.eclipse.xtext.xbase.lib.InputOutput;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.xtext.example.mydsl.mml.AllVariables;
 import org.xtext.example.mydsl.mml.DT;
 import org.xtext.example.mydsl.mml.DataInput;
 import org.xtext.example.mydsl.mml.FormulaItem;
+import org.xtext.example.mydsl.mml.MLAlgorithm;
 import org.xtext.example.mydsl.mml.MLChoiceAlgorithm;
 import org.xtext.example.mydsl.mml.MMLModel;
 import org.xtext.example.mydsl.mml.PredictorVariables;
@@ -26,27 +22,49 @@ import org.xtext.example.mydsl.mml.StratificationMethod;
 import org.xtext.example.mydsl.mml.Validation;
 import org.xtext.example.mydsl.mml.ValidationMetric;
 import org.xtext.example.mydsl.mml.XFormula;
-import org.xtext.example.mydsl.tests.MmlInjectorProvider;
 
-@ExtendWith(InjectionExtension.class)
-@InjectWith(MmlInjectorProvider.class)
 @SuppressWarnings("all")
 public class MmlCompilateurScikitLearn {
-  public static void main(final String[] args) {
+  private MMLModel mmlModel;
+  
+  private final String name = "MmlCompilateurScikitLearn";
+  
+  private MmlCompilateurScikitLearn() {
   }
   
-  @Inject
-  private ParseHelper<MMLModel> parseHelper;
+  public MmlCompilateurScikitLearn(final MMLModel mmlModel) {
+    if ((mmlModel == null)) {
+      throw new IllegalArgumentException((("you should initialize " + this.name) + "with non null value"));
+    }
+    this.mmlModel = mmlModel;
+  }
   
-  public String compileDataInput(final CharSequence code) {
+  public EList<MLAlgorithm> removeDuplicate(final EList<MLChoiceAlgorithm> input) {
+    final EList<MLAlgorithm> result = new UniqueEList<MLAlgorithm>();
+    final List<String> list = new ArrayList<String>();
+    for (final MLChoiceAlgorithm item : input) {
+      {
+        final MLAlgorithm MLA = item.getAlgorithm();
+        boolean _contains = list.contains(MLA.getClass().getSimpleName());
+        boolean _not = (!_contains);
+        if (_not) {
+          list.add(MLA.getClass().getSimpleName());
+          result.add(MLA);
+        }
+      }
+    }
+    return result;
+  }
+  
+  public String compileDataInput() {
     try {
-      final MMLModel result = this.parseHelper.parse(code);
-      final DataInput dataInput = result.getInput();
+      final DataInput dataInput = this.mmlModel.getInput();
       final String fileLocation = dataInput.getFilelocation();
-      final List<MLChoiceAlgorithm> mlChoiceAlgorithms = result.getAlgorithms();
+      final EList<MLChoiceAlgorithm> mlChoiceAlgorithms = this.mmlModel.getAlgorithms();
       String algorithmImport = "";
       String algorithmBody = "";
-      for (final MLChoiceAlgorithm mlAlgorithm : mlChoiceAlgorithms) {
+      final EList<MLAlgorithm> MLAList = this.removeDuplicate(mlChoiceAlgorithms);
+      for (final MLAlgorithm mlAlgorithm : MLAList) {
         boolean _matched = false;
         if (mlAlgorithm instanceof DT) {
           _matched=true;
@@ -78,7 +96,7 @@ public class MmlCompilateurScikitLearn {
           InputOutput.<String>print("default");
         }
       }
-      final Validation validation = result.getValidation();
+      final Validation validation = this.mmlModel.getValidation();
       final StratificationMethod stratification = validation.getStratification();
       final List<ValidationMetric> metrics = validation.getMetric();
       int _number = stratification.getNumber();
@@ -99,7 +117,7 @@ public class MmlCompilateurScikitLearn {
       pythonImport = (_pythonImport_2 + (("from sklearn.model_selection import " + trainning) + "\n"));
       final String csvReading = (("\nmml_data = pd.read_csv(\"" + fileLocation) + "\")");
       String pandasCode = (pythonImport + csvReading);
-      final RFormula formula = result.getFormula();
+      final RFormula formula = this.mmlModel.getFormula();
       if ((formula == null)) {
         String column = "\ncolumn = mml_data.columns[-1]";
         String _pandasCode = pandasCode;
@@ -113,7 +131,6 @@ public class MmlCompilateurScikitLearn {
         boolean _tripleNotEquals = (_predictive != null);
         if (_tripleNotEquals) {
           final FormulaItem predictive = formula.getPredictive();
-          InputOutput.<String>println(("predictive = " + predictive));
           int _column = predictive.getColumn();
           boolean _tripleNotEquals_1 = (_column != 0);
           if (_tripleNotEquals_1) {
@@ -130,7 +147,6 @@ public class MmlCompilateurScikitLearn {
             }
           }
         } else {
-          InputOutput.<String>print("Here");
           String column_1 = "\ncolumn = mml_data.columns[-1]";
           String _pandasCode_4 = pandasCode;
           pandasCode = (_pandasCode_4 + ("\n" + column_1));
@@ -192,14 +208,6 @@ public class MmlCompilateurScikitLearn {
       byte[] _bytes = pandasCode.getBytes();
       File _file = new File("mml.py");
       Files.write(_bytes, _file);
-      final Process p = Runtime.getRuntime().exec("python mml.py");
-      InputStream _inputStream = p.getInputStream();
-      InputStreamReader _inputStreamReader = new InputStreamReader(_inputStream);
-      final BufferedReader in = new BufferedReader(_inputStreamReader);
-      String line = null;
-      while (((line = in.readLine()) != null)) {
-        System.out.println(line);
-      }
       return pandasCode;
     } catch (Throwable _e) {
       throw Exceptions.sneakyThrow(_e);

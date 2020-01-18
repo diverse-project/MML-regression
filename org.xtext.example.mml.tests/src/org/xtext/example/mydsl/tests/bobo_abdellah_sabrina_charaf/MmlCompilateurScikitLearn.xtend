@@ -1,19 +1,16 @@
 package org.xtext.example.mydsl.tests.bobo_abdellah_sabrina_charaf
 
 import com.google.common.io.Files
-import com.google.inject.Inject
-import java.io.BufferedReader
 import java.io.File
-import java.io.InputStreamReader
+import java.util.ArrayList
 import java.util.List
-import org.eclipse.xtext.testing.InjectWith
-import org.eclipse.xtext.testing.extensions.InjectionExtension
-import org.eclipse.xtext.testing.util.ParseHelper
-import org.junit.jupiter.api.^extension.ExtendWith
+import org.eclipse.emf.common.util.EList
+import org.eclipse.emf.common.util.UniqueEList
 import org.xtext.example.mydsl.mml.AllVariables
 import org.xtext.example.mydsl.mml.DT
 import org.xtext.example.mydsl.mml.DataInput
 import org.xtext.example.mydsl.mml.FormulaItem
+import org.xtext.example.mydsl.mml.MLAlgorithm
 import org.xtext.example.mydsl.mml.MLChoiceAlgorithm
 import org.xtext.example.mydsl.mml.MMLModel
 import org.xtext.example.mydsl.mml.PredictorVariables
@@ -23,35 +20,48 @@ import org.xtext.example.mydsl.mml.StratificationMethod
 import org.xtext.example.mydsl.mml.Validation
 import org.xtext.example.mydsl.mml.ValidationMetric
 import org.xtext.example.mydsl.mml.XFormula
-import org.xtext.example.mydsl.tests.MmlInjectorProvider
 
-@ExtendWith(InjectionExtension)
-@InjectWith(MmlInjectorProvider)
 class MmlCompilateurScikitLearn {
 	
-	def static void main(String[] args) {
+	var MMLModel mmlModel;
+	val String name = "MmlCompilateurScikitLearn";
+	
+	private new(){
 		
 	}
+	new(MMLModel mmlModel) {
+		if (mmlModel === null ){
+			throw new IllegalArgumentException("you should initialize "+this.name+"with non null value");
+		}
+		this.mmlModel = mmlModel;
+	}	
 	
-	@Inject
-	ParseHelper<MMLModel> parseHelper
-	
-	
-	
-	def String compileDataInput(CharSequence code) {
-		val MMLModel result = parseHelper.parse(
-			code
-		)
+	def EList<MLAlgorithm> removeDuplicate(EList<MLChoiceAlgorithm> input){
+		val EList<MLAlgorithm> result = new UniqueEList<MLAlgorithm>();
+		val List<String> list = new ArrayList<String>();
 		
-		val DataInput dataInput = result.input;
+		for (MLChoiceAlgorithm item: input){
+			val MLAlgorithm MLA = item.algorithm;
+			if(!list.contains(MLA.class.simpleName)){
+				list.add(MLA.class.simpleName);
+				result.add(MLA);
+			}
+		}
+		return result;
+	}
+	
+	def String compileDataInput() {
+		
+		val DataInput dataInput = mmlModel.input;
 		val String fileLocation = dataInput.filelocation;
 		
 		//Algorithm
-		val List<MLChoiceAlgorithm> mlChoiceAlgorithms = result.algorithms;
+		val EList<MLChoiceAlgorithm> mlChoiceAlgorithms = mmlModel.algorithms;
 		var String algorithmImport="";
 		var String algorithmBody="";
 		
-		for(MLChoiceAlgorithm mlAlgorithm: mlChoiceAlgorithms){
+		val EList<MLAlgorithm> MLAList = removeDuplicate(mlChoiceAlgorithms);
+		for(MLAlgorithm mlAlgorithm: MLAList){
 			switch mlAlgorithm {
 				DT: {
 					algorithmImport += "\nfrom sklearn import tree";
@@ -75,7 +85,7 @@ class MmlCompilateurScikitLearn {
 		
 		
 		//TrainningTest
-		val Validation validation = result.validation;
+		val Validation validation = mmlModel.validation;
 		val StratificationMethod stratification = validation.stratification;
 		//Metric
 		val List<ValidationMetric> metrics = validation.metric;
@@ -99,7 +109,7 @@ class MmlCompilateurScikitLearn {
 		var String	pandasCode = pythonImport + csvReading;
 		
 		//Formula
-		val RFormula formula = result.formula;
+		val RFormula formula = mmlModel.formula;
 		if (formula === null) {
 			var String column= "\ncolumn = mml_data.columns[-1]";
 			pandasCode += "\n"+column+" \nX = mml_data.drop(columns=[column]) ";
@@ -110,7 +120,6 @@ class MmlCompilateurScikitLearn {
 			var String predictiveColName
 			if (formula.predictive !== null) {
 				val FormulaItem predictive = formula.predictive;
-				println("predictive = "+(predictive));
 				
 				if(predictive.column !== 0 ){
 					predictiveColumn = predictive.column;
@@ -123,7 +132,6 @@ class MmlCompilateurScikitLearn {
 				
 			}
 			else{
-				print("Here")
 				var String column= "\ncolumn = mml_data.columns[-1]";
 				pandasCode += "\n"+column;
 				pandasCode += "\ny = mml_data[column] ";
@@ -170,13 +178,7 @@ class MmlCompilateurScikitLearn {
 		 * venv/bin/pip install -r requirements.txt
 		 */
 		
-		val Process	p = Runtime.getRuntime().exec("python mml.py");
-		val BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-		var String line;
 		
-		while (( line = in.readLine()) !== null) {
-			System.out.println(line);
-		}
 		return pandasCode;
 	}
 	
