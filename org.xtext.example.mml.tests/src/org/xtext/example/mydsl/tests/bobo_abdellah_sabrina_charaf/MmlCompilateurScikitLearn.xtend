@@ -1,7 +1,9 @@
 package org.xtext.example.mydsl.tests.bobo_abdellah_sabrina_charaf
 
 import com.google.common.io.Files
+import java.io.BufferedReader
 import java.io.File
+import java.io.InputStreamReader
 import java.util.ArrayList
 import java.util.List
 import org.eclipse.emf.common.util.EList
@@ -10,6 +12,7 @@ import org.xtext.example.mydsl.mml.AllVariables
 import org.xtext.example.mydsl.mml.DT
 import org.xtext.example.mydsl.mml.DataInput
 import org.xtext.example.mydsl.mml.FormulaItem
+import org.xtext.example.mydsl.mml.FrameworkLang
 import org.xtext.example.mydsl.mml.MLAlgorithm
 import org.xtext.example.mydsl.mml.MLChoiceAlgorithm
 import org.xtext.example.mydsl.mml.MMLModel
@@ -20,6 +23,7 @@ import org.xtext.example.mydsl.mml.StratificationMethod
 import org.xtext.example.mydsl.mml.Validation
 import org.xtext.example.mydsl.mml.ValidationMetric
 import org.xtext.example.mydsl.mml.XFormula
+import java.util.stream.DoubleStream.Builder
 
 class MmlCompilateurScikitLearn {
 	
@@ -52,13 +56,12 @@ class MmlCompilateurScikitLearn {
 		return result;
 	}
 	
-	def Output compileDataInput() {
+	def String compileDataInput() {
 		
-		val Output output = new Output();
 		val DataInput dataInput = mmlModel.input;
 		val String fileLocation = dataInput.filelocation;
+		
 		//Algorithm
-		val EList<MLChoiceAlgorithm> mlChoiceAlgorithms = mmlModel.algorithms;
 		var String algorithmImport="";
 		var String algorithmBody="";
 		
@@ -152,6 +155,7 @@ class MmlCompilateurScikitLearn {
 				PredictorVariables:{
 					var PredictorVariables	predictorsVariables =  formula.predictors as PredictorVariables;
 					val List<FormulaItem> predictorsList = predictorsVariables.vars
+					//TODO
 				}	
 				default : print("default")	
 			}
@@ -162,7 +166,7 @@ class MmlCompilateurScikitLearn {
 		
 		for(ValidationMetric validationMetric: metrics){
 			pandasCode += "\naccuracy = "+validationMetric.literal.toString()+"(y_test, y_pred)";
-			pandasCode += "\nprint('"+validationMetric.literal.toString()+":', accuracy)";
+			pandasCode += "\nprint('"+validationMetric.literal.toString()+"', accuracy)";
 		}
 				
 		Files.write(pandasCode.getBytes(), new File("mml.py"));
@@ -178,8 +182,32 @@ class MmlCompilateurScikitLearn {
 		 */
 		
 		
-		//return pandasCode;
-		return output;
+		return pandasCode;
 	}
 	
+	def Output compile(){
+		val Output result = new Output();
+		result.frameworkLang = FrameworkLang.SCIKIT;
+		result.mlAlgorithm = this.mlAlgorithm;
+		val DataInput dataInput = mmlModel.input;
+		result.fileLocation = dataInput.filelocation;
+		val String render = compileDataInput();
+		
+		Files.write(render.getBytes(), new File("mml.py"));
+		
+		val double startTime = System.currentTimeMillis() as double;
+		val Process p = Runtime.getRuntime().exec("python mml.py");
+		val double endTime = System.currentTimeMillis() as double;
+		val BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+		var String line;
+		while ((line = in.readLine()) !== null) {
+			var String[] output = line.split(',');
+			val String metricName = output.get(0).replace("(","").replace("'","");
+			val String value = output.get(1).replace(")","");
+			result.validationMetric_result.put(metricName,Double.valueOf(value));
+			System.out.println(line);
+	    }
+		result.timestamp = endTime - startTime;
+		return result;
+	}
 }

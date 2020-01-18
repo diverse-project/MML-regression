@@ -333,7 +333,7 @@ class MmlParsingTest {
 		
 		for(ValidationMetric validationMetric: metrics){
 			pandasCode += "\naccuracy = "+validationMetric.literal.toString()+"(y_test, y_pred)";
-			pandasCode += "\nprint('"+validationMetric.literal.toString()+":', accuracy)";
+			pandasCode += "\nprint('"+validationMetric.literal.toString()+"', accuracy)";
 		}
 				
 		Files.write(pandasCode.getBytes(), new File("mml.py"));
@@ -352,7 +352,7 @@ class MmlParsingTest {
 		val BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
 		var String line;
 		
-		while (( line = in.readLine()) !== null) {
+		while (( line = in.readLine()) !== null) {			
 			System.out.println(line);
 		}
 	}
