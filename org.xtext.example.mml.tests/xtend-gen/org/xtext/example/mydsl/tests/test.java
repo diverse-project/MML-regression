@@ -3,7 +3,12 @@
  */
 package org.xtext.example.mydsl.tests;
 
+import com.google.common.io.Files;
 import com.google.inject.Inject;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtend2.lib.StringConcatenation;
@@ -16,6 +21,8 @@ import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.xtext.example.mydsl.mml.CSVParsingConfiguration;
+import org.xtext.example.mydsl.mml.DataInput;
 import org.xtext.example.mydsl.mml.FrameworkLang;
 import org.xtext.example.mydsl.mml.MLChoiceAlgorithm;
 import org.xtext.example.mydsl.mml.MMLModel;
@@ -69,9 +76,62 @@ public class test {
   
   @Test
   public void compileDataInput() {
-    throw new Error("Unresolved compilation problems:"
-      + "\nThe method or field algorithms is undefined for the type MMLModel"
-      + "\nget cannot be resolved");
+    try {
+      StringConcatenation _builder = new StringConcatenation();
+      _builder.append("datainput \"boston.csv\" separator ;");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("mlframework scikit-learn");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("algorithm DT");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("TrainingTest { ");
+      _builder.newLine();
+      _builder.append("\t\t");
+      _builder.append("percentageTraining 70");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("}");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("mean_absolute_error");
+      _builder.newLine();
+      final MMLModel result = this.parseHelper.parse(_builder);
+      final DataInput dataInput = result.getInput();
+      final String fileLocation = dataInput.getFilelocation();
+      final String pythonImport = "import pandas as pd\n";
+      final String DEFAULT_COLUMN_SEPARATOR = ",";
+      String csv_separator = DEFAULT_COLUMN_SEPARATOR;
+      final CSVParsingConfiguration parsingInstruction = dataInput.getParsingInstruction();
+      if ((parsingInstruction != null)) {
+        System.err.println(("parsing instruction..." + parsingInstruction));
+        csv_separator = parsingInstruction.getSep().toString();
+      }
+      String _mkValueInSingleQuote = this.mkValueInSingleQuote(fileLocation);
+      String _plus = ("mml_data = pd.read_csv(" + _mkValueInSingleQuote);
+      String _plus_1 = (_plus + ", sep=");
+      String _mkValueInSingleQuote_1 = this.mkValueInSingleQuote(csv_separator);
+      String _plus_2 = (_plus_1 + _mkValueInSingleQuote_1);
+      final String csvReading = (_plus_2 + ")");
+      String pandasCode = (pythonImport + csvReading);
+      String _pandasCode = pandasCode;
+      pandasCode = (_pandasCode + "\nprint (mml_data)\n");
+      byte[] _bytes = pandasCode.getBytes();
+      File _file = new File("mml.py");
+      Files.write(_bytes, _file);
+      final Process p = Runtime.getRuntime().exec("python mml.py");
+      InputStream _inputStream = p.getInputStream();
+      InputStreamReader _inputStreamReader = new InputStreamReader(_inputStream);
+      final BufferedReader in = new BufferedReader(_inputStreamReader);
+      String line = null;
+      while (((line = in.readLine()) != null)) {
+        System.out.println(line);
+      }
+    } catch (Throwable _e) {
+      throw Exceptions.sneakyThrow(_e);
+    }
   }
   
   public String algorithmTreatment(final MLChoiceAlgorithm algo) {
