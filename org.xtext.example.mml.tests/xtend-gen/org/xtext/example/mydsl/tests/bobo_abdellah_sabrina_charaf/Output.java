@@ -7,7 +7,7 @@ import org.xtext.example.mydsl.mml.ValidationMetric;
 
 @SuppressWarnings("all")
 public class Output {
-  private MLAlgorithm mlAlgorithm;
+  public MLAlgorithm mlAlgorithm;
   
   public FrameworkLang frameworkLang;
   
