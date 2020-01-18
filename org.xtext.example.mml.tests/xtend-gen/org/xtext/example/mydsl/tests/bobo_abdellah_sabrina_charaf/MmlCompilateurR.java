@@ -10,6 +10,7 @@ import org.xtext.example.mydsl.mml.CrossValidation;
 import org.xtext.example.mydsl.mml.DT;
 import org.xtext.example.mydsl.mml.DataInput;
 import org.xtext.example.mydsl.mml.FormulaItem;
+import org.xtext.example.mydsl.mml.FrameworkLang;
 import org.xtext.example.mydsl.mml.GTB;
 import org.xtext.example.mydsl.mml.MLAlgorithm;
 import org.xtext.example.mydsl.mml.MLChoiceAlgorithm;
@@ -216,8 +217,9 @@ public class MmlCompilateurR {
   }
   
   public Output compile() {
-    throw new Error("Unresolved compilation problems:"
-      + "\nThe field frameworkLang is not visible"
-      + "\nThe field mlAlgorithm is not visible");
+    final Output result = new Output();
+    result.frameworkLang = FrameworkLang.R;
+    result.mlAlgorithm = this.MLA;
+    return result;
   }
 }

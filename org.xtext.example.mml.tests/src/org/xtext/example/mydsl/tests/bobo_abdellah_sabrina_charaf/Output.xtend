@@ -7,12 +7,10 @@ import java.util.Map
 
 class Output {
 	
-	MLAlgorithm mlAlgorithm;
-	FrameworkLang frameworkLang;
-	String fileLocation;
-	double timestamp;
-	Map<ValidationMetric, Double> validationMetric_result;
-	
-
+	public MLAlgorithm mlAlgorithm;
+	public FrameworkLang frameworkLang;
+	public String fileLocation;
+	public double timestamp;
+	public Map<ValidationMetric, Double> validationMetric_result;
 	
 }

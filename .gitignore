@@ -1,5 +1,3 @@
-.*
-/.gradle/
-*.class
-*.trace
+*
+!/org.xtext.example.mml.tests/src/org/xtext/example/mydsl/tests
 !.gitignore
