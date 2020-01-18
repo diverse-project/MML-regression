@@ -77,7 +77,7 @@ public class MmlParsingJavaTest {
 		 */
 		Process p = Runtime.getRuntime().exec("python mml.py");
 		BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-		String line; 
+		String line;
 		while ((line = in.readLine()) != null) {
 			System.out.println(line);
 	    }

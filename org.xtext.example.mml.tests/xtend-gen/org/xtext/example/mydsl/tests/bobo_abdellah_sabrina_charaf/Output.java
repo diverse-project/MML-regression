@@ -7,13 +7,13 @@ import org.xtext.example.mydsl.mml.ValidationMetric;
 
 @SuppressWarnings("all")
 public class Output {
-  public MLAlgorithm mlAlgorithm;
+  private MLAlgorithm mlAlgorithm;
   
-  public FrameworkLang frameworkLang;
+  private FrameworkLang frameworkLang;
   
-  public String fileLocation;
+  private String fileLocation;
   
-  public double timestamp;
+  private double timestamp;
   
-  public Map<ValidationMetric, Double> validationMetric_result;
+  private Map<ValidationMetric, Double> validationMetric_result;
 }

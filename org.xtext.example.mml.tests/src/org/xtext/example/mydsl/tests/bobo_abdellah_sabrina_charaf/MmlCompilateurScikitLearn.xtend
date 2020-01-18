@@ -24,16 +24,18 @@ import org.xtext.example.mydsl.mml.XFormula
 class MmlCompilateurScikitLearn {
 	
 	var MMLModel mmlModel;
+	var MLAlgorithm mlAlgorithm;
 	val String name = "MmlCompilateurScikitLearn";
 	
 	private new(){
 		
 	}
-	new(MMLModel mmlModel) {
+	new(MMLModel mmlModel, MLAlgorithm mlAlgorithm) {
 		if (mmlModel === null ){
 			throw new IllegalArgumentException("you should initialize "+this.name+"with non null value");
 		}
 		this.mmlModel = mmlModel;
+		this.mlAlgorithm = mlAlgorithm;
 	}	
 	
 	def EList<MLAlgorithm> removeDuplicate(EList<MLChoiceAlgorithm> input){
@@ -50,37 +52,34 @@ class MmlCompilateurScikitLearn {
 		return result;
 	}
 	
-	def String compileDataInput() {
+	def Output compileDataInput() {
 		
+		val Output output = new Output();
 		val DataInput dataInput = mmlModel.input;
 		val String fileLocation = dataInput.filelocation;
-		
 		//Algorithm
 		val EList<MLChoiceAlgorithm> mlChoiceAlgorithms = mmlModel.algorithms;
 		var String algorithmImport="";
 		var String algorithmBody="";
 		
-		val EList<MLAlgorithm> MLAList = removeDuplicate(mlChoiceAlgorithms);
-		for(MLAlgorithm mlAlgorithm: MLAList){
-			switch mlAlgorithm {
-				DT: {
-					algorithmImport += "\nfrom sklearn import tree";
-					algorithmBody += "\nclf = tree.DecisionTreeRegressor()";
-					algorithmBody += "\nclf.fit(X_train, y_train)";
-					algorithmBody += "\ny_pred =  clf.predict(X_test)"
-				
-				}
-				
-				RandomForest: {
-					algorithmImport += "\nimport numpy as np";
-					algorithmImport += "\nfrom sklearn.ensemble import RandomForestRegressor";
-					algorithmBody += "\nregressor = RandomForestRegressor()";
-					algorithmBody += "\nregressor.fit(X_train, y_train)";
-					algorithmBody += "\ny_pred = regressor.predict(X_test)"
-				}
-				default : print("default")
+		switch mlAlgorithm {
+			DT: {
+				algorithmImport += "\nfrom sklearn import tree";
+				algorithmBody += "\nclf = tree.DecisionTreeRegressor()";
+				algorithmBody += "\nclf.fit(X_train, y_train)";
+				algorithmBody += "\ny_pred =  clf.predict(X_test)"
 			
 			}
+			
+			RandomForest: {
+				algorithmImport += "\nimport numpy as np";
+				algorithmImport += "\nfrom sklearn.ensemble import RandomForestRegressor";
+				algorithmBody += "\nregressor = RandomForestRegressor()";
+				algorithmBody += "\nregressor.fit(X_train, y_train)";
+				algorithmBody += "\ny_pred = regressor.predict(X_test)"
+			}
+			default : print("default")
+		
 		}
 		
 		
@@ -179,7 +178,8 @@ class MmlCompilateurScikitLearn {
 		 */
 		
 		
-		return pandasCode;
+		//return pandasCode;
+		return output;
 	}
 	
 }
