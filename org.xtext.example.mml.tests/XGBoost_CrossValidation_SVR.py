@@ -8,11 +8,11 @@ from sklearn.svm import SVR
 import pandas as pd
 import xgboost as xgb
 import warnings
-df = pd.read_csv('/home/nico/IdeaProjects/idm_project/MML-regression/runtimeXText/boston/BostonHousing.csv', sep=',')
+df = pd.read_csv('/home/nico/IdeaProjects/idm_project/MML-regression/runtimeXText/boston/netflix.csv', sep=',')
 warnings.filterwarnings("ignore")
 
-X = df.drop(['medv'], axis=1)
-y = df['medv']
+X = df.drop(['ratingdescription'], axis=1)
+y = df['ratingdescription']
 
 xgb_model = SVR(kernel='linear',epsilon=0.2)
 

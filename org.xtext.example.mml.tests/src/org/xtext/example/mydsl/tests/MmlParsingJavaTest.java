@@ -145,8 +145,9 @@ public class MmlParsingJavaTest {
 			file.setReadable(true, false);
 			file.setWritable(true, false);
 		}
+
+		int nbIte = 4;
 		int cpu_cores = Runtime.getRuntime().availableProcessors();
-		int nbIte = 16;
 		System.out.println("CPU cores available : " + cpu_cores);
 		System.out.println("Number of iteration : " + nbIte);
 
@@ -154,37 +155,49 @@ public class MmlParsingJavaTest {
 		System.out.println("Score comparison...");
 		EList<ValidationMetric> metrics = result.getValidation().getMetric();
 
-		List<Future<Map<String, Map<String, Double>>>> futureList = new ArrayList<>();
+		List<Map<String, Future<Map<String, Double>>>> futureList = new ArrayList<>();
 		List<Map<String, Map<String, Double>>> threadResults = new ArrayList<>();
+		int totalExecutions = 0;
+		int timeout = 30;
 
 		ExecutorService executor = Executors.newFixedThreadPool(cpu_cores);
 		for (int i = 0; i < nbIte; i++) {
-			futureList.add(executor.submit(new ProgramExecution(files_code.keySet(), metrics)));
+			Map<String, Future<Map<String, Double>>> futureIteration = new LinkedHashMap<>();
+			for (String fileName : files_code.keySet()) {
+				totalExecutions++;
+				futureIteration.put(fileName, executor.submit(new ProgramExecution(timeout, fileName, metrics)));
+			}
+			futureList.add(futureIteration);
 		}
 		int tNb = 0;
-		for (Future<Map<String, Map<String, Double>>> thread : futureList) {
-			printProgress(0, nbIte, tNb);
-			threadResults.add(thread.get());
-			tNb++;
+		Map<String, Integer> successfulFilename = new HashMap<>();
+		for (Map<String, Future<Map<String, Double>>> futureItem : futureList) {
+			for (Entry<String, Future<Map<String, Double>>> threadResult : futureItem.entrySet()) {
+				printProgress(0, totalExecutions, tNb);
+				Map<String, Double> futureResult = threadResult.getValue().get();
+				if (futureResult != null) {
+					successfulFilename.put(threadResult.getKey(), 0);
+					threadResults.add(Collections.singletonMap(threadResult.getKey(), futureResult));
+				} else {
+					System.err.print("\n"+threadResult.getKey() + " timeout");
+				}
+				tNb++;
+			}
 		}
-		printProgress(0, nbIte, nbIte);
+		printProgress(0, totalExecutions, totalExecutions);
 		System.out.println();
 
-		Map<String, Map<String, Double>> finalScoreResult = initScoreResultMap(metrics);
-		Map<String, Map<String, Double>> scoreResult;
+		Map<String, Map<String, Double>> finalScoreResult = initScoreResultMap(metrics, successfulFilename);
 
 		Set<String> statsValName = finalScoreResult.entrySet().iterator().next().getValue().keySet();
 		System.out.println("Gathering results...");
 
-		for (int i = 0; i < nbIte; i++) {
-
-			scoreResult = threadResults.get(i);
+		for (Map<String, Map<String, Double>> scoreResult : threadResults) {
 
 			for (Entry<String, Map<String, Double>> entry : scoreResult.entrySet()) {
 				Map<String, Double> metricComparison = new HashMap<>(entry.getValue());
 				Map<String, Double> oldMetricValue = new HashMap<>(finalScoreResult.get(entry.getKey()));
 				String fileName = entry.getKey();
-
 				for (String metric : statsValName) {
 					Double oldValue = oldMetricValue.get(metric);
 					Double newValue = metricComparison.get(metric);
@@ -214,7 +227,8 @@ public class MmlParsingJavaTest {
 		return meanMap;
 	}
 
-	private Map<String, Map<String, Double>> initScoreResultMap(EList<ValidationMetric> metrics) {
+	private Map<String, Map<String, Double>> initScoreResultMap(EList<ValidationMetric> metrics,
+			Map<String, Integer> successfulFilename) {
 		Map<String, Map<String, Double>> initMap = new HashMap<>();
 		Map<String, Double> emptyMap = new HashMap<>();
 		for (ValidationMetric metric : metrics)
@@ -222,7 +236,7 @@ public class MmlParsingJavaTest {
 
 		emptyMap.put("Execution_Time", 0.0);
 
-		for (String entry : files_code.keySet())
+		for (String entry : successfulFilename.keySet())
 			initMap.put(entry, emptyMap);
 
 		return initMap;

@@ -1,4 +1,4 @@
-Date,Price (All),Change (All),Price (New),Change (New),Price (Modern),Change (Modern),Price (Older),Change (Older)
+Date,PriceA,ChangeA,PriceN,ChangeN,PriceM,ChangeM,PriceO,ChangeO
 1952-11-01,1891,0.0,2107,0.0,2020,0.0,1524,0.0
 1953-02-01,1891,0.0,2107,0.0,2002,0.0,1542,0.0
 1953-05-01,1891,0.0,2107,0.0,2002,0.0,1542,0.0

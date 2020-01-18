@@ -24,4 +24,3 @@ CrossValidation {
     numRepetitionCross 5
 }
 mean_squared_error mean_absolute_error median_absolute_error
-

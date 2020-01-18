@@ -7,11 +7,11 @@ from sklearn.model_selection import cross_validate
 from sklearn.tree import DecisionTreeRegressor
 import pandas as pd
 import warnings
-df = pd.read_csv('/home/nico/IdeaProjects/idm_project/MML-regression/runtimeXText/boston/BostonHousing.csv', sep=',')
+df = pd.read_csv('/home/nico/IdeaProjects/idm_project/MML-regression/runtimeXText/boston/x264-netflix.csv', sep=',')
 warnings.filterwarnings("ignore")
 
-X = df.drop(['medv'], axis=1)
-y = df['medv']
+X = df.drop(['usertime'], axis=1)
+y = df['usertime']
 
 clf = DecisionTreeRegressor()
 
