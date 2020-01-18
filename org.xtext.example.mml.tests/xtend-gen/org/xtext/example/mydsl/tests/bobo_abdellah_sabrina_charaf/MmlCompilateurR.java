@@ -5,10 +5,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.common.util.UniqueEList;
 import org.eclipse.xtext.xbase.lib.Exceptions;
 import org.eclipse.xtext.xbase.lib.InputOutput;
 import org.xtext.example.mydsl.mml.AllVariables;
@@ -19,7 +16,6 @@ import org.xtext.example.mydsl.mml.FormulaItem;
 import org.xtext.example.mydsl.mml.FrameworkLang;
 import org.xtext.example.mydsl.mml.GTB;
 import org.xtext.example.mydsl.mml.MLAlgorithm;
-import org.xtext.example.mydsl.mml.MLChoiceAlgorithm;
 import org.xtext.example.mydsl.mml.MMLModel;
 import org.xtext.example.mydsl.mml.PredictorVariables;
 import org.xtext.example.mydsl.mml.RFormula;
@@ -42,6 +38,10 @@ public class MmlCompilateurR {
   
   private final String name = "MmlCompilateurR";
   
+  private String imports = "";
+  
+  private String rasCode = "";
+  
   private MmlCompilateurR() {
   }
   
@@ -53,26 +53,95 @@ public class MmlCompilateurR {
     this.MLA = MLA;
   }
   
-  public EList<MLAlgorithm> removeDuplicate(final EList<MLChoiceAlgorithm> input) {
-    final EList<MLAlgorithm> result = new UniqueEList<MLAlgorithm>();
-    final List<String> list = new ArrayList<String>();
-    for (final MLChoiceAlgorithm item : input) {
-      {
-        final MLAlgorithm MLA = item.getAlgorithm();
-        boolean _contains = list.contains(MLA.getClass().getSimpleName());
-        boolean _not = (!_contains);
-        if (_not) {
-          list.add(MLA.getClass().getSimpleName());
-          result.add(MLA);
+  public String metricCode(final EList<ValidationMetric> VMList) {
+    String result = "";
+    for (final ValidationMetric item : VMList) {
+      if (item != null) {
+        switch (item) {
+          case MSE:
+            String _result = result;
+            result = (_result + ("mse(testY2, result)" + "\n"));
+            break;
+          case MAE:
+            String _result_1 = result;
+            result = (_result_1 + ("mae(testY2, result)" + "\n"));
+            break;
+          case MAPE:
+            String _result_2 = result;
+            result = (_result_2 + ("mape(testY2, result)" + "\n"));
+            break;
+          default:
+            break;
         }
+      } else {
       }
     }
     return result;
   }
   
+  public void algorithmCode(final String predictiveColName, final String predictors) {
+    final MLAlgorithm _switchValue = this.MLA;
+    boolean _matched = false;
+    if (_switchValue instanceof DT) {
+      _matched=true;
+      String _imports = this.imports;
+      this.imports = (_imports + "library(rpart)\n");
+      final DTImpl dtImpl = ((DTImpl) this.MLA);
+      String _rasCode = this.rasCode;
+      this.rasCode = (_rasCode + (((("fit <- rpart(" + predictiveColName) + "~") + predictors) + 
+        ", data = train, method = \'class\', control = rpart.control(cp = 0"));
+      int _max_depth = dtImpl.getMax_depth();
+      boolean _tripleNotEquals = (_max_depth != 0);
+      if (_tripleNotEquals) {
+        String _rasCode_1 = this.rasCode;
+        int _max_depth_1 = dtImpl.getMax_depth();
+        String _plus = (",maxdepth = " + Integer.valueOf(_max_depth_1));
+        this.rasCode = (_rasCode_1 + _plus);
+      }
+      String _rasCode_2 = this.rasCode;
+      this.rasCode = (_rasCode_2 + ("))" + "\n"));
+      String _rasCode_3 = this.rasCode;
+      this.rasCode = (_rasCode_3 + ("result1<-predict(fit, test, type = \'class\')" + "\n"));
+      String _rasCode_4 = this.rasCode;
+      this.rasCode = (_rasCode_4 + ("result <- as.numeric(levels(result1))[result1]" + "\n"));
+    }
+    if (!_matched) {
+      if (_switchValue instanceof SVR) {
+        _matched=true;
+        InputOutput.<String>println("SVR");
+      }
+    }
+    if (!_matched) {
+      if (_switchValue instanceof GTB) {
+        _matched=true;
+        InputOutput.<String>println("GTB");
+      }
+    }
+    if (!_matched) {
+      if (_switchValue instanceof RandomForest) {
+        _matched=true;
+        String _imports = this.imports;
+        this.imports = (_imports + "library(randomForest)\n");
+        String _rasCode = this.rasCode;
+        this.rasCode = (_rasCode + ((((("fit <- randomForest(" + predictiveColName) + "~") + predictors) + 
+          ", data = train, method = \'class\')") + "\n"));
+        String _rasCode_1 = this.rasCode;
+        this.rasCode = (_rasCode_1 + ("result<-predict(fit, test, type = \'class\')" + "\n"));
+      }
+    }
+    if (!_matched) {
+      if (_switchValue instanceof SGD) {
+        _matched=true;
+        InputOutput.<String>println("SGD");
+      }
+    }
+    if (!_matched) {
+      InputOutput.<String>println("default");
+    }
+  }
+  
   public String render() {
     final DataInput dataInput = this.mmlModel.getInput();
-    final EList<MLChoiceAlgorithm> MLCAList = this.mmlModel.getAlgorithms();
     final RFormula formula = this.mmlModel.getFormula();
     final Validation validation = this.mmlModel.getValidation();
     final StratificationMethod stratificationMethod = validation.getStratification();
@@ -90,17 +159,17 @@ public class MmlCompilateurR {
         split_ratio = trainingTest.getNumber();
       }
     }
-    String imports = ("library(dplyr)" + "\n");
-    String _imports = imports;
-    imports = (_imports + ("library(caTools)" + "\n"));
-    String _imports_1 = imports;
-    imports = (_imports_1 + ("library(Metrics)" + "\n"));
+    String _imports = this.imports;
+    this.imports = (_imports + ("library(caTools)" + "\n"));
+    String _imports_1 = this.imports;
+    this.imports = (_imports_1 + ("library(Metrics)" + "\n"));
     String predictiveColName = "colnames(df)[ncol(df)-1]";
     int predictiveColumn = 0;
     String predictors = ".";
     final String DEFAULT_COLUMN_SEPARATOR = ",";
     final String csv_separator = DEFAULT_COLUMN_SEPARATOR;
-    String rasCode = ((((("read.csv(\"" + fileLocation) + "\",head = TRUE, sep=\"") + csv_separator) + "\")->df") + "\n");
+    String _rasCode = this.rasCode;
+    this.rasCode = (_rasCode + ((((("read.csv(\"" + fileLocation) + "\",head = TRUE, sep=\"") + csv_separator) + "\")->df") + "\n"));
     String selectX = ("df %>% select(-c())->X" + "\n");
     String selectY = ("df %>% select(c())->Y" + "\n");
     if ((formula != null)) {
@@ -149,95 +218,24 @@ public class MmlCompilateurR {
         }
       }
     }
-    String _rasCode = rasCode;
-    rasCode = (_rasCode + (selectX + selectY));
-    String _rasCode_1 = rasCode;
-    rasCode = (_rasCode_1 + ((((("sample.split(df$" + predictiveColName) + ",SplitRatio=") + Double.valueOf(split_ratio)) + ")->split_index") + "\n"));
-    String _rasCode_2 = rasCode;
-    rasCode = (_rasCode_2 + ("train<-subset(df,split_index==T)" + "\n"));
-    String _rasCode_3 = rasCode;
-    rasCode = (_rasCode_3 + ("test<-subset(df,split_index==F)" + "\n"));
-    final EList<MLAlgorithm> MLAList = this.removeDuplicate(MLCAList);
-    for (final MLAlgorithm MLA : MLAList) {
-      boolean _matched_2 = false;
-      if (MLA instanceof DT) {
-        _matched_2=true;
-        String _imports_2 = imports;
-        imports = (_imports_2 + "library(rpart)\n");
-        final DTImpl dtImpl = ((DTImpl) MLA);
-        String _rasCode_4 = rasCode;
-        rasCode = (_rasCode_4 + (((("fit <- rpart(" + predictiveColName) + "~") + predictors) + 
-          ", data = train, method = \'class\', control = rpart.control(cp = 0"));
-        int _max_depth = dtImpl.getMax_depth();
-        boolean _tripleNotEquals_1 = (_max_depth != 0);
-        if (_tripleNotEquals_1) {
-          String _rasCode_5 = rasCode;
-          int _max_depth_1 = dtImpl.getMax_depth();
-          String _plus = (",maxdepth = " + Integer.valueOf(_max_depth_1));
-          rasCode = (_rasCode_5 + _plus);
-        }
-        String _rasCode_6 = rasCode;
-        rasCode = (_rasCode_6 + ("))" + "\n"));
-        String _rasCode_7 = rasCode;
-        rasCode = (_rasCode_7 + ("result1<-predict(fit, test, type = \'class\')" + "\n"));
-        String _rasCode_8 = rasCode;
-        rasCode = (_rasCode_8 + ("result <- as.numeric(levels(result1))[result1]" + "\n"));
-      }
-      if (!_matched_2) {
-        if (MLA instanceof SVR) {
-          _matched_2=true;
-          InputOutput.<String>println("SVR");
-        }
-      }
-      if (!_matched_2) {
-        if (MLA instanceof GTB) {
-          _matched_2=true;
-          InputOutput.<String>println("GTB");
-        }
-      }
-      if (!_matched_2) {
-        if (MLA instanceof RandomForest) {
-          _matched_2=true;
-          InputOutput.<String>println("RandomForest");
-        }
-      }
-      if (!_matched_2) {
-        if (MLA instanceof SGD) {
-          _matched_2=true;
-          InputOutput.<String>println("SGD");
-        }
-      }
-      if (!_matched_2) {
-        InputOutput.<String>println("default");
-      }
-    }
-    rasCode = (imports + rasCode);
-    String _rasCode_4 = rasCode;
-    rasCode = (_rasCode_4 + ((("test %>% select(c(" + predictiveColName) + "))->testY") + "\n"));
-    String _rasCode_5 = rasCode;
-    rasCode = (_rasCode_5 + ("testY2 <- testY[,1:length(testY)]" + "\n"));
-    for (final ValidationMetric item : VMList) {
-      if (item != null) {
-        switch (item) {
-          case MSE:
-            String _rasCode_6 = rasCode;
-            rasCode = (_rasCode_6 + "mse(testY2, result)");
-            break;
-          case MAE:
-            String _rasCode_7 = rasCode;
-            rasCode = (_rasCode_7 + "mae(testY2, result)");
-            break;
-          case MAPE:
-            String _rasCode_8 = rasCode;
-            rasCode = (_rasCode_8 + "mape(testY2, result)");
-            break;
-          default:
-            break;
-        }
-      } else {
-      }
-    }
-    return rasCode;
+    String _rasCode_1 = this.rasCode;
+    this.rasCode = (_rasCode_1 + (selectX + selectY));
+    String _rasCode_2 = this.rasCode;
+    this.rasCode = (_rasCode_2 + ((((("sample.split(df$" + predictiveColName) + ",SplitRatio=") + Double.valueOf(split_ratio)) + ")->split_index") + "\n"));
+    String _rasCode_3 = this.rasCode;
+    this.rasCode = (_rasCode_3 + ("train<-subset(df,split_index==T)" + "\n"));
+    String _rasCode_4 = this.rasCode;
+    this.rasCode = (_rasCode_4 + ("test<-subset(df,split_index==F)" + "\n"));
+    this.algorithmCode(predictiveColName, predictors);
+    this.rasCode = (this.imports + this.rasCode);
+    String _rasCode_5 = this.rasCode;
+    this.rasCode = (_rasCode_5 + ((("test %>% select(c(" + predictiveColName) + "))->testY") + "\n"));
+    String _rasCode_6 = this.rasCode;
+    this.rasCode = (_rasCode_6 + ("testY2 <- testY[,1:length(testY)]" + "\n"));
+    String _rasCode_7 = this.rasCode;
+    String _metricCode = this.metricCode(VMList);
+    this.rasCode = (_rasCode_7 + _metricCode);
+    return this.rasCode;
   }
   
   public Output compile() {

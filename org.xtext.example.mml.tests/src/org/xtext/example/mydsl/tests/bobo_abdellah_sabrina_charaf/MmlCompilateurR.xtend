@@ -34,7 +34,8 @@ class MmlCompilateurR {
 	var MMLModel mmlModel;
 	var MLAlgorithm MLA;
 	val String name = "MmlCompilateurR";
-
+	var String imports = "";
+	var String rasCode = "";
 	private new() {
 	}
 
@@ -46,23 +47,64 @@ class MmlCompilateurR {
 		this.MLA = MLA;
 	}
 
-	def EList<MLAlgorithm> removeDuplicate(EList<MLChoiceAlgorithm> input) {
-		val EList<MLAlgorithm> result = new UniqueEList<MLAlgorithm>();
-		val List<String> list = new ArrayList<String>();
-
-		for (MLChoiceAlgorithm item : input) {
-			val MLAlgorithm MLA = item.algorithm;
-			if (!list.contains(MLA.class.simpleName)) {
-				list.add(MLA.class.simpleName);
-				result.add(MLA);
+	def String metricCode(EList<ValidationMetric> VMList) {
+		var String result = "";
+		for (ValidationMetric item : VMList) {
+			switch item {
+				case ValidationMetric.MSE: {
+					result += "mse(testY2, result)" + "\n";
+				}
+				case ValidationMetric.MAE: {
+					result += "mae(testY2, result)" + "\n";
+				}
+				case ValidationMetric.MAPE: {
+					result += "mape(testY2, result)" + "\n";
+				}
+				default: {
+				}
 			}
 		}
 		return result;
 	}
+	
+	def void algorithmCode(String predictiveColName, String predictors) {
+		switch this.MLA {
+			DT: {
+				imports += "library(rpart)\n";
+				val DTImpl dtImpl = MLA as DTImpl;
+				rasCode += "fit <- rpart(" + predictiveColName + "~" + predictors +
+					", data = train, method = 'class', control = rpart.control(cp = 0";
+				if (dtImpl.max_depth !== 0) {
+					rasCode += ",maxdepth = " + dtImpl.max_depth;
+				}
+				rasCode += "))" + "\n";
+				rasCode += "result1<-predict(fit, test, type = 'class')" + "\n";
+				rasCode += "result <- as.numeric(levels(result1))[result1]" + "\n";
+
+			}
+			SVR: {
+				println("SVR")
+			}
+			GTB: {
+				println("GTB")
+			}
+			RandomForest: {
+				imports += "library(randomForest)\n";
+				rasCode += "fit <- randomForest(" + predictiveColName + "~" + predictors +
+					", data = train, method = 'class')"+"\n";
+				rasCode += "result<-predict(fit, test, type = 'class')" + "\n";
+			}
+			SGD: {
+				println("SGD")
+			}
+			default: {
+				println("default")
+			}
+		}
+	}
 
 	def String render() {
 		val DataInput dataInput = mmlModel.input;
-		val EList<MLChoiceAlgorithm> MLCAList = mmlModel.algorithms
 		val RFormula formula = mmlModel.formula;
 		val Validation validation = mmlModel.validation;
 
@@ -80,7 +122,6 @@ class MmlCompilateurR {
 			}
 		}
 
-		var String imports = "library(dplyr)" + "\n";
 		imports += "library(caTools)" + "\n";
 		imports += "library(Metrics)" + "\n";
 		var String predictiveColName = "colnames(df)[ncol(df)-1]";
@@ -88,7 +129,7 @@ class MmlCompilateurR {
 		var String predictors = "."; // by default
 		val String DEFAULT_COLUMN_SEPARATOR = ","; // by default
 		val String csv_separator = DEFAULT_COLUMN_SEPARATOR;
-		var String rasCode = "read.csv(\"" + fileLocation + "\",head = TRUE, sep=\"" + csv_separator + "\")->df" + "\n";
+		rasCode += "read.csv(\"" + fileLocation + "\",head = TRUE, sep=\"" + csv_separator + "\")->df" + "\n";
 
 		var String selectX = "df %>% select(-c())->X" + "\n";
 		var String selectY = "df %>% select(c())->Y" + "\n";
@@ -126,59 +167,13 @@ class MmlCompilateurR {
 		rasCode += "train<-subset(df,split_index==T)" + "\n";
 		rasCode += "test<-subset(df,split_index==F)" + "\n";
 
-		val EList<MLAlgorithm> MLAList = removeDuplicate(MLCAList);
-		for (MLAlgorithm MLA : MLAList) {
-			switch MLA {
-				DT: {
-					imports += "library(rpart)\n";
-					val DTImpl dtImpl = MLA as DTImpl;
-					rasCode += "fit <- rpart(" + predictiveColName + "~" + predictors +
-						", data = train, method = 'class', control = rpart.control(cp = 0";
-					if (dtImpl.max_depth !== 0) {
-						rasCode += ",maxdepth = " + dtImpl.max_depth;
-					}
-					rasCode += "))" + "\n";
-					rasCode += "result1<-predict(fit, test, type = 'class')" + "\n";
-					rasCode += "result <- as.numeric(levels(result1))[result1]" + "\n";
-
-				}
-				SVR: {
-					println("SVR")
-				}
-				GTB: {
-					println("GTB")
-				}
-				RandomForest: {
-					println("RandomForest")
-				}
-				SGD: {
-					println("SGD")
-				}
-				default: {
-					println("default")
-				}
-			}
-		}
+		algorithmCode(predictiveColName, predictors);
 
 		rasCode = imports + rasCode;
 		rasCode += "test %>% select(c(" + predictiveColName + "))->testY" + "\n";
 		rasCode += "testY2 <- testY[,1:length(testY)]" + "\n";
 
-		for (ValidationMetric item : VMList) {
-			switch item {
-				case ValidationMetric.MSE: {
-					rasCode += "mse(testY2, result)";
-				}
-				case ValidationMetric.MAE: {
-					rasCode += "mae(testY2, result)";
-				}
-				case ValidationMetric.MAPE: {
-					rasCode += "mape(testY2, result)";
-				}
-				default: {
-				}
-			}
-		}
+		rasCode += metricCode(VMList);
 		return rasCode;
 	}
 
