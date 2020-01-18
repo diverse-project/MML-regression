@@ -1,3 +1,8 @@
 *
-!/org.xtext.example.mml.tests/src/org/xtext/example/mydsl/tests
+!/org.xtext.example.mml.tests/src/org/xtext/example/mydsl/tests/bobo_abdellah_sabrina_charaf/MmlCompilateur.xtend
+!/org.xtext.example.mml.tests/src/org/xtext/example/mydsl/tests/bobo_abdellah_sabrina_charaf/MmlCompilateurR.xtend
+!/org.xtext.example.mml.tests/src/org/xtext/example/mydsl/tests/bobo_abdellah_sabrina_charaf/MmlCompilateurRTest.xtend
+!/org.xtext.example.mml.tests/src/org/xtext/example/mydsl/tests/bobo_abdellah_sabrina_charaf/MmlCompilateurScikitLearn.xtend
+!/org.xtext.example.mml.tests/src/org/xtext/example/mydsl/tests/bobo_abdellah_sabrina_charaf/MmlParsingTest.xtend
+!/org.xtext.example.mml.tests/src/org/xtext/example/mydsl/tests/bobo_abdellah_sabrina_charaf/Output.xtend
 !.gitignore
