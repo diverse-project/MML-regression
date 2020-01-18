@@ -1,5 +1,5 @@
-!.gitignore
 .*
 /.gradle/
 *.class
 *.trace
+!.gitignore
