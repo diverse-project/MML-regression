@@ -13,5 +13,6 @@ class Output {
 	double timestamp;
 	Map<ValidationMetric, Double> validationMetric_result;
 	
+
 	
 }

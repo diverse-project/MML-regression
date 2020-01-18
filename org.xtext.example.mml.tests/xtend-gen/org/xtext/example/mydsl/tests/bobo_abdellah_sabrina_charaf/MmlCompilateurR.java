@@ -25,6 +25,7 @@ import org.xtext.example.mydsl.mml.Validation;
 import org.xtext.example.mydsl.mml.ValidationMetric;
 import org.xtext.example.mydsl.mml.XFormula;
 import org.xtext.example.mydsl.mml.impl.DTImpl;
+import org.xtext.example.mydsl.tests.bobo_abdellah_sabrina_charaf.Output;
 
 @SuppressWarnings("all")
 public class MmlCompilateurR {
@@ -212,5 +213,11 @@ public class MmlCompilateurR {
     String _rasCode_6 = rasCode;
     rasCode = (_rasCode_6 + "mae(testY3, result)");
     return rasCode;
+  }
+  
+  public Output compile() {
+    throw new Error("Unresolved compilation problems:"
+      + "\nThe field frameworkLang is not visible"
+      + "\nThe field mlAlgorithm is not visible");
   }
 }
