@@ -22,21 +22,25 @@ import org.xtext.example.mydsl.mml.StratificationMethod;
 import org.xtext.example.mydsl.mml.Validation;
 import org.xtext.example.mydsl.mml.ValidationMetric;
 import org.xtext.example.mydsl.mml.XFormula;
+import org.xtext.example.mydsl.tests.bobo_abdellah_sabrina_charaf.Output;
 
 @SuppressWarnings("all")
 public class MmlCompilateurScikitLearn {
   private MMLModel mmlModel;
+  
+  private MLAlgorithm mlAlgorithm;
   
   private final String name = "MmlCompilateurScikitLearn";
   
   private MmlCompilateurScikitLearn() {
   }
   
-  public MmlCompilateurScikitLearn(final MMLModel mmlModel) {
+  public MmlCompilateurScikitLearn(final MMLModel mmlModel, final MLAlgorithm mlAlgorithm) {
     if ((mmlModel == null)) {
       throw new IllegalArgumentException((("you should initialize " + this.name) + "with non null value"));
     }
     this.mmlModel = mmlModel;
+    this.mlAlgorithm = mlAlgorithm;
   }
   
   public EList<MLAlgorithm> removeDuplicate(final EList<MLChoiceAlgorithm> input) {
@@ -56,45 +60,44 @@ public class MmlCompilateurScikitLearn {
     return result;
   }
   
-  public String compileDataInput() {
+  public Output compileDataInput() {
     try {
+      final Output output = new Output();
       final DataInput dataInput = this.mmlModel.getInput();
       final String fileLocation = dataInput.getFilelocation();
       final EList<MLChoiceAlgorithm> mlChoiceAlgorithms = this.mmlModel.getAlgorithms();
       String algorithmImport = "";
       String algorithmBody = "";
-      final EList<MLAlgorithm> MLAList = this.removeDuplicate(mlChoiceAlgorithms);
-      for (final MLAlgorithm mlAlgorithm : MLAList) {
-        boolean _matched = false;
-        if (mlAlgorithm instanceof DT) {
+      final MLAlgorithm mlAlgorithm = this.mlAlgorithm;
+      boolean _matched = false;
+      if (mlAlgorithm instanceof DT) {
+        _matched=true;
+        String _algorithmImport = algorithmImport;
+        algorithmImport = (_algorithmImport + "\nfrom sklearn import tree");
+        String _algorithmBody = algorithmBody;
+        algorithmBody = (_algorithmBody + "\nclf = tree.DecisionTreeRegressor()");
+        String _algorithmBody_1 = algorithmBody;
+        algorithmBody = (_algorithmBody_1 + "\nclf.fit(X_train, y_train)");
+        String _algorithmBody_2 = algorithmBody;
+        algorithmBody = (_algorithmBody_2 + "\ny_pred =  clf.predict(X_test)");
+      }
+      if (!_matched) {
+        if (mlAlgorithm instanceof RandomForest) {
           _matched=true;
           String _algorithmImport = algorithmImport;
-          algorithmImport = (_algorithmImport + "\nfrom sklearn import tree");
+          algorithmImport = (_algorithmImport + "\nimport numpy as np");
+          String _algorithmImport_1 = algorithmImport;
+          algorithmImport = (_algorithmImport_1 + "\nfrom sklearn.ensemble import RandomForestRegressor");
           String _algorithmBody = algorithmBody;
-          algorithmBody = (_algorithmBody + "\nclf = tree.DecisionTreeRegressor()");
+          algorithmBody = (_algorithmBody + "\nregressor = RandomForestRegressor()");
           String _algorithmBody_1 = algorithmBody;
-          algorithmBody = (_algorithmBody_1 + "\nclf.fit(X_train, y_train)");
+          algorithmBody = (_algorithmBody_1 + "\nregressor.fit(X_train, y_train)");
           String _algorithmBody_2 = algorithmBody;
-          algorithmBody = (_algorithmBody_2 + "\ny_pred =  clf.predict(X_test)");
+          algorithmBody = (_algorithmBody_2 + "\ny_pred = regressor.predict(X_test)");
         }
-        if (!_matched) {
-          if (mlAlgorithm instanceof RandomForest) {
-            _matched=true;
-            String _algorithmImport = algorithmImport;
-            algorithmImport = (_algorithmImport + "\nimport numpy as np");
-            String _algorithmImport_1 = algorithmImport;
-            algorithmImport = (_algorithmImport_1 + "\nfrom sklearn.ensemble import RandomForestRegressor");
-            String _algorithmBody = algorithmBody;
-            algorithmBody = (_algorithmBody + "\nregressor = RandomForestRegressor()");
-            String _algorithmBody_1 = algorithmBody;
-            algorithmBody = (_algorithmBody_1 + "\nregressor.fit(X_train, y_train)");
-            String _algorithmBody_2 = algorithmBody;
-            algorithmBody = (_algorithmBody_2 + "\ny_pred = regressor.predict(X_test)");
-          }
-        }
-        if (!_matched) {
-          InputOutput.<String>print("default");
-        }
+      }
+      if (!_matched) {
+        InputOutput.<String>print("default");
       }
       final Validation validation = this.mmlModel.getValidation();
       final StratificationMethod stratification = validation.getStratification();
@@ -208,7 +211,7 @@ public class MmlCompilateurScikitLearn {
       byte[] _bytes = pandasCode.getBytes();
       File _file = new File("mml.py");
       Files.write(_bytes, _file);
-      return pandasCode;
+      return output;
     } catch (Throwable _e) {
       throw Exceptions.sneakyThrow(_e);
     }

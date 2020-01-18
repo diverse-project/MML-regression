@@ -12,4 +12,6 @@ class Output {
 	String fileLocation;
 	double timestamp;
 	Map<ValidationMetric, Double> validationMetric_result;
+	
+	
 }
