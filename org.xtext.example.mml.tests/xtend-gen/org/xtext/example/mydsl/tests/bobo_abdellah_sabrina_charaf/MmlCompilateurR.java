@@ -1,9 +1,15 @@
 package org.xtext.example.mydsl.tests.bobo_abdellah_sabrina_charaf;
 
+import com.google.common.io.Files;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.UniqueEList;
+import org.eclipse.xtext.xbase.lib.Exceptions;
 import org.eclipse.xtext.xbase.lib.InputOutput;
 import org.xtext.example.mydsl.mml.AllVariables;
 import org.xtext.example.mydsl.mml.CrossValidation;
@@ -151,7 +157,6 @@ public class MmlCompilateurR {
     rasCode = (_rasCode_2 + ("train<-subset(df,split_index==T)" + "\n"));
     String _rasCode_3 = rasCode;
     rasCode = (_rasCode_3 + ("test<-subset(df,split_index==F)" + "\n"));
-    int i = 1;
     final EList<MLAlgorithm> MLAList = this.removeDuplicate(MLCAList);
     for (final MLAlgorithm MLA : MLAList) {
       boolean _matched_2 = false;
@@ -161,7 +166,7 @@ public class MmlCompilateurR {
         imports = (_imports_2 + "library(rpart)\n");
         final DTImpl dtImpl = ((DTImpl) MLA);
         String _rasCode_4 = rasCode;
-        rasCode = (_rasCode_4 + (((((("fit" + Integer.valueOf(i)) + " <- rpart(") + predictiveColName) + "~") + predictors) + 
+        rasCode = (_rasCode_4 + (((("fit <- rpart(" + predictiveColName) + "~") + predictors) + 
           ", data = train, method = \'class\', control = rpart.control(cp = 0"));
         int _max_depth = dtImpl.getMax_depth();
         boolean _tripleNotEquals_1 = (_max_depth != 0);
@@ -174,7 +179,7 @@ public class MmlCompilateurR {
         String _rasCode_6 = rasCode;
         rasCode = (_rasCode_6 + ("))" + "\n"));
         String _rasCode_7 = rasCode;
-        rasCode = (_rasCode_7 + (((("result" + Integer.valueOf(i)) + "<-predict(fit") + Integer.valueOf(i)) + ", test, type = \'class\')"));
+        rasCode = (_rasCode_7 + ("result<-predict(fit, test, type = \'class\')" + "\n"));
       }
       if (!_matched_2) {
         if (MLA instanceof SVR) {
@@ -217,9 +222,26 @@ public class MmlCompilateurR {
   }
   
   public Output compile() {
-    final Output result = new Output();
-    result.frameworkLang = FrameworkLang.R;
-    result.mlAlgorithm = this.MLA;
-    return result;
+    try {
+      final Output result = new Output();
+      result.frameworkLang = FrameworkLang.R;
+      result.mlAlgorithm = this.MLA;
+      final String render = this.render();
+      final String filePath = "./src/org/xtext/example/mydsl/tests/bobo_abdellah_sabrina_charaf/mml.R";
+      byte[] _bytes = render.getBytes();
+      File _file = new File(filePath);
+      Files.write(_bytes, _file);
+      final Process p = Runtime.getRuntime().exec(("Rscript " + filePath));
+      InputStream _inputStream = p.getInputStream();
+      InputStreamReader _inputStreamReader = new InputStreamReader(_inputStream);
+      final BufferedReader in = new BufferedReader(_inputStreamReader);
+      String line = null;
+      while (((line = in.readLine()) != null)) {
+        System.out.println(line);
+      }
+      return result;
+    } catch (Throwable _e) {
+      throw Exceptions.sneakyThrow(_e);
+    }
   }
 }

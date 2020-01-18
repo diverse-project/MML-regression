@@ -1,13 +1,19 @@
 package org.xtext.example.mydsl.tests.bobo_abdellah_sabrina_charaf
 
-import java.util.HashSet
-import java.util.Set
+import com.google.common.io.Files
+import java.io.BufferedReader
+import java.io.File
+import java.io.InputStreamReader
+import java.util.ArrayList
+import java.util.List
 import org.eclipse.emf.common.util.EList
+import org.eclipse.emf.common.util.UniqueEList
 import org.xtext.example.mydsl.mml.AllVariables
 import org.xtext.example.mydsl.mml.CrossValidation
 import org.xtext.example.mydsl.mml.DT
 import org.xtext.example.mydsl.mml.DataInput
 import org.xtext.example.mydsl.mml.FormulaItem
+import org.xtext.example.mydsl.mml.FrameworkLang
 import org.xtext.example.mydsl.mml.GTB
 import org.xtext.example.mydsl.mml.MLAlgorithm
 import org.xtext.example.mydsl.mml.MLChoiceAlgorithm
@@ -22,10 +28,6 @@ import org.xtext.example.mydsl.mml.TrainingTest
 import org.xtext.example.mydsl.mml.Validation
 import org.xtext.example.mydsl.mml.ValidationMetric
 import org.xtext.example.mydsl.mml.impl.DTImpl
-import java.util.ArrayList
-import org.eclipse.emf.common.util.UniqueEList
-import java.util.List
-import org.xtext.example.mydsl.mml.FrameworkLang
 
 class MmlCompilateurR {
 	
@@ -124,20 +126,19 @@ class MmlCompilateurR {
 		rasCode += "train<-subset(df,split_index==T)" + "\n";
 		rasCode += "test<-subset(df,split_index==F)" + "\n";
 
-		var int i = 1;
 		val EList<MLAlgorithm> MLAList = removeDuplicate(MLCAList);
 		for (MLAlgorithm MLA : MLAList) {
 			switch MLA {
 				DT: {
 					imports += "library(rpart)\n";
 					val DTImpl dtImpl = MLA as DTImpl;
-					rasCode += "fit" + i + " <- rpart(" + predictiveColName + "~" + predictors +
+					rasCode += "fit <- rpart(" + predictiveColName + "~" + predictors +
 						", data = train, method = 'class', control = rpart.control(cp = 0";
 					if (dtImpl.max_depth !== 0) {
 						rasCode += ",maxdepth = " + dtImpl.max_depth;
 					}
 					rasCode += "))" + "\n";
-					rasCode += "result"+i+"<-predict(fit"+i+", test, type = 'class')";
+					rasCode += "result<-predict(fit, test, type = 'class')"+"\n";
 
 				}
 				SVR: {
@@ -173,6 +174,17 @@ class MmlCompilateurR {
 		val Output result = new Output();
 		result.frameworkLang = FrameworkLang.R;
 		result.mlAlgorithm = this.MLA;
+		val String render =render();
+		val String filePath = "./src/org/xtext/example/mydsl/tests/bobo_abdellah_sabrina_charaf/mml.R";
+		Files.write(render.getBytes(), new File(filePath));
+		val Process	p = Runtime.getRuntime().exec("Rscript "+filePath);
+		
+		val BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+		var String line;
+		
+		while (( line = in.readLine()) !== null) {
+			System.out.println(line);
+		}
 		return result;
 	}
 }

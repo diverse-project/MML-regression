@@ -1,9 +1,6 @@
 package org.xtext.example.mydsl.tests.bobo_abdellah_sabrina_charaf
 
-import com.google.common.io.Files
 import com.google.inject.Inject
-import java.io.BufferedReader
-import java.io.File
 import org.eclipse.xtext.testing.InjectWith
 import org.eclipse.xtext.testing.extensions.InjectionExtension
 import org.eclipse.xtext.testing.util.ParseHelper
@@ -24,7 +21,7 @@ class MmlCompilateurRTest {
 
 		val MMLModel result = parseHelper.parse('''
 			datainput "boston.csv" separator ;
-				mlframework scikit-learn
+				mlframework R
 				algorithm DT
 				formula "medv" ~ .
 				TrainingTest { 
@@ -33,7 +30,8 @@ class MmlCompilateurRTest {
 				mean_absolute_error
 		''')
 		
-		//Files.write(rasCode.getBytes(), new File("mml.R"));
+		val MmlCompilateur mmlcompilateur = new MmlCompilateur(result);
+		mmlcompilateur.render();
 	}
 
 }

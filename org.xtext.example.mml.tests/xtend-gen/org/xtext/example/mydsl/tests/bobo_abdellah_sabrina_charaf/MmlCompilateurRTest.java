@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.xtext.example.mydsl.mml.MMLModel;
 import org.xtext.example.mydsl.tests.MmlInjectorProvider;
+import org.xtext.example.mydsl.tests.bobo_abdellah_sabrina_charaf.MmlCompilateur;
 
 @ExtendWith(InjectionExtension.class)
 @InjectWith(MmlInjectorProvider.class)
@@ -25,7 +26,7 @@ public class MmlCompilateurRTest {
       _builder.append("datainput \"boston.csv\" separator ;");
       _builder.newLine();
       _builder.append("\t");
-      _builder.append("mlframework scikit-learn");
+      _builder.append("mlframework R");
       _builder.newLine();
       _builder.append("\t");
       _builder.append("algorithm DT");
@@ -46,6 +47,8 @@ public class MmlCompilateurRTest {
       _builder.append("mean_absolute_error");
       _builder.newLine();
       final MMLModel result = this.parseHelper.parse(_builder);
+      final MmlCompilateur mmlcompilateur = new MmlCompilateur(result);
+      mmlcompilateur.render();
     } catch (Throwable _e) {
       throw Exceptions.sneakyThrow(_e);
     }
