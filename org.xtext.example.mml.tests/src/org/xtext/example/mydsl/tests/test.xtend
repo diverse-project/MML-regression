@@ -69,8 +69,8 @@ class test {
 		val String csvReading = "mml_data = pd.read_csv(" + mkValueInSingleQuote(fileLocation) + ", sep=" +
 			mkValueInSingleQuote(csv_separator) + ")";
 		var String pandasCode = pythonImport + csvReading;
-		val MLChoiceAlgorithm algo =result.algorithms.get(0);
-		algorithmTreatment(algo);
+		//val MLChoiceAlgorithm algo =result.algorithms.get(0);
+		//algorithmTreatment(algo);
 		pandasCode += "\nprint (mml_data)\n";
 
 		Files.write(pandasCode.getBytes(), new File("mml.py"));
