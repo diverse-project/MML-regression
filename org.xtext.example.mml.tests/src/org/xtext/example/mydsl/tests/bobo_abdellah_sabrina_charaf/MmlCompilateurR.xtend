@@ -52,19 +52,17 @@ class MmlCompilateurR {
 		''')
 
 		val DataInput dataInput = result.input;
-		val EList<MLChoiceAlgorithm> mlA = result.algorithms
+		val EList<MLChoiceAlgorithm> MLCAList = result.algorithms
 		val RFormula formula = result.formula;
 		val Validation validation = result.validation;
-		
-		
+
 		val StratificationMethod stratificationMethod = validation.stratification;
-		val EList<ValidationMetric> eList = validation.metric;
+		val EList<ValidationMetric> VMList = validation.metric;
 		val String fileLocation = dataInput.filelocation;
 		var double split_ratio = 0.7;
-		
+
 		switch stratificationMethod {
 			CrossValidation: {
-				
 			}
 			TrainingTest: {
 				val TrainingTest trainingTest = stratificationMethod as TrainingTest;
@@ -74,6 +72,7 @@ class MmlCompilateurR {
 
 		var String imports = "library(dplyr)" + "\n";
 		imports += "library(caTools)" + "\n";
+		imports += "library(Metrics)" + "\n";
 		var String predictiveColName = "colnames(df)[ncol(df)-1]";
 		var int predictiveColumn;
 		var String predictors = "."; // by default
@@ -113,77 +112,52 @@ class MmlCompilateurR {
 		}
 
 		rasCode += selectX + selectY;
-		rasCode += "sample.split(df$" + predictiveColName + ",SplitRatio=" + split_ratio + ")->split_index"+"\n";
+		rasCode += "sample.split(df$" + predictiveColName + ",SplitRatio=" + split_ratio + ")->split_index" + "\n";
 		rasCode += "train<-subset(df,split_index==T)" + "\n";
 		rasCode += "test<-subset(df,split_index==F)" + "\n";
 
-		switch mlA {
-			DT: {
-				imports += "library(rpart)\n";
-				val DTImpl dtImpl = mlA as DTImpl;
-				if (predictiveColName !== null) {
-					rasCode += "fit <- rpart(" + predictiveColName + "~" + predictors +
+		var int i = 1;
+		for (MLChoiceAlgorithm item : MLCAList) {
+			val MLAlgorithm MLA = item.algorithm;
+			switch MLA {
+				DT: {
+					imports += "library(rpart)\n";
+					val DTImpl dtImpl = MLA as DTImpl;
+					rasCode += "fit" + i + " <- rpart(" + predictiveColName + "~" + predictors +
 						", data = train, method = 'class', control = rpart.control(cp = 0";
 					if (dtImpl.max_depth !== 0) {
 						rasCode += ",maxdepth = " + dtImpl.max_depth;
 					}
 					rasCode += "))" + "\n";
+					rasCode += "result"+i+"<-predict(fit"+i+", test, type = 'class')";
+
+				}
+				SVR: {
+					println("SVR")
+				}
+				GTB: {
+					println("GTB")
+				}
+				RandomForest: {
+					println("RandomForest")
+				}
+				SGD: {
+					println("SGD")
+				}
+				default: {
+					println("default")
 				}
 			}
-			SVR: {
-				println("SVR")
-			}
-			GTB: {
-				println("GTB")
-			}
-			RandomForest: {
-				println("RandomForest")
-			}
-			SGD: {
-				println("SGD")
-			}
-			default: {
-				println("default")
-			}
 		}
-		// visitor.visit(mlA);		
-		/*
-		 * read.csv("https://raw.githubusercontent.com/acherm/teaching-MDE1920/master/boston/boston.csv")->df
-		 * View(df)
-		 * library(dplyr)
-		 * df %>% select(-c(medv))->X
-		 * View(X)
-		 * df %>% select(c(medv))->Y
-		 * View(Y)
-		 * #Spliting Data
-		 * library(caTools)
-		 * sample.split(df$medv,SplitRatio=0.7)->split_index
-		 * train<-subset(df,split_index==T)
-		 * test<-subset(df,split_index==F)
-		 * test %>% select(-c(medv))->testX
-		 * test %>% select(c(medv))->testY
-		 * View(train)
-		 * View(test)
-		 * nrow(train)
-		 * nrow(test)
-		 * #training
-		 * library(rpart)
-		 * library(rpart.plot)
-		 * fit <- rpart(medv~., data = train, method = 'class')
-		 * rpart.plot(fit)
-		 * summary(fit)
-		 * result<-predict(fit, test, type = 'class')
-		 * #table_mat <- table(testY, result)
-		 * #table_mat
-		 * library(Metrics)
-		 * View(testY)
-		 * testY2 <- testY[1:length(testY)]
-		 * View(testY2)
-		 * View(result)
-		 * #mse(testY, result)
-		 */
+
 		rasCode = imports + rasCode;
-		rasCode += "test %>% select(c("+predictiveColName+"))->testY"+"\n";
+		rasCode += "test %>% select(c(" + predictiveColName + "))->testY" + "\n";
+		rasCode += "testY2 <- testY[,1:length(testY)]"+"\n";
+		
+		for (ValidationMetric item : VMList){
+			
+		}
+		mae(testY3, result)
 		Files.write(rasCode.getBytes(), new File("mml.R"));
 	}
 
