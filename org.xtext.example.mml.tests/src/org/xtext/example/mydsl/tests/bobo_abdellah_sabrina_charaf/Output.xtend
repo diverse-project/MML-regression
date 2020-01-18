@@ -7,7 +7,7 @@ import java.util.Map
 
 class Output {
 	
-	public MLAlgorithm mlAlgorithm;
+	MLAlgorithm mlAlgorithm;
 	public FrameworkLang frameworkLang;
 	public String fileLocation;
 	public double timestamp;

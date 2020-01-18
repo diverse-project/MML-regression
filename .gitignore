@@ -1,4 +1,5 @@
 *
+*/
 !/org.xtext.example.mml.tests/src/org/xtext/example/mydsl/tests/bobo_abdellah_sabrina_charaf/MmlCompilateur.xtend
 !/org.xtext.example.mml.tests/src/org/xtext/example/mydsl/tests/bobo_abdellah_sabrina_charaf/MmlCompilateurR.xtend
 !/org.xtext.example.mml.tests/src/org/xtext/example/mydsl/tests/bobo_abdellah_sabrina_charaf/MmlCompilateurRTest.xtend
