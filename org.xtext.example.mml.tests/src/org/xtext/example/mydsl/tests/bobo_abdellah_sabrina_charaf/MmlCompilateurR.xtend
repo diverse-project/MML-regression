@@ -29,16 +29,18 @@ import java.util.List
 class MmlCompilateurR {
 	
 	var MMLModel mmlModel;
+	var MLAlgorithm MLA;
 	val String name = "MmlCompilateurR";
 	
 	private new(){
 		
 	}
-	new(MMLModel mmlModel) {
+	new(MMLModel mmlModel,MLAlgorithm MLA) {
 		if (mmlModel === null ){
 			throw new IllegalArgumentException("you should initialize "+this.name+"with non null value");
 		}
 		this.mmlModel = mmlModel;
+		this.MLA = MLA;
 	}
 	
 	def EList<MLAlgorithm> removeDuplicate(EList<MLChoiceAlgorithm> input){
