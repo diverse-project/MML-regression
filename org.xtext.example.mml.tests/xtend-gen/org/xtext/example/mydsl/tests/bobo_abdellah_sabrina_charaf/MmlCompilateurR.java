@@ -179,7 +179,9 @@ public class MmlCompilateurR {
         String _rasCode_6 = rasCode;
         rasCode = (_rasCode_6 + ("))" + "\n"));
         String _rasCode_7 = rasCode;
-        rasCode = (_rasCode_7 + ("result<-predict(fit, test, type = \'class\')" + "\n"));
+        rasCode = (_rasCode_7 + ("result1<-predict(fit, test, type = \'class\')" + "\n"));
+        String _rasCode_8 = rasCode;
+        rasCode = (_rasCode_8 + ("result <- as.numeric(levels(result1))[result1]" + "\n"));
       }
       if (!_matched_2) {
         if (MLA instanceof SVR) {
@@ -215,9 +217,26 @@ public class MmlCompilateurR {
     String _rasCode_5 = rasCode;
     rasCode = (_rasCode_5 + ("testY2 <- testY[,1:length(testY)]" + "\n"));
     for (final ValidationMetric item : VMList) {
+      if (item != null) {
+        switch (item) {
+          case MSE:
+            String _rasCode_6 = rasCode;
+            rasCode = (_rasCode_6 + "mse(testY2, result)");
+            break;
+          case MAE:
+            String _rasCode_7 = rasCode;
+            rasCode = (_rasCode_7 + "mae(testY2, result)");
+            break;
+          case MAPE:
+            String _rasCode_8 = rasCode;
+            rasCode = (_rasCode_8 + "mape(testY2, result)");
+            break;
+          default:
+            break;
+        }
+      } else {
+      }
     }
-    String _rasCode_6 = rasCode;
-    rasCode = (_rasCode_6 + "mae(testY3, result)");
     return rasCode;
   }
   

@@ -30,37 +30,37 @@ import org.xtext.example.mydsl.mml.ValidationMetric
 import org.xtext.example.mydsl.mml.impl.DTImpl
 
 class MmlCompilateurR {
-	
+
 	var MMLModel mmlModel;
 	var MLAlgorithm MLA;
 	val String name = "MmlCompilateurR";
-	
-	private new(){
-		
+
+	private new() {
 	}
-	new(MMLModel mmlModel,MLAlgorithm MLA) {
-		if (mmlModel === null ){
-			throw new IllegalArgumentException("you should initialize "+this.name+"with non null value");
+
+	new(MMLModel mmlModel, MLAlgorithm MLA) {
+		if (mmlModel === null) {
+			throw new IllegalArgumentException("you should initialize " + this.name + "with non null value");
 		}
 		this.mmlModel = mmlModel;
 		this.MLA = MLA;
 	}
-	
-	def EList<MLAlgorithm> removeDuplicate(EList<MLChoiceAlgorithm> input){
+
+	def EList<MLAlgorithm> removeDuplicate(EList<MLChoiceAlgorithm> input) {
 		val EList<MLAlgorithm> result = new UniqueEList<MLAlgorithm>();
 		val List<String> list = new ArrayList<String>();
-		
-		for (MLChoiceAlgorithm item: input){
+
+		for (MLChoiceAlgorithm item : input) {
 			val MLAlgorithm MLA = item.algorithm;
-			if(!list.contains(MLA.class.simpleName)){
+			if (!list.contains(MLA.class.simpleName)) {
 				list.add(MLA.class.simpleName);
 				result.add(MLA);
 			}
 		}
 		return result;
 	}
-	
-	def String render(){
+
+	def String render() {
 		val DataInput dataInput = mmlModel.input;
 		val EList<MLChoiceAlgorithm> MLCAList = mmlModel.algorithms
 		val RFormula formula = mmlModel.formula;
@@ -138,7 +138,8 @@ class MmlCompilateurR {
 						rasCode += ",maxdepth = " + dtImpl.max_depth;
 					}
 					rasCode += "))" + "\n";
-					rasCode += "result<-predict(fit, test, type = 'class')"+"\n";
+					rasCode += "result1<-predict(fit, test, type = 'class')" + "\n";
+					rasCode += "result <- as.numeric(levels(result1))[result1]" + "\n";
 
 				}
 				SVR: {
@@ -161,27 +162,38 @@ class MmlCompilateurR {
 
 		rasCode = imports + rasCode;
 		rasCode += "test %>% select(c(" + predictiveColName + "))->testY" + "\n";
-		rasCode += "testY2 <- testY[,1:length(testY)]"+"\n";
-		
-		for (ValidationMetric item : VMList){
-			
+		rasCode += "testY2 <- testY[,1:length(testY)]" + "\n";
+
+		for (ValidationMetric item : VMList) {
+			switch item {
+				case ValidationMetric.MSE: {
+					rasCode += "mse(testY2, result)";
+				}
+				case ValidationMetric.MAE: {
+					rasCode += "mae(testY2, result)";
+				}
+				case ValidationMetric.MAPE: {
+					rasCode += "mape(testY2, result)";
+				}
+				default: {
+				}
+			}
 		}
-		rasCode += "mae(testY3, result)";
 		return rasCode;
 	}
-	
-	def Output compile(){
+
+	def Output compile() {
 		val Output result = new Output();
 		result.frameworkLang = FrameworkLang.R;
 		result.mlAlgorithm = this.MLA;
-		val String render =render();
+		val String render = render();
 		val String filePath = "./src/org/xtext/example/mydsl/tests/bobo_abdellah_sabrina_charaf/mml.R";
 		Files.write(render.getBytes(), new File(filePath));
-		val Process	p = Runtime.getRuntime().exec("Rscript "+filePath);
-		
+		val Process p = Runtime.getRuntime().exec("Rscript " + filePath);
+
 		val BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
 		var String line;
-		
+
 		while (( line = in.readLine()) !== null) {
 			System.out.println(line);
 		}
