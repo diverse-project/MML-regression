@@ -29,7 +29,7 @@ public class MmlParsingJavaTest {
 	
 	@Test
 	public void loadModel() throws Exception {
-		MMLModel result = parseHelper.parse("datainput \"foo.csv\"\n"
+		MMLModel result = parseHelper.parse("datainput \"boston.csv\"\n"
 				+ "mlframework scikit-learn\n"
 				+ "algorithm DT\n"
 				+ "TrainingTest { percentageTraining 70 }\n"
@@ -38,7 +38,7 @@ public class MmlParsingJavaTest {
 		Assertions.assertNotNull(result);
 		EList<Resource.Diagnostic> errors = result.eResource().getErrors();
 		Assertions.assertTrue(errors.isEmpty(), "Unexpected errors");			
-		Assertions.assertEquals("foo.csv", result.getInput().getFilelocation());			
+		Assertions.assertEquals("boston.csv", result.getInput().getFilelocation());			
 		
 	}		
 	

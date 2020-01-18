@@ -73,29 +73,32 @@ class MmlParsingTest {
 		
 		//Algorithm
 		val List<MLChoiceAlgorithm> mlChoiceAlgorithms = result.algorithms;
-		val MLAlgorithm mlAlgorithm = mlChoiceAlgorithms.get(0).algorithm;
 		var String algorithmImport="";
 		var String algorithmBody="";
-		//je taime <3
-		switch mlAlgorithm {
-			DT: {
-				algorithmImport += "\nfrom sklearn import tree";
-				algorithmBody += "\nclf = tree.DecisionTreeRegressor()";
-				algorithmBody += "\nclf.fit(X_train, y_train)";
-				algorithmBody += "\ny_pred =  clf.predict(X_test)"
+		
+		for(MLChoiceAlgorithm mlAlgorithm: mlChoiceAlgorithms){
+			switch mlAlgorithm {
+				DT: {
+					algorithmImport += "\nfrom sklearn import tree";
+					algorithmBody += "\nclf = tree.DecisionTreeRegressor()";
+					algorithmBody += "\nclf.fit(X_train, y_train)";
+					algorithmBody += "\ny_pred =  clf.predict(X_test)"
+				
+				}
+				
+				RandomForest: {
+					algorithmImport += "\nimport numpy as np";
+					algorithmImport += "\nfrom sklearn.ensemble import RandomForestRegressor";
+					algorithmBody += "\nregressor = RandomForestRegressor()";
+					algorithmBody += "\nregressor.fit(X_train, y_train)";
+					algorithmBody += "\ny_pred = regressor.predict(X_test)"
+				}
+				default : print("default")
 			
 			}
-			
-			RandomForest: {
-				algorithmImport += "\nimport numpy as np";
-				algorithmImport += "\nfrom sklearn.ensemble import RandomForestRegressor";
-				algorithmBody += "\nregressor = RandomForestRegressor()";
-				algorithmBody += "\nregressor.fit(X_train, y_train)";
-				algorithmBody += "\ny_pred = regressor.predict(X_test)"
-			} 
-			default : print("default")
-			
 		}
+		
+		
 		//TrainningTest
 		val Validation validation = result.validation;
 		val StratificationMethod stratification = validation.stratification;
@@ -117,13 +120,6 @@ class MmlParsingTest {
 		}
 		pythonImport += "from sklearn.model_selection import "+trainning+"\n";
 		
-		
-		/*
-		if (parsingInstruction != null) {
-			System.err.println("parsing instruction..." + parsingInstruction);
-			csv_separator = parsingInstruction.getSep().toString();
-		}
-		*/
 		val String	csvReading = "\nmml_data = pd.read_csv(\""+ fileLocation + "\")";
 		var String	pandasCode = pythonImport + csvReading;
 		
@@ -306,7 +302,6 @@ class MmlParsingTest {
 				
 			}
 			else{
-				print("Here")
 				var String column= "\ncolumn = mml_data.columns[-1]";
 				pandasCode += "\n"+column;
 				pandasCode += "\ny = mml_data[column] ";

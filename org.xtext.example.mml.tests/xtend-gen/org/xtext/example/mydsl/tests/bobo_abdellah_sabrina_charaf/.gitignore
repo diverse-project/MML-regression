@@ -9,4 +9,9 @@
 /MmlParsingTest.java
 /.MmlCompilateurRTest.java._trace
 /.MmlCompilateurRT.java._trace
+<<<<<<< HEAD
+/.MmlCompilateurRTest.xtendbin
+/MmlCompilateurRTest.java
+=======
 /.MmlCompilateur.java._trace
+>>>>>>> fc5f08a6136fcc15d70addfda286cfd5047098b3
