@@ -1,7 +1,10 @@
 package org.xtext.example.mydsl.tests.bobo_abdellah_sabrina_charaf;
 
 import com.google.common.io.Files;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.emf.common.util.EList;
@@ -12,6 +15,7 @@ import org.xtext.example.mydsl.mml.AllVariables;
 import org.xtext.example.mydsl.mml.DT;
 import org.xtext.example.mydsl.mml.DataInput;
 import org.xtext.example.mydsl.mml.FormulaItem;
+import org.xtext.example.mydsl.mml.FrameworkLang;
 import org.xtext.example.mydsl.mml.MLAlgorithm;
 import org.xtext.example.mydsl.mml.MLChoiceAlgorithm;
 import org.xtext.example.mydsl.mml.MMLModel;
@@ -60,12 +64,10 @@ public class MmlCompilateurScikitLearn {
     return result;
   }
   
-  public Output compileDataInput() {
+  public String compileDataInput() {
     try {
-      final Output output = new Output();
       final DataInput dataInput = this.mmlModel.getInput();
       final String fileLocation = dataInput.getFilelocation();
-      final EList<MLChoiceAlgorithm> mlChoiceAlgorithms = this.mmlModel.getAlgorithms();
       String algorithmImport = "";
       String algorithmBody = "";
       final MLAlgorithm mlAlgorithm = this.mlAlgorithm;
@@ -204,14 +206,50 @@ public class MmlCompilateurScikitLearn {
           String _pandasCode_10 = pandasCode;
           String _string_2 = validationMetric_1.getLiteral().toString();
           String _plus_4 = ("\nprint(\'" + _string_2);
-          String _plus_5 = (_plus_4 + ":\', accuracy)");
+          String _plus_5 = (_plus_4 + "\', accuracy)");
           pandasCode = (_pandasCode_10 + _plus_5);
         }
       }
       byte[] _bytes = pandasCode.getBytes();
       File _file = new File("mml.py");
       Files.write(_bytes, _file);
-      return output;
+      return pandasCode;
+    } catch (Throwable _e) {
+      throw Exceptions.sneakyThrow(_e);
+    }
+  }
+  
+  public Output compile() {
+    try {
+      final Output result = new Output();
+      result.frameworkLang = FrameworkLang.SCIKIT;
+      result.mlAlgorithm = this.mlAlgorithm;
+      final DataInput dataInput = this.mmlModel.getInput();
+      result.fileLocation = dataInput.getFilelocation();
+      final String render = this.compileDataInput();
+      byte[] _bytes = render.getBytes();
+      File _file = new File("mml.py");
+      Files.write(_bytes, _file);
+      long _currentTimeMillis = System.currentTimeMillis();
+      final double startTime = ((double) _currentTimeMillis);
+      final Process p = Runtime.getRuntime().exec("python mml.py");
+      long _currentTimeMillis_1 = System.currentTimeMillis();
+      final double endTime = ((double) _currentTimeMillis_1);
+      InputStream _inputStream = p.getInputStream();
+      InputStreamReader _inputStreamReader = new InputStreamReader(_inputStream);
+      final BufferedReader in = new BufferedReader(_inputStreamReader);
+      String line = null;
+      while (((line = in.readLine()) != null)) {
+        {
+          String[] output = line.split(",");
+          final String metricName = (output[0]).replace("(", "").replace("\'", "");
+          final String value = (output[1]).replace(")", "");
+          result.validationMetric_result.put(metricName, Double.valueOf(value));
+          System.out.println(line);
+        }
+      }
+      result.timestamp = (endTime - startTime);
+      return result;
     } catch (Throwable _e) {
       throw Exceptions.sneakyThrow(_e);
     }

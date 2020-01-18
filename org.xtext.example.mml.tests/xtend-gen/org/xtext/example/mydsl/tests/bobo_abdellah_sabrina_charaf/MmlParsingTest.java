@@ -453,7 +453,7 @@ public class MmlParsingTest {
           String _pandasCode_10 = pandasCode;
           String _string_2 = validationMetric_1.getLiteral().toString();
           String _plus_4 = ("\nprint(\'" + _string_2);
-          String _plus_5 = (_plus_4 + ":\', accuracy)");
+          String _plus_5 = (_plus_4 + "\', accuracy)");
           pandasCode = (_pandasCode_10 + _plus_5);
         }
       }

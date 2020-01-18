@@ -11,6 +11,6 @@ class Output {
 	public FrameworkLang frameworkLang;
 	public String fileLocation;
 	public double timestamp;
-	public Map<ValidationMetric, Double> validationMetric_result;
+	public Map<String, Double> validationMetric_result;
 	
 }
