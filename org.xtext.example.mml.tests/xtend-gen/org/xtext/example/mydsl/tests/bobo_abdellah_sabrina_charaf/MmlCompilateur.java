@@ -63,7 +63,8 @@ public class MmlCompilateur {
             case SCIKIT:
               break;
             case R:
-              final MmlCompilateurR mmlCompilateurR = new MmlCompilateurR(this.mmlModel);
+              MLAlgorithm _algorithm = item.getAlgorithm();
+              final MmlCompilateurR mmlCompilateurR = new MmlCompilateurR(this.mmlModel, _algorithm);
               result = mmlCompilateurR.render();
               break;
             default:

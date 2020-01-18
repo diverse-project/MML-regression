@@ -49,7 +49,8 @@ class MmlCompilateur {
 							
 				}
 				case FrameworkLang.R: {
-					val MmlCompilateurR mmlCompilateurR = new MmlCompilateurR(mmlModel);					result = mmlCompilateurR.render(); 
+					val MmlCompilateurR mmlCompilateurR = new MmlCompilateurR(mmlModel,item.algorithm);
+					result = mmlCompilateurR.render(); 
 				}
 				default: {
 				}

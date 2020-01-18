@@ -32,16 +32,8 @@ class MmlCompilateurRTest {
 				}
 				mean_absolute_error
 		''')
-
-		val MmlCompilateurR mmlCompilateurR = new MmlCompilateurR(result);
-		val String rasCode = mmlCompilateurR.render(); 
-		Files.write(rasCode.getBytes(), new File("mml.R"));
 		
-//		val MmlCompilateurScikitLearn mmlCompilateurScikitLearn = new MmlCompilateurScikitLearn(result);
-//		val String rasCode1 = mmlCompilateurScikitLearn.compileDataInput();
-//		Files.write(rasCode1.getBytes(), new File("mml.py"));
-		
-		
+		//Files.write(rasCode.getBytes(), new File("mml.R"));
 	}
 
 }

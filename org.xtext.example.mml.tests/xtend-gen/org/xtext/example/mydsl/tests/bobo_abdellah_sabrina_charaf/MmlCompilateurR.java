@@ -30,16 +30,19 @@ import org.xtext.example.mydsl.mml.impl.DTImpl;
 public class MmlCompilateurR {
   private MMLModel mmlModel;
   
+  private MLAlgorithm MLA;
+  
   private final String name = "MmlCompilateurR";
   
   private MmlCompilateurR() {
   }
   
-  public MmlCompilateurR(final MMLModel mmlModel) {
+  public MmlCompilateurR(final MMLModel mmlModel, final MLAlgorithm MLA) {
     if ((mmlModel == null)) {
       throw new IllegalArgumentException((("you should initialize " + this.name) + "with non null value"));
     }
     this.mmlModel = mmlModel;
+    this.MLA = MLA;
   }
   
   public EList<MLAlgorithm> removeDuplicate(final EList<MLChoiceAlgorithm> input) {
