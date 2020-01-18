@@ -38,10 +38,11 @@ class MmlCompilateur {
 		}
 		return result;
 	}
+	
 	def String render(){
 		var String result = "";
 		val EList<MLChoiceAlgorithm> MLCAList = removeDuplicate(mmlModel.algorithms)
-		
+		val EList<Output> outputList = new UniqueEList<Output>();
 		for(MLChoiceAlgorithm item : MLCAList){
 			val FrameworkLang framework = item.framework;
 			switch framework {
@@ -50,7 +51,7 @@ class MmlCompilateur {
 				}
 				case FrameworkLang.R: {
 					val MmlCompilateurR mmlCompilateurR = new MmlCompilateurR(mmlModel,item.algorithm);
-					result = mmlCompilateurR.render(); 
+					outputList.add(mmlCompilateurR.compile()); 
 				}
 				default: {
 				}

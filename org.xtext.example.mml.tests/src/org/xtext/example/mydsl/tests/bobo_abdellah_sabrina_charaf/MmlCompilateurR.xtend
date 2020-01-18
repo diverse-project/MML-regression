@@ -25,6 +25,7 @@ import org.xtext.example.mydsl.mml.impl.DTImpl
 import java.util.ArrayList
 import org.eclipse.emf.common.util.UniqueEList
 import java.util.List
+import org.xtext.example.mydsl.mml.FrameworkLang
 
 class MmlCompilateurR {
 	
@@ -166,5 +167,12 @@ class MmlCompilateurR {
 		}
 		rasCode += "mae(testY3, result)";
 		return rasCode;
+	}
+	
+	def Output compile(){
+		val Output result = new Output();
+		result.frameworkLang = FrameworkLang.R;
+		result.mlAlgorithm = this.MLA;
+		return result;
 	}
 }

@@ -9,6 +9,7 @@ import org.xtext.example.mydsl.mml.MLAlgorithm;
 import org.xtext.example.mydsl.mml.MLChoiceAlgorithm;
 import org.xtext.example.mydsl.mml.MMLModel;
 import org.xtext.example.mydsl.tests.bobo_abdellah_sabrina_charaf.MmlCompilateurR;
+import org.xtext.example.mydsl.tests.bobo_abdellah_sabrina_charaf.Output;
 
 @SuppressWarnings("all")
 public class MmlCompilateur {
@@ -55,6 +56,7 @@ public class MmlCompilateur {
   public String render() {
     String result = "";
     final EList<MLChoiceAlgorithm> MLCAList = this.removeDuplicate(this.mmlModel.getAlgorithms());
+    final EList<Output> outputList = new UniqueEList<Output>();
     for (final MLChoiceAlgorithm item : MLCAList) {
       {
         final FrameworkLang framework = item.getFramework();
@@ -65,7 +67,7 @@ public class MmlCompilateur {
             case R:
               MLAlgorithm _algorithm = item.getAlgorithm();
               final MmlCompilateurR mmlCompilateurR = new MmlCompilateurR(this.mmlModel, _algorithm);
-              result = mmlCompilateurR.render();
+              outputList.add(mmlCompilateurR.compile());
               break;
             default:
               break;

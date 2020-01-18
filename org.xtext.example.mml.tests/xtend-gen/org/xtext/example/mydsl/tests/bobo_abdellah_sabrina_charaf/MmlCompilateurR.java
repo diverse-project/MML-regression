@@ -10,6 +10,7 @@ import org.xtext.example.mydsl.mml.CrossValidation;
 import org.xtext.example.mydsl.mml.DT;
 import org.xtext.example.mydsl.mml.DataInput;
 import org.xtext.example.mydsl.mml.FormulaItem;
+import org.xtext.example.mydsl.mml.FrameworkLang;
 import org.xtext.example.mydsl.mml.GTB;
 import org.xtext.example.mydsl.mml.MLAlgorithm;
 import org.xtext.example.mydsl.mml.MLChoiceAlgorithm;
@@ -25,6 +26,7 @@ import org.xtext.example.mydsl.mml.Validation;
 import org.xtext.example.mydsl.mml.ValidationMetric;
 import org.xtext.example.mydsl.mml.XFormula;
 import org.xtext.example.mydsl.mml.impl.DTImpl;
+import org.xtext.example.mydsl.tests.bobo_abdellah_sabrina_charaf.Output;
 
 @SuppressWarnings("all")
 public class MmlCompilateurR {
@@ -212,5 +214,12 @@ public class MmlCompilateurR {
     String _rasCode_6 = rasCode;
     rasCode = (_rasCode_6 + "mae(testY3, result)");
     return rasCode;
+  }
+  
+  public Output compile() {
+    final Output result = new Output();
+    result.frameworkLang = FrameworkLang.R;
+    result.mlAlgorithm = this.MLA;
+    return result;
   }
 }
