@@ -26,6 +26,12 @@ public class Output {
       " Framework: ") + this.frameworkLang) + " ExectutionTime: ") + Double.valueOf(this.timestamp)));
     Set<Map.Entry<String, Double>> _entrySet = this.validationMetric_result.entrySet();
     for (final Map.Entry e : _entrySet) {
+      {
+        final String key = e.getKey().toString();
+        final double value = (Double.valueOf(e.getValue().toString())).doubleValue();
+        String _result_1 = result;
+        result = (_result_1 + (((" Metric : " + key) + " value: ") + Double.valueOf(value)));
+      }
     }
     return result;
   }

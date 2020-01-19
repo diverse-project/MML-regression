@@ -245,7 +245,6 @@ public class MmlCompilateurScikitLearn {
           final String metricName = (output[0]).replace("(", "").replace("\'", "");
           final String value = (output[1]).replace(")", "");
           result.validationMetric_result.put(metricName, Double.valueOf(value));
-          System.out.println(line);
         }
       }
       result.timestamp = (endTime - startTime);

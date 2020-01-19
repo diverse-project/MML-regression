@@ -26,10 +26,16 @@ public class MmlCompilateurRTest {
       _builder.append("datainput \"boston.csv\" separator ;");
       _builder.newLine();
       _builder.append("\t");
-      _builder.append("mlframework R");
+      _builder.append("mlframework scikit-learn");
       _builder.newLine();
       _builder.append("\t");
-      _builder.append("algorithm DT");
+      _builder.append("algorithm DT ");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("mlframework scikit-learn");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("algorithm RandomForest");
       _builder.newLine();
       _builder.append("\t");
       _builder.append("formula \"medv\" ~ .");
@@ -44,7 +50,7 @@ public class MmlCompilateurRTest {
       _builder.append("}");
       _builder.newLine();
       _builder.append("\t");
-      _builder.append("mean_absolute_error");
+      _builder.append("mean_absolute_error mean_squared_error");
       _builder.newLine();
       final MMLModel result = this.parseHelper.parse(_builder);
       final MmlCompilateur mmlcompilateur = new MmlCompilateur(result);

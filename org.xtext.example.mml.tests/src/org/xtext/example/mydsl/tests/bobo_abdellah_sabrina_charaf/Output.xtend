@@ -19,6 +19,10 @@ class Output {
 				" Framework: "+frameworkLang+ " ExectutionTime: "+timestamp;
 		
 		for(Map.Entry e: validationMetric_result.entrySet()) {
+			val String key = e.key.toString();
+			val double value = Double.valueOf(e.value.toString);
+			
+			result += " Metric : "+key+ " value: "+value
 			
 		}
 		return result;

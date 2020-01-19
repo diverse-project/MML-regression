@@ -21,13 +21,15 @@ class MmlCompilateurRTest {
 
 		val MMLModel result = parseHelper.parse('''
 			datainput "boston.csv" separator ;
-				mlframework R
-				algorithm DT
+				mlframework scikit-learn
+				algorithm DT 
+				mlframework scikit-learn
+				algorithm RandomForest
 				formula "medv" ~ .
 				TrainingTest { 
 					percentageTraining 70
 				}
-				mean_absolute_error
+				mean_absolute_error mean_squared_error
 		''')
 		
 		val MmlCompilateur mmlcompilateur = new MmlCompilateur(result);
