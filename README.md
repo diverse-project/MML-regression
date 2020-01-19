@@ -4,7 +4,7 @@ Authors : Picard Michaël, Pavy Myriam, Petit Valentin, Chertier Kevin
 
 ## Code
 
-Disclaimer : we are novice in machine learning field, so we couldn't grasp the whole understanding needed to look back and judge our work. So, our implementation and interpretation can be mistaken.
+Disclaimer : we are new to machine learning, so we couldn't grasp the whole understanding needed to look back and judge our work. So, our implementation and interpretation can be inaccurate.
 
 ### Architecture
 
@@ -14,36 +14,36 @@ The main package is composed of :
 - `MmlParsingKMMVTest` : The test case.
 - `MmlResult` : A collection class, used by MmlEvaluator.
 - `Compilateur` package :
-  - `Compilateur` : An interface, decriving all the methods that a compilator have to provide.
+  - `Compilateur` : An interface, describing all the methods a compilator has to provide.
   - `Pair` : A class to manage Pairs.
-  - `Utils` : An utilities class.
-  - `R`, `sklearn`, `weka` and `xgboost` packages : contains the implementations of each framework.
+  - `Utils` : An utility class.
+  - `R`, `sklearn`, `weka` and `xgboost` packages : contain the implementations of each framework.
 
-### Compilators
-The **Scikit-Learn** compilator is complete and running. You need to have **python3** and two python's package, `pandas` and `sklearn` to use it.
+### Compilers
+The **Scikit-Learn** compiler is complete and running. You need to have **python3** and two python's packages, `pandas` and `sklearn` to use it.
 
-The **Weka** compilator is complete and running, but lack the one feature and is could be unstable. `SVR` kernel option can't be set to `Linear`, since it's not implemented in **Weka**, so if `Linear` is selected, an error message will tell the user about it and then the program will stop. You need to have at least **Java 8** to use it.
+The **Weka** compiler is complete and running, but lacks one feature. `SVR` kernel option can't be set to `Linear` since it's not implemented in **Weka**, so if `Linear` is selected, an error message will inform the user and the program will stop. You need to have at least **Java 8** to use it.
 
-The **R** compilator is complete and running, but lack the cross validation on SGD, since it does not exist. You need to install the system package `r-base` and `r-base-dev` (for ubuntu), along with the some R library : `caret`, `rpart`, `gbm`, `randomForest`, `e1071`, `kernlab` and `sgd`.
+The **R** compiler is complete and running, but lacks the cross validation on SGD, since we couldn't find a satisfying implementation. You need to install the system package `r-base` and `r-base-dev` (for ubuntu), along with the following R libraries : `caret`, `rpart`, `gbm`, `randomForest`, `e1071`, `kernlab` and `sgd`.
 
-The **XGBoost** compilator (with **Python**) is particulary difficult to work with. In fact, he could be called complete since XGBoost is already selecting the best method for you, ignoring your parameter. Or we haven't grasp the understanding of it. We don't know. You need the same dependencies as **Scikit-Learn** compilator with also `xgboost` python package.
+The **XGBoost** compiler (with **Python**) is particulary difficult to work with. Indeed, XGBoost selects automatically the best algorithm depending on your dataset. It was then not really possible to adapt our language to XGBoost. Thus, the calls to XGBoost are made almost regardless of the algorithm chosen in mml. You need the same dependencies as **Scikit-Learn** compiler with also `xgboost` python package.
 
 ### Testing and experiment
 
-We have implemented 10 program in mml that test an algorithm and a training method in each software, in order to ensure that our compiler will work flawlessly.
-Each program is compiled, and run, regardless of the result or the encountered error, and the result (or the abscence of result) are displayed.
+We have implemented 12 programs in mml that test an algorithm and a training method using the 3 frameworks, in order to ensure that our compilers work flawlessly.
+Each program is compiled, and run, regardless of the result or the encountered errors, and the result (or the absence of result) is displayed.
 
-For the experiment, we have create a collection which can collect result about each run, such as the result and the time spent. This result are then displayed conveniently for us to work with.
+For the experiment, we created a collection which collects the result and the execution time for each run. This result is then displayed conveniently for us to work with.
 
 ## Experiment
 ### How
 Just run `MmlEvaluator` with the mml's files as parameters.
 
-It will automatically try to build and run all the mml program, displaying the result of the analysis after a while. You could retrieve the result as **Markdown** table, as we have done in this report.
+It will automatically try to build and run all the mml programs, displaying the result of the analysis after a while. You could retrieve the result as a **Markdown** table, as we did in this report.
 
-We have used boston.mml, x264.mml and x264_netflix.mml, replacing all the `True` and `False` value by the full uppercase equivalent (`TRUE` and `FALSE`) in the x264*.csv files, in order to prevent R to fail on them.
+We used boston.mml, x264.mml and x264_netflix.mml, replacing all the `True` and `False` values by the full uppercase equivalents (`TRUE` and `FALSE`) in the x264*.csv files, in order to prevent R from failing for the SGD algorithm.
 
-### Result
+### Results
 
 | Data | Algorithm | Framework | Execution Time (sec) | MAPE (%) |
 |---|---|---|---|---|
@@ -105,12 +105,12 @@ We have used boston.mml, x264.mml and x264_netflix.mml, replacing all the `True`
 | x264_netflix.csv | SVR | scikit-learn | 0.951010997 | 7.052318289762591 |
 | x264_netflix.csv | SVR | R | 14.937443756 | 1.180777E23 |
 
-Top 3 by result : 
-- R RF with x264.csv elapsed 33.22749568 with 0.047949 MAPE
-- scikit-learn RF with x264.csv elapsed 2.701399093 with 0.053032076525503555 MAPE
-- Weka RF with x264.csv elapsed 3.569256242 with 0.05739139542533088 MAPE
+Top 3 by results : 
+- R RF with x264.csv took 33.22749568 seconds with 0.047949 MAPE
+- scikit-learn RF with x264.csv took 2.701399093 seconds with 0.053032076525503555 MAPE
+- Weka RF with x264.csv took 3.569256242 seconds with 0.05739139542533088 MAPE
 
-Result order by efficiency : 
+Results ordered by efficiency : 
 
 | Data | Algorithm | Framework | Execution Time (sec) | MAPE (%) |
 |---|---|---|---|---|
@@ -172,12 +172,12 @@ Result order by efficiency :
 | x264_netflix.csv | SVR | R | 14.937443756 | 1.180777E23 |
 | x264_netflix.csv | SGD | scikit-learn | 0.741845317 | 2.520699417380451E23 |
 
-Top 3 by time : 
-- scikit-learn SGD with boston.csv elapsed 0.721721155 with 1.1622960588844716E14 MAPE
-- scikit-learn DT with x264_netflix.csv elapsed 0.736688122 with 0.275387261434218 MAPE
-- scikit-learn SGD with x264_netflix.csv elapsed 0.741845317 with 2.520699417380451E23 MAPE
+Top 3 by execution time : 
+- scikit-learn SGD with boston.csv took 0.721721155 seconds with 1.1622960588844716E14 MAPE
+- scikit-learn DT with x264_netflix.csv took 0.736688122 seconds with 0.275387261434218 MAPE
+- scikit-learn SGD with x264_netflix.csv took 0.741845317 seconds with 2.520699417380451E23 MAPE
 
-Result order by time : 
+Results ordered by execution time : 
 
 | Data | Algorithm | Framework | Execution Time (sec) | MAPE (%) |
 |---|---|---|---|---|
@@ -241,18 +241,17 @@ Result order by time :
 
 ### Interpretation
 
-We can observe few things :
-- scikit-learn is usually the fastest framework, regardling of the data file or the algorithm, except for some exception, where XGBoost outperform it. So Python's framework where globally faster.
-- On each csv file, the RandomForest algorithm have perform the best, with R as the best framework in term of overall result.
-- SGD and SVR efficiency is really weird in some cases.
-- All files are equivalent in term of evaluation time, but in term of efficiency, x264 yield the best efficiency and boston the worst.
+We made the following observations :
+- scikit-learn is the fastest framework on DT, regardless of the data, and also on SGD with boston.csv and x264_netflix.csv, but XGBoost outperforms it in all other cases. So Python's framework is globally faster.
+- On each csv file, the RandomForest algorithm has performed the best, with R being the best framework in term of overall results.
+- SGD and SVR efficiency is really poor in some cases.
+- All files are equivalent in term of evaluation time, but in term of efficiency, x264 yields the best efficiency and boston the worst.
 - Each framework is pretty equivalent to others in terms of efficiency, except in some weird cases.
 
-Overall, we advise to use either Python's frameworks or R' one, because on how natural and easy to use these languages are. But if you have to choose between all, it will be better to use sklearn as a beginner, since it provide a lot of usefull documentation, when other can be quite obscure to understand.
+Overall, we advise to use either Python's frameworks or R's, because of how natural and easy to use these languages are. But if you have to choose between all, it will be better to use sklearn as a beginner, since it provides a lot of useful documentation, when others can be quite obscure to understand.
 
 ## Feedback
 
-Although the project can be quite interesting, the lack of context or knowledge of machine learning held us back to really make an accurate implementation and to really try to improve.
-In fact, it's showing with the weird behaviour of SVR and SGD in some case : are they inappropriate or we haven't choose the correct implementation or even tune it in the good way? We can't decide on it.
-
-Also, it was a quite a huge project to work with, when we already have a lot of other big project to work on in other courses.
+Although the project can be quite interesting, the lack of context or knowledge of machine learning held us back from making a really accurate implementation and from optimizing it.
+The poor efficiency of SVR and SGD is maybe due to the fact that we didn't choose the correct implementation or didn't tune it the good way? We don't have the elements to answer that question.
+Also, it was quite a huge project to work on, and the workload on other projects prevented us from improving our work the way we wanted.
