@@ -4,8 +4,6 @@ import com.google.common.io.Files
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
-import java.util.ArrayList
-import java.util.List
 import org.eclipse.emf.common.util.EList
 import org.eclipse.emf.common.util.UniqueEList
 import org.xtext.example.mydsl.mml.AllVariables
@@ -16,7 +14,6 @@ import org.xtext.example.mydsl.mml.FormulaItem
 import org.xtext.example.mydsl.mml.FrameworkLang
 import org.xtext.example.mydsl.mml.GTB
 import org.xtext.example.mydsl.mml.MLAlgorithm
-import org.xtext.example.mydsl.mml.MLChoiceAlgorithm
 import org.xtext.example.mydsl.mml.MMLModel
 import org.xtext.example.mydsl.mml.PredictorVariables
 import org.xtext.example.mydsl.mml.RFormula
@@ -36,6 +33,9 @@ class MmlCompilateurR {
 	val String name = "MmlCompilateurR";
 	var String imports = "";
 	var String rasCode = "";
+	val EList<String> metricList = new UniqueEList<String>();
+	var String fileLocation = "";
+
 	private new() {
 	}
 
@@ -53,12 +53,15 @@ class MmlCompilateurR {
 			switch item {
 				case ValidationMetric.MSE: {
 					result += "mse(testY2, result)" + "\n";
+					metricList.add("mse");
 				}
 				case ValidationMetric.MAE: {
 					result += "mae(testY2, result)" + "\n";
+					metricList.add("mae");
 				}
 				case ValidationMetric.MAPE: {
 					result += "mape(testY2, result)" + "\n";
+					metricList.add("mape");
 				}
 				default: {
 				}
@@ -66,7 +69,7 @@ class MmlCompilateurR {
 		}
 		return result;
 	}
-	
+
 	def void algorithmCode(String predictiveColName, String predictors) {
 		switch this.MLA {
 			DT: {
@@ -90,8 +93,9 @@ class MmlCompilateurR {
 			}
 			RandomForest: {
 				imports += "library(randomForest)\n";
-				rasCode += "fit <- randomForest(" + predictiveColName + "~" + predictors +
-					", data = train, method = 'class')"+"\n";
+				rasCode +=
+					"fit <- randomForest(" + predictiveColName + "~" + predictors +
+						", data = train, method = 'class')" + "\n";
 				rasCode += "result<-predict(fit, test, type = 'class')" + "\n";
 			}
 			SGD: {
@@ -110,7 +114,7 @@ class MmlCompilateurR {
 
 		val StratificationMethod stratificationMethod = validation.stratification;
 		val EList<ValidationMetric> VMList = validation.metric;
-		val String fileLocation = dataInput.filelocation;
+		fileLocation = dataInput.filelocation;
 		var double split_ratio = 0.7;
 
 		switch stratificationMethod {
@@ -121,7 +125,8 @@ class MmlCompilateurR {
 				split_ratio = trainingTest.number;
 			}
 		}
-
+		
+		imports += "library(dplyr)" + "\n";
 		imports += "library(caTools)" + "\n";
 		imports += "library(Metrics)" + "\n";
 		var String predictiveColName = "colnames(df)[ncol(df)-1]";
@@ -182,16 +187,26 @@ class MmlCompilateurR {
 		result.frameworkLang = FrameworkLang.R;
 		result.mlAlgorithm = this.MLA;
 		val String render = render();
-		val String filePath = "./src/org/xtext/example/mydsl/tests/bobo_abdellah_sabrina_charaf/mml.R";
+		result.fileLocation = fileLocation;
+		val String filePath = "mml.R";
 		Files.write(render.getBytes(), new File(filePath));
+		
+		val double startTime = System.currentTimeMillis() as double;
 		val Process p = Runtime.getRuntime().exec("Rscript " + filePath);
-
+		val double endTime = System.currentTimeMillis() as double;
 		val BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
 		var String line;
-
+		
+		val EList<Double> metricValueList = new UniqueEList<Double>();
 		while (( line = in.readLine()) !== null) {
-			System.out.println(line);
+			val String[] compileResult = line.split(" ");
+			metricValueList.add(Double.valueOf(compileResult.get(1)));
 		}
+		
+		for (var i = 0; i< metricValueList.size; i++){
+			result.validationMetric_result.put(metricList.get(i),metricValueList.get(i));
+		}
+		result.timestamp = endTime - startTime;
 		return result;
 	}
 }

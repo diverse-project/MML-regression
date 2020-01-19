@@ -15,8 +15,8 @@ class Output {
 	
 	override String toString(){
 		var String result="";
-		result +="[ Data: "+fileLocation+ " Algorithm : "+mlAlgorithm+ 
-				" Framework: "+frameworkLang+ " ExectutionTime: "+timestamp;
+		result +="[ Data: "+fileLocation+ " Algorithm : "+mlAlgorithm.class.simpleName+ 
+				" Framework: "+frameworkLang+ " ExectutionTime: "+timestamp+"]";
 		
 		for(Map.Entry e: validationMetric_result.entrySet()) {
 			val String key = e.key.toString();

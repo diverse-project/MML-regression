@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.UniqueEList;
 import org.eclipse.xtext.xbase.lib.Exceptions;
 import org.eclipse.xtext.xbase.lib.InputOutput;
 import org.xtext.example.mydsl.mml.AllVariables;
@@ -42,6 +43,10 @@ public class MmlCompilateurR {
   
   private String rasCode = "";
   
+  private final EList<String> metricList = new UniqueEList<String>();
+  
+  private String fileLocation = "";
+  
   private MmlCompilateurR() {
   }
   
@@ -61,14 +66,17 @@ public class MmlCompilateurR {
           case MSE:
             String _result = result;
             result = (_result + ("mse(testY2, result)" + "\n"));
+            this.metricList.add("mse");
             break;
           case MAE:
             String _result_1 = result;
             result = (_result_1 + ("mae(testY2, result)" + "\n"));
+            this.metricList.add("mae");
             break;
           case MAPE:
             String _result_2 = result;
             result = (_result_2 + ("mape(testY2, result)" + "\n"));
+            this.metricList.add("mape");
             break;
           default:
             break;
@@ -123,8 +131,9 @@ public class MmlCompilateurR {
         String _imports = this.imports;
         this.imports = (_imports + "library(randomForest)\n");
         String _rasCode = this.rasCode;
-        this.rasCode = (_rasCode + ((((("fit <- randomForest(" + predictiveColName) + "~") + predictors) + 
-          ", data = train, method = \'class\')") + "\n"));
+        this.rasCode = (_rasCode + 
+          ((((("fit <- randomForest(" + predictiveColName) + "~") + predictors) + 
+            ", data = train, method = \'class\')") + "\n"));
         String _rasCode_1 = this.rasCode;
         this.rasCode = (_rasCode_1 + ("result<-predict(fit, test, type = \'class\')" + "\n"));
       }
@@ -146,7 +155,7 @@ public class MmlCompilateurR {
     final Validation validation = this.mmlModel.getValidation();
     final StratificationMethod stratificationMethod = validation.getStratification();
     final EList<ValidationMetric> VMList = validation.getMetric();
-    final String fileLocation = dataInput.getFilelocation();
+    this.fileLocation = dataInput.getFilelocation();
     double split_ratio = 0.7;
     boolean _matched = false;
     if (stratificationMethod instanceof CrossValidation) {
@@ -160,16 +169,18 @@ public class MmlCompilateurR {
       }
     }
     String _imports = this.imports;
-    this.imports = (_imports + ("library(caTools)" + "\n"));
+    this.imports = (_imports + ("library(dplyr)" + "\n"));
     String _imports_1 = this.imports;
-    this.imports = (_imports_1 + ("library(Metrics)" + "\n"));
+    this.imports = (_imports_1 + ("library(caTools)" + "\n"));
+    String _imports_2 = this.imports;
+    this.imports = (_imports_2 + ("library(Metrics)" + "\n"));
     String predictiveColName = "colnames(df)[ncol(df)-1]";
     int predictiveColumn = 0;
     String predictors = ".";
     final String DEFAULT_COLUMN_SEPARATOR = ",";
     final String csv_separator = DEFAULT_COLUMN_SEPARATOR;
     String _rasCode = this.rasCode;
-    this.rasCode = (_rasCode + ((((("read.csv(\"" + fileLocation) + "\",head = TRUE, sep=\"") + csv_separator) + "\")->df") + "\n"));
+    this.rasCode = (_rasCode + ((((("read.csv(\"" + this.fileLocation) + "\",head = TRUE, sep=\"") + csv_separator) + "\")->df") + "\n"));
     String selectX = ("df %>% select(-c())->X" + "\n");
     String selectY = ("df %>% select(c())->Y" + "\n");
     if ((formula != null)) {
@@ -244,18 +255,31 @@ public class MmlCompilateurR {
       result.frameworkLang = FrameworkLang.R;
       result.mlAlgorithm = this.MLA;
       final String render = this.render();
-      final String filePath = "./src/org/xtext/example/mydsl/tests/bobo_abdellah_sabrina_charaf/mml.R";
+      result.fileLocation = this.fileLocation;
+      final String filePath = "mml.R";
       byte[] _bytes = render.getBytes();
       File _file = new File(filePath);
       Files.write(_bytes, _file);
+      long _currentTimeMillis = System.currentTimeMillis();
+      final double startTime = ((double) _currentTimeMillis);
       final Process p = Runtime.getRuntime().exec(("Rscript " + filePath));
+      long _currentTimeMillis_1 = System.currentTimeMillis();
+      final double endTime = ((double) _currentTimeMillis_1);
       InputStream _inputStream = p.getInputStream();
       InputStreamReader _inputStreamReader = new InputStreamReader(_inputStream);
       final BufferedReader in = new BufferedReader(_inputStreamReader);
       String line = null;
+      final EList<Double> metricValueList = new UniqueEList<Double>();
       while (((line = in.readLine()) != null)) {
-        System.out.println(line);
+        {
+          final String[] compileResult = line.split(" ");
+          metricValueList.add(Double.valueOf(compileResult[1]));
+        }
       }
+      for (int i = 0; (i < metricValueList.size()); i++) {
+        result.validationMetric_result.put(this.metricList.get(i), metricValueList.get(i));
+      }
+      result.timestamp = (endTime - startTime);
       return result;
     } catch (Throwable _e) {
       throw Exceptions.sneakyThrow(_e);

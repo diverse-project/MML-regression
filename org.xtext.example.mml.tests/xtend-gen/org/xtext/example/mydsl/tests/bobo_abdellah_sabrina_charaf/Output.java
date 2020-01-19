@@ -22,8 +22,15 @@ public class Output {
   public String toString() {
     String result = "";
     String _result = result;
-    result = (_result + ((((((("[ Data: " + this.fileLocation) + " Algorithm : ") + this.mlAlgorithm) + 
-      " Framework: ") + this.frameworkLang) + " ExectutionTime: ") + Double.valueOf(this.timestamp)));
+    String _simpleName = this.mlAlgorithm.getClass().getSimpleName();
+    String _plus = ((("[ Data: " + this.fileLocation) + " Algorithm : ") + _simpleName);
+    String _plus_1 = (_plus + 
+      " Framework: ");
+    String _plus_2 = (_plus_1 + this.frameworkLang);
+    String _plus_3 = (_plus_2 + " ExectutionTime: ");
+    String _plus_4 = (_plus_3 + Double.valueOf(this.timestamp));
+    String _plus_5 = (_plus_4 + "]");
+    result = (_result + _plus_5);
     Set<Map.Entry<String, Double>> _entrySet = this.validationMetric_result.entrySet();
     for (final Map.Entry e : _entrySet) {
       {
