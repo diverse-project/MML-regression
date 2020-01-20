@@ -22,12 +22,12 @@ public class Output {
   public String toString() {
     String result = "";
     String _result = result;
-    String _simpleName = this.mlAlgorithm.getClass().getSimpleName();
-    String _plus = ((("[ Data: " + this.fileLocation) + " Algorithm : ") + _simpleName);
+    String _simpleName = (this.mlAlgorithm.getClass().getInterfaces()[0]).getSimpleName();
+    String _plus = ((("[ Data: " + this.fileLocation) + ", Algorithm : ") + _simpleName);
     String _plus_1 = (_plus + 
-      " Framework: ");
+      ", Framework: ");
     String _plus_2 = (_plus_1 + this.frameworkLang);
-    String _plus_3 = (_plus_2 + " ExectutionTime: ");
+    String _plus_3 = (_plus_2 + ", ExectutionTime: ");
     String _plus_4 = (_plus_3 + Double.valueOf(this.timestamp));
     String _plus_5 = (_plus_4 + "]");
     result = (_result + _plus_5);
@@ -37,7 +37,7 @@ public class Output {
         final String key = e.getKey().toString();
         final double value = (Double.valueOf(e.getValue().toString())).doubleValue();
         String _result_1 = result;
-        result = (_result_1 + (((" Metric : " + key) + " value: ") + Double.valueOf(value)));
+        result = (_result_1 + (((", Metric : " + key) + ", value: ") + Double.valueOf(value)));
       }
     }
     return result;

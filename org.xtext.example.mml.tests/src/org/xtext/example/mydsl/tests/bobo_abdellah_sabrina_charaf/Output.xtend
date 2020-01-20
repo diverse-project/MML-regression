@@ -15,14 +15,14 @@ class Output {
 	
 	override String toString(){
 		var String result="";
-		result +="[ Data: "+fileLocation+ " Algorithm : "+mlAlgorithm.class.simpleName+ 
-				" Framework: "+frameworkLang+ " ExectutionTime: "+timestamp+"]";
+		result +="[ Data: "+fileLocation+ ", Algorithm : "+mlAlgorithm.class.getInterfaces.get(0).simpleName+ 
+				", Framework: "+frameworkLang+ ", ExectutionTime: "+timestamp+"]";
 		
 		for(Map.Entry e: validationMetric_result.entrySet()) {
 			val String key = e.key.toString();
 			val double value = Double.valueOf(e.value.toString);
 			
-			result += " Metric : "+key+ " value: "+value
+			result += ", Metric : "+key+ ", value: "+value
 			
 		}
 		return result;
