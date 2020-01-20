@@ -1,0 +1,7 @@
+datainput "boston.csv" separator ,
+	mlframework scikit-learn algorithm SVR kernel=poly
+	mlframework Weka algorithm SVR kernel=poly
+	mlframework R algorithm SVR kernel=poly
+	mlframework xgboost algorithm SVR kernel=poly
+TrainingTest { percentageTraining 70 }
+mean_absolute_error

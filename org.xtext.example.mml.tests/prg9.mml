@@ -1,0 +1,7 @@
+datainput "boston.csv" separator ,
+	mlframework scikit-learn algorithm GTB
+	mlframework Weka algorithm GTB
+	mlframework R algorithm GTB
+	mlframework xgboost algorithm GTB
+CrossValidation { numRepetitionCross 10 }
+mean_absolute_error

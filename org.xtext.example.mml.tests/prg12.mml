@@ -1,0 +1,10 @@
+datainput "boston.csv" separator ,
+	mlframework R algorithm DT
+	mlframework R algorithm RF
+	mlframework R algorithm SVR kernel=poly
+	mlframework R algorithm SGD
+	mlframework R algorithm GTB
+TrainingTest { percentageTraining 80 }
+mean_absolute_error
+mean_squared_error
+mean_absolute_percentage_error
