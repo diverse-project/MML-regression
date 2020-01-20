@@ -31,7 +31,16 @@ class MmlCompilateurRTest {
 				}
 				mean_absolute_error mean_squared_error
 		''')
-		val MMLModel result1 = parseHelper.parse('''
+		
+		
+		val MmlCompilateur mmlcompilateur = new MmlCompilateur(result);
+		mmlcompilateur.render();
+	}
+
+	@Test
+	def void mmlcomp2() {
+	
+		val MMLModel result = parseHelper.parse('''
 			datainput "boston.csv" separator ;
 				mlframework Scikit-Learn
 				algorithm DT
@@ -43,7 +52,15 @@ class MmlCompilateurRTest {
 				}
 				mean_absolute_error mean_squared_error
 		''')
-		val MMLModel result2 = parseHelper.parse('''
+		
+		val MmlCompilateur mmlcompilateur = new MmlCompilateur(result);
+		mmlcompilateur.render();
+	}
+
+@Test
+	def void mmlcomp3() {
+	
+		val MMLModel result = parseHelper.parse('''
 			datainput "boston.csv" separator ;
 				mlframework Scikit-Learn
 				algorithm DT
@@ -54,7 +71,15 @@ class MmlCompilateurRTest {
 				}
 				mean_absolute_error mean_squared_error
 		''')
-		val MMLModel result3 = parseHelper.parse('''
+		
+		val MmlCompilateur mmlcompilateur = new MmlCompilateur(result);
+		mmlcompilateur.render();
+	}
+	@Test
+	def void mmlcomp4() {
+	
+		
+		val MMLModel result = parseHelper.parse('''
 			datainput "boston.csv" separator ;
 				mlframework Scikit-Learn
 				algorithm DT
@@ -65,7 +90,14 @@ class MmlCompilateurRTest {
 				}
 				mean_absolute_error
 		''')
-		val MMLModel result4 = parseHelper.parse('''
+		
+		val MmlCompilateur mmlcompilateur = new MmlCompilateur(result);
+		mmlcompilateur.render();
+	}
+	@Test
+	def void mmlcomp5() {
+	
+		val MMLModel result = parseHelper.parse('''
 			datainput "boston.csv" separator ;
 				mlframework Scikit-Learn
 				algorithm DT
@@ -80,8 +112,8 @@ class MmlCompilateurRTest {
 				}
 				mean_absolute_error mean_squared_error
 		''')
-		val MmlCompilateur mmlcompilateur = new MmlCompilateur(result3);
+		
+		val MmlCompilateur mmlcompilateur = new MmlCompilateur(result);
 		mmlcompilateur.render();
 	}
-
 }
