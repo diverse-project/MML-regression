@@ -1,3 +1,5 @@
+SAHID Christophe, LOMON Corentin, LESOURD Kélig
+
 # Rapport IDM
 
 ### Premier rendu
