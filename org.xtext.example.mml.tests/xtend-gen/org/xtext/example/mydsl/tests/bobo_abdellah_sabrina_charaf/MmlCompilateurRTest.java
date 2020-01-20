@@ -278,6 +278,9 @@ public class MmlCompilateurRTest {
       _builder.append("algorithm SVR");
       _builder.newLine();
       _builder.append("\t");
+      _builder.append("formula \"medv\" ~ .");
+      _builder.newLine();
+      _builder.append("\t");
       _builder.append("TrainingTest { ");
       _builder.newLine();
       _builder.append("\t\t");
@@ -307,13 +310,13 @@ public class MmlCompilateurRTest {
       _builder.append("mlframework R");
       _builder.newLine();
       _builder.append("\t");
-      _builder.append("algorithm DT");
+      _builder.append("algorithm SVR");
       _builder.newLine();
       _builder.append("\t");
       _builder.append("mlframework R");
       _builder.newLine();
       _builder.append("\t");
-      _builder.append("algorithm SVR");
+      _builder.append("algorithm DT");
       _builder.newLine();
       _builder.append("\t");
       _builder.append("mlframework R");

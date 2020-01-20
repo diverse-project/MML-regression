@@ -150,6 +150,7 @@ class MmlCompilateurRTest {
 				algorithm DT
 				mlframework R
 				algorithm SVR
+				formula "medv" ~ .
 				TrainingTest { 
 					percentageTraining 70
 				}
@@ -167,9 +168,9 @@ class MmlCompilateurRTest {
 		val MMLModel result = parseHelper.parse('''
 			datainput "boston.csv" separator ,
 				mlframework R
-				algorithm DT
-				mlframework R
 				algorithm SVR
+				mlframework R
+				algorithm DT
 				mlframework R
 				algorithm RandomForest
 				formula "medv" ~ .
