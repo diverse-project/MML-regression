@@ -35,6 +35,7 @@ class MmlCompilateurR {
 	var String rasCode = "";
 	val EList<String> metricList = new UniqueEList<String>();
 	var String fileLocation = "";
+	var int numRepetitionCross = 0;
 
 	private new() {
 	}
@@ -70,6 +71,68 @@ class MmlCompilateurR {
 		return result;
 	}
 
+	def void algorithmCodeCrossValid(String predictiveColName, String predictors) {
+		rasCode += "n <- nrow(df)" + "\n";
+		rasCode += "K <- " + numRepetitionCross;
+		rasCode += "taille <- n%/%K" + "\n";
+		rasCode += "set.seed(5)" + "\n";
+		rasCode += "alea <- runif(n)" + "\n";
+		rasCode += "rang <- rank(alea)" + "\n";
+		rasCode += "bloc <- (rang-1)%/%taille + 1" + "\n";
+		rasCode += "bloc <- as.factor(bloc)" + "\n";
+		rasCode += "my_array <- array(0,dim=c(K)) " + "\n";
+		rasCode += "for (k in 1:K) {" + "\n";
+		rasCode += "  fit <- rpart(medv ~. , data = df[bloc!=k,], method = 'class')" + "\n";
+		rasCode += "  result <- predict(fit,df[bloc == k,], type ='class')" + "\n";
+
+		rasCode += "  result <- as.numeric(levels(result))[result]" + "\n";
+		rasCode += "  my_array[k] <- mae(df$medv[bloc==k],result)" + "\n";
+		rasCode += "}" + "\n";
+
+		rasCode += "value <- mean(my_array)" + "\n";
+		rasCode += "value" + "\n";
+		switch this.MLA {
+			DT: {
+				imports += "library(rpart)\n";
+				val DTImpl dtImpl = MLA as DTImpl;
+				rasCode += "fit <- rpart(" + predictiveColName + "~" + predictors +
+					", data = train, method = 'class', control = rpart.control(cp = 0";
+				if (dtImpl.max_depth !== 0) {
+					rasCode += ",maxdepth = " + dtImpl.max_depth;
+				}
+				rasCode += "))" + "\n";
+				rasCode += "result1<-predict(fit, test, type = 'class')" + "\n";
+				rasCode += "result <- as.numeric(levels(result1))[result1]" + "\n";
+
+			}
+			SVR: {
+				imports += "library(e1071)\n";
+				rasCode +=
+					"fit <- svm(" + predictiveColName + "~" + predictors + ", data = train, method = 'class')" + "\n";
+				rasCode += "result<-predict(fit, test, type = 'class')" + "\n";
+			}
+			GTB: {
+				println("GTB")
+			}
+			RandomForest: {
+				imports += "library(randomForest)\n";
+				rasCode +=
+					"fit <- randomForest(" + predictiveColName + "~" + predictors +
+						", data = train, method = 'class')" + "\n";
+				rasCode += "result<-predict(fit, test, type = 'class')" + "\n";
+			}
+			SGD: {
+				imports += "library(sgd)\n";
+				rasCode +=
+					"fit <- sgd(" + predictiveColName + "~" + predictors + ", data = train, method = 'class')" + "\n";
+				rasCode += "result<-predict(fit, test, type = 'class')" + "\n";
+			}
+			default: {
+				println("default")
+			}
+		}
+	}
+
 	def void algorithmCode(String predictiveColName, String predictors) {
 		switch this.MLA {
 			DT: {
@@ -86,7 +149,10 @@ class MmlCompilateurR {
 
 			}
 			SVR: {
-				println("SVR")
+				imports += "library(e1071)\n";
+				rasCode +=
+					"fit <- svm(" + predictiveColName + "~" + predictors + ", data = train, method = 'class')" + "\n";
+				rasCode += "result<-predict(fit, test, type = 'class')" + "\n";
 			}
 			GTB: {
 				println("GTB")
@@ -99,7 +165,10 @@ class MmlCompilateurR {
 				rasCode += "result<-predict(fit, test, type = 'class')" + "\n";
 			}
 			SGD: {
-				println("SGD")
+				imports += "library(sgd)\n";
+				rasCode +=
+					"fit <- sgd(" + predictiveColName + "~" + predictors + ", data = train, method = 'class')" + "\n";
+				rasCode += "result<-predict(fit, test, type = 'class')" + "\n";
 			}
 			default: {
 				println("default")
@@ -116,16 +185,19 @@ class MmlCompilateurR {
 		val EList<ValidationMetric> VMList = validation.metric;
 		fileLocation = dataInput.filelocation;
 		var double split_ratio = 0.7;
+		var int numRepetitionCross = 0;
 
 		switch stratificationMethod {
 			CrossValidation: {
+				val CrossValidation crossValidation = stratificationMethod as CrossValidation;
+				numRepetitionCross = crossValidation.number;
 			}
 			TrainingTest: {
 				val TrainingTest trainingTest = stratificationMethod as TrainingTest;
 				split_ratio = trainingTest.number;
 			}
 		}
-		
+
 		imports += "library(dplyr)" + "\n";
 		imports += "library(caTools)" + "\n";
 		imports += "library(Metrics)" + "\n";
@@ -172,13 +244,16 @@ class MmlCompilateurR {
 		rasCode += "train<-subset(df,split_index==T)" + "\n";
 		rasCode += "test<-subset(df,split_index==F)" + "\n";
 
-		algorithmCode(predictiveColName, predictors);
+		if (numRepetitionCross > 0) {
+			algorithmCodeCrossValid(predictiveColName, predictors);
+		} else {
+			algorithmCode(predictiveColName, predictors);
+			rasCode += "test %>% select(c(" + predictiveColName + "))->testY" + "\n";
+			rasCode += "testY2 <- testY[,1:length(testY)]" + "\n";
+			rasCode += metricCode(VMList);
+		}
 
 		rasCode = imports + rasCode;
-		rasCode += "test %>% select(c(" + predictiveColName + "))->testY" + "\n";
-		rasCode += "testY2 <- testY[,1:length(testY)]" + "\n";
-
-		rasCode += metricCode(VMList);
 		return rasCode;
 	}
 
@@ -190,21 +265,21 @@ class MmlCompilateurR {
 		result.fileLocation = fileLocation;
 		val String filePath = "mml.R";
 		Files.write(render.getBytes(), new File(filePath));
-		
+
 		val double startTime = System.currentTimeMillis() as double;
 		val Process p = Runtime.getRuntime().exec("Rscript " + filePath);
 		val double endTime = System.currentTimeMillis() as double;
 		val BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
 		var String line;
-		
+
 		val EList<Double> metricValueList = new UniqueEList<Double>();
 		while (( line = in.readLine()) !== null) {
 			val String[] compileResult = line.split(" ");
 			metricValueList.add(Double.valueOf(compileResult.get(1)));
 		}
-		
-		for (var i = 0; i< metricValueList.size; i++){
-			result.validationMetric_result.put(metricList.get(i),metricValueList.get(i));
+
+		for (var i = 0; i < metricValueList.size; i++) {
+			result.validationMetric_result.put(metricList.get(i), metricValueList.get(i));
 		}
 		result.timestamp = endTime - startTime;
 		return result;
