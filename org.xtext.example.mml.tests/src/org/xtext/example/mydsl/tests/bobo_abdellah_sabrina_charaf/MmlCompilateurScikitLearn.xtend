@@ -206,9 +206,9 @@ class MmlCompilateurScikitLearn {
 		
 		Files.write(render.getBytes(), new File("mml.py"));
 		
-		val double startTime = System.currentTimeMillis() as double;
+		val long startTime = System.currentTimeMillis() as long;
 		val Process p = Runtime.getRuntime().exec("python mml.py");
-		val double endTime = System.currentTimeMillis() as double;
+		val long endTime = System.currentTimeMillis() as long;
 		val BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
 		var String line;
 		while ((line = in.readLine()) !== null) {

@@ -166,15 +166,6 @@ class MmlCompilateurRTest {
 	def void mmlcompR5() {
 
 		val MMLModel result = parseHelper.parse('''
-<<<<<<< HEAD
-			datainput "boston.csv" separator ;
-				mlframework Scikit-Learn
-				algorithm RandomForest
-				mlframework Scikit-Learn
-				algorithm SVR
-				mlframework Scikit-Learn
-				algorithm DT
-=======
 			datainput "boston.csv" separator ,
 				mlframework R
 				algorithm SVR
@@ -183,7 +174,6 @@ class MmlCompilateurRTest {
 				mlframework R
 				algorithm RandomForest
 				formula "medv" ~ .
->>>>>>> b3e6f391ea5254fa776a9b37aafe2822cac7ee56
 				CrossValidation { 
 					numRepetitionCross 8
 				}
