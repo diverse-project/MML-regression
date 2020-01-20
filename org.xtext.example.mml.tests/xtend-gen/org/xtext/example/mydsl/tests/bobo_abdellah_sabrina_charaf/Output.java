@@ -14,7 +14,7 @@ public class Output {
   
   public String fileLocation;
   
-  public double timestamp;
+  public long timestamp;
   
   public Map<String, Double> validationMetric_result = new HashMap<String, Double>();
   
@@ -28,7 +28,7 @@ public class Output {
       ", Framework: ");
     String _plus_2 = (_plus_1 + this.frameworkLang);
     String _plus_3 = (_plus_2 + ", ExectutionTime: ");
-    String _plus_4 = (_plus_3 + Double.valueOf(this.timestamp));
+    String _plus_4 = (_plus_3 + Long.valueOf(this.timestamp));
     String _plus_5 = (_plus_4 + "]");
     result = (_result + _plus_5);
     Set<Map.Entry<String, Double>> _entrySet = this.validationMetric_result.entrySet();

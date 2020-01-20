@@ -1,10 +1,7 @@
 package org.xtext.example.mydsl.tests.bobo_abdellah_sabrina_charaf;
 
 import com.google.common.io.Files;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.List;
 import org.eclipse.xtext.xbase.lib.Exceptions;
 import org.eclipse.xtext.xbase.lib.InputOutput;
@@ -13,7 +10,6 @@ import org.xtext.example.mydsl.mml.CrossValidation;
 import org.xtext.example.mydsl.mml.DT;
 import org.xtext.example.mydsl.mml.DataInput;
 import org.xtext.example.mydsl.mml.FormulaItem;
-import org.xtext.example.mydsl.mml.FrameworkLang;
 import org.xtext.example.mydsl.mml.GTB;
 import org.xtext.example.mydsl.mml.MLAlgorithm;
 import org.xtext.example.mydsl.mml.MMLModel;
@@ -267,37 +263,7 @@ public class MmlCompilateurScikitLearn {
   }
   
   public Output compile() {
-    try {
-      final Output result = new Output();
-      result.frameworkLang = FrameworkLang.SCIKIT;
-      result.mlAlgorithm = this.mlAlgorithm;
-      final DataInput dataInput = this.mmlModel.getInput();
-      result.fileLocation = dataInput.getFilelocation();
-      final String render = this.compileDataInput();
-      byte[] _bytes = render.getBytes();
-      File _file = new File("mml.py");
-      Files.write(_bytes, _file);
-      long _currentTimeMillis = System.currentTimeMillis();
-      final double startTime = ((double) _currentTimeMillis);
-      final Process p = Runtime.getRuntime().exec("python mml.py");
-      long _currentTimeMillis_1 = System.currentTimeMillis();
-      final double endTime = ((double) _currentTimeMillis_1);
-      InputStream _inputStream = p.getInputStream();
-      InputStreamReader _inputStreamReader = new InputStreamReader(_inputStream);
-      final BufferedReader in = new BufferedReader(_inputStreamReader);
-      String line = null;
-      while (((line = in.readLine()) != null)) {
-        {
-          String[] output = line.split(",");
-          final String metricName = (output[0]).replace("(", "").replace("\'", "");
-          final String value = (output[1]).replace(")", "");
-          result.validationMetric_result.put(metricName, Double.valueOf(value));
-        }
-      }
-      result.timestamp = (endTime - startTime);
-      return result;
-    } catch (Throwable _e) {
-      throw Exceptions.sneakyThrow(_e);
-    }
+    throw new Error("Unresolved compilation problems:"
+      + "\nType mismatch: cannot convert from double to long");
   }
 }
