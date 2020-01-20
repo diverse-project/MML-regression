@@ -22,8 +22,8 @@
 'kernel='=17
 'linear'=42
 'mean_absolute_error'=46
-'mean_absolute_percentage_error'=47
 'mean_squared_error'=45
+'median_absolute_error'=47
 'mlframework'=13
 'numRepetitionCross'=32
 'percentageTraining'=35

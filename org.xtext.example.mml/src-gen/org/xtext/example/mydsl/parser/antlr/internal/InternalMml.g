@@ -1253,10 +1253,10 @@ ruleValidationMetric returns [Enumerator current=null]
 		)
 		    |
 		(
-			enumLiteral_2='mean_absolute_percentage_error'
+			enumLiteral_2='median_absolute_error'
 			{
-				$current = grammarAccess.getValidationMetricAccess().getMAPEEnumLiteralDeclaration_2().getEnumLiteral().getInstance();
-				newLeafNode(enumLiteral_2, grammarAccess.getValidationMetricAccess().getMAPEEnumLiteralDeclaration_2());
+				$current = grammarAccess.getValidationMetricAccess().getMEAEEnumLiteralDeclaration_2().getEnumLiteral().getInstance();
+				newLeafNode(enumLiteral_2, grammarAccess.getValidationMetricAccess().getMEAEEnumLiteralDeclaration_2());
 			}
 		)
 	)

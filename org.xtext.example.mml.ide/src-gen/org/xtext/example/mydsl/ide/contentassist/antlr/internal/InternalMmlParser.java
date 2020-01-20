@@ -22,7 +22,7 @@ import java.util.ArrayList;
 @SuppressWarnings("all")
 public class InternalMmlParser extends AbstractInternalContentAssistParser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "RULE_INT", "RULE_STRING", "RULE_ID", "RULE_ML_COMMENT", "RULE_SL_COMMENT", "RULE_WS", "RULE_ANY_OTHER", "'DT'", "'DecisionTree'", "'RandomForest'", "'RF'", "'StochasticGradientDescent'", "'SGD'", "'GradientBoostingRegressor'", "'GTB'", "','", "';'", "'scikit-learn'", "'R'", "'Weka'", "'xgboost'", "'linear'", "'poly'", "'rbf'", "'mean_squared_error'", "'mean_absolute_error'", "'mean_absolute_percentage_error'", "'datainput'", "'separator'", "'mlframework'", "'algorithm'", "'SVR'", "'C='", "'kernel='", "'.'", "'formula'", "'~'", "'+'", "'CrossValidation'", "'{'", "'numRepetitionCross'", "'}'", "'TrainingTest'", "'percentageTraining'"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "RULE_INT", "RULE_STRING", "RULE_ID", "RULE_ML_COMMENT", "RULE_SL_COMMENT", "RULE_WS", "RULE_ANY_OTHER", "'DT'", "'DecisionTree'", "'RandomForest'", "'RF'", "'StochasticGradientDescent'", "'SGD'", "'GradientBoostingRegressor'", "'GTB'", "','", "';'", "'scikit-learn'", "'R'", "'Weka'", "'xgboost'", "'linear'", "'poly'", "'rbf'", "'mean_squared_error'", "'mean_absolute_error'", "'median_absolute_error'", "'datainput'", "'separator'", "'mlframework'", "'algorithm'", "'SVR'", "'C='", "'kernel='", "'.'", "'formula'", "'~'", "'+'", "'CrossValidation'", "'{'", "'numRepetitionCross'", "'}'", "'TrainingTest'", "'percentageTraining'"
     };
     public static final int T__19=19;
     public static final int T__15=15;
@@ -2861,13 +2861,13 @@ public class InternalMmlParser extends AbstractInternalContentAssistParser {
 
 
     // $ANTLR start "rule__ValidationMetric__Alternatives"
-    // InternalMml.g:883:1: rule__ValidationMetric__Alternatives : ( ( ( 'mean_squared_error' ) ) | ( ( 'mean_absolute_error' ) ) | ( ( 'mean_absolute_percentage_error' ) ) );
+    // InternalMml.g:883:1: rule__ValidationMetric__Alternatives : ( ( ( 'mean_squared_error' ) ) | ( ( 'mean_absolute_error' ) ) | ( ( 'median_absolute_error' ) ) );
     public final void rule__ValidationMetric__Alternatives() throws RecognitionException {
 
         		int stackSize = keepStackSize();
         	
         try {
-            // InternalMml.g:887:1: ( ( ( 'mean_squared_error' ) ) | ( ( 'mean_absolute_error' ) ) | ( ( 'mean_absolute_percentage_error' ) ) )
+            // InternalMml.g:887:1: ( ( ( 'mean_squared_error' ) ) | ( ( 'mean_absolute_error' ) ) | ( ( 'median_absolute_error' ) ) )
             int alt12=3;
             switch ( input.LA(1) ) {
             case 28:
@@ -2936,20 +2936,20 @@ public class InternalMmlParser extends AbstractInternalContentAssistParser {
                     }
                     break;
                 case 3 :
-                    // InternalMml.g:900:2: ( ( 'mean_absolute_percentage_error' ) )
+                    // InternalMml.g:900:2: ( ( 'median_absolute_error' ) )
                     {
-                    // InternalMml.g:900:2: ( ( 'mean_absolute_percentage_error' ) )
-                    // InternalMml.g:901:3: ( 'mean_absolute_percentage_error' )
+                    // InternalMml.g:900:2: ( ( 'median_absolute_error' ) )
+                    // InternalMml.g:901:3: ( 'median_absolute_error' )
                     {
-                     before(grammarAccess.getValidationMetricAccess().getMAPEEnumLiteralDeclaration_2()); 
-                    // InternalMml.g:902:3: ( 'mean_absolute_percentage_error' )
-                    // InternalMml.g:902:4: 'mean_absolute_percentage_error'
+                     before(grammarAccess.getValidationMetricAccess().getMEAEEnumLiteralDeclaration_2()); 
+                    // InternalMml.g:902:3: ( 'median_absolute_error' )
+                    // InternalMml.g:902:4: 'median_absolute_error'
                     {
                     match(input,30,FOLLOW_2); 
 
                     }
 
-                     after(grammarAccess.getValidationMetricAccess().getMAPEEnumLiteralDeclaration_2()); 
+                     after(grammarAccess.getValidationMetricAccess().getMEAEEnumLiteralDeclaration_2()); 
 
                     }
 

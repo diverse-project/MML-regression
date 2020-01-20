@@ -898,9 +898,9 @@ rule__ValidationMetric__Alternatives
 	)
 	|
 	(
-		{ before(grammarAccess.getValidationMetricAccess().getMAPEEnumLiteralDeclaration_2()); }
-		('mean_absolute_percentage_error')
-		{ after(grammarAccess.getValidationMetricAccess().getMAPEEnumLiteralDeclaration_2()); }
+		{ before(grammarAccess.getValidationMetricAccess().getMEAEEnumLiteralDeclaration_2()); }
+		('median_absolute_error')
+		{ after(grammarAccess.getValidationMetricAccess().getMEAEEnumLiteralDeclaration_2()); }
 	)
 ;
 finally {

@@ -22,7 +22,7 @@ import java.util.ArrayList;
 @SuppressWarnings("all")
 public class InternalMmlParser extends AbstractInternalAntlrParser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "RULE_STRING", "RULE_INT", "RULE_ID", "RULE_ML_COMMENT", "RULE_SL_COMMENT", "RULE_WS", "RULE_ANY_OTHER", "'datainput'", "'separator'", "'mlframework'", "'algorithm'", "'SVR'", "'C='", "'kernel='", "'DT'", "'DecisionTree'", "'RandomForest'", "'RF'", "'StochasticGradientDescent'", "'SGD'", "'GradientBoostingRegressor'", "'GTB'", "'.'", "'formula'", "'~'", "'+'", "'CrossValidation'", "'{'", "'numRepetitionCross'", "'}'", "'TrainingTest'", "'percentageTraining'", "','", "';'", "'scikit-learn'", "'R'", "'Weka'", "'xgboost'", "'linear'", "'poly'", "'rbf'", "'mean_squared_error'", "'mean_absolute_error'", "'mean_absolute_percentage_error'"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "RULE_STRING", "RULE_INT", "RULE_ID", "RULE_ML_COMMENT", "RULE_SL_COMMENT", "RULE_WS", "RULE_ANY_OTHER", "'datainput'", "'separator'", "'mlframework'", "'algorithm'", "'SVR'", "'C='", "'kernel='", "'DT'", "'DecisionTree'", "'RandomForest'", "'RF'", "'StochasticGradientDescent'", "'SGD'", "'GradientBoostingRegressor'", "'GTB'", "'.'", "'formula'", "'~'", "'+'", "'CrossValidation'", "'{'", "'numRepetitionCross'", "'}'", "'TrainingTest'", "'percentageTraining'", "','", "';'", "'scikit-learn'", "'R'", "'Weka'", "'xgboost'", "'linear'", "'poly'", "'rbf'", "'mean_squared_error'", "'mean_absolute_error'", "'median_absolute_error'"
     };
     public static final int T__19=19;
     public static final int T__15=15;
@@ -3409,7 +3409,7 @@ public class InternalMmlParser extends AbstractInternalAntlrParser {
 
 
     // $ANTLR start "ruleValidationMetric"
-    // InternalMml.g:1231:1: ruleValidationMetric returns [Enumerator current=null] : ( (enumLiteral_0= 'mean_squared_error' ) | (enumLiteral_1= 'mean_absolute_error' ) | (enumLiteral_2= 'mean_absolute_percentage_error' ) ) ;
+    // InternalMml.g:1231:1: ruleValidationMetric returns [Enumerator current=null] : ( (enumLiteral_0= 'mean_squared_error' ) | (enumLiteral_1= 'mean_absolute_error' ) | (enumLiteral_2= 'median_absolute_error' ) ) ;
     public final Enumerator ruleValidationMetric() throws RecognitionException {
         Enumerator current = null;
 
@@ -3421,10 +3421,10 @@ public class InternalMmlParser extends AbstractInternalAntlrParser {
         	enterRule();
 
         try {
-            // InternalMml.g:1237:2: ( ( (enumLiteral_0= 'mean_squared_error' ) | (enumLiteral_1= 'mean_absolute_error' ) | (enumLiteral_2= 'mean_absolute_percentage_error' ) ) )
-            // InternalMml.g:1238:2: ( (enumLiteral_0= 'mean_squared_error' ) | (enumLiteral_1= 'mean_absolute_error' ) | (enumLiteral_2= 'mean_absolute_percentage_error' ) )
+            // InternalMml.g:1237:2: ( ( (enumLiteral_0= 'mean_squared_error' ) | (enumLiteral_1= 'mean_absolute_error' ) | (enumLiteral_2= 'median_absolute_error' ) ) )
+            // InternalMml.g:1238:2: ( (enumLiteral_0= 'mean_squared_error' ) | (enumLiteral_1= 'mean_absolute_error' ) | (enumLiteral_2= 'median_absolute_error' ) )
             {
-            // InternalMml.g:1238:2: ( (enumLiteral_0= 'mean_squared_error' ) | (enumLiteral_1= 'mean_absolute_error' ) | (enumLiteral_2= 'mean_absolute_percentage_error' ) )
+            // InternalMml.g:1238:2: ( (enumLiteral_0= 'mean_squared_error' ) | (enumLiteral_1= 'mean_absolute_error' ) | (enumLiteral_2= 'median_absolute_error' ) )
             int alt21=3;
             switch ( input.LA(1) ) {
             case 45:
@@ -3485,15 +3485,15 @@ public class InternalMmlParser extends AbstractInternalAntlrParser {
                     }
                     break;
                 case 3 :
-                    // InternalMml.g:1255:3: (enumLiteral_2= 'mean_absolute_percentage_error' )
+                    // InternalMml.g:1255:3: (enumLiteral_2= 'median_absolute_error' )
                     {
-                    // InternalMml.g:1255:3: (enumLiteral_2= 'mean_absolute_percentage_error' )
-                    // InternalMml.g:1256:4: enumLiteral_2= 'mean_absolute_percentage_error'
+                    // InternalMml.g:1255:3: (enumLiteral_2= 'median_absolute_error' )
+                    // InternalMml.g:1256:4: enumLiteral_2= 'median_absolute_error'
                     {
                     enumLiteral_2=(Token)match(input,47,FOLLOW_2); 
 
-                    				current = grammarAccess.getValidationMetricAccess().getMAPEEnumLiteralDeclaration_2().getEnumLiteral().getInstance();
-                    				newLeafNode(enumLiteral_2, grammarAccess.getValidationMetricAccess().getMAPEEnumLiteralDeclaration_2());
+                    				current = grammarAccess.getValidationMetricAccess().getMEAEEnumLiteralDeclaration_2().getEnumLiteral().getInstance();
+                    				newLeafNode(enumLiteral_2, grammarAccess.getValidationMetricAccess().getMEAEEnumLiteralDeclaration_2());
                     			
 
                     }

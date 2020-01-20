@@ -776,14 +776,14 @@ public class MmlGrammarAccess extends AbstractGrammarElementFinder {
 		private final Keyword cMSEMean_squared_errorKeyword_0_0 = (Keyword)cMSEEnumLiteralDeclaration_0.eContents().get(0);
 		private final EnumLiteralDeclaration cMAEEnumLiteralDeclaration_1 = (EnumLiteralDeclaration)cAlternatives.eContents().get(1);
 		private final Keyword cMAEMean_absolute_errorKeyword_1_0 = (Keyword)cMAEEnumLiteralDeclaration_1.eContents().get(0);
-		private final EnumLiteralDeclaration cMAPEEnumLiteralDeclaration_2 = (EnumLiteralDeclaration)cAlternatives.eContents().get(2);
-		private final Keyword cMAPEMean_absolute_percentage_errorKeyword_2_0 = (Keyword)cMAPEEnumLiteralDeclaration_2.eContents().get(0);
+		private final EnumLiteralDeclaration cMEAEEnumLiteralDeclaration_2 = (EnumLiteralDeclaration)cAlternatives.eContents().get(2);
+		private final Keyword cMEAEMedian_absolute_errorKeyword_2_0 = (Keyword)cMEAEEnumLiteralDeclaration_2.eContents().get(0);
 		
 		//enum ValidationMetric:
-		//	MSE='mean_squared_error' | MAE='mean_absolute_error' | MAPE="mean_absolute_percentage_error";
+		//	MSE='mean_squared_error' | MAE='mean_absolute_error' | MEAE="median_absolute_error";
 		public EnumRule getRule() { return rule; }
 		
-		//MSE='mean_squared_error' | MAE='mean_absolute_error' | MAPE="mean_absolute_percentage_error"
+		//MSE='mean_squared_error' | MAE='mean_absolute_error' | MEAE="median_absolute_error"
 		public Alternatives getAlternatives() { return cAlternatives; }
 		
 		//MSE='mean_squared_error'
@@ -798,11 +798,11 @@ public class MmlGrammarAccess extends AbstractGrammarElementFinder {
 		//'mean_absolute_error'
 		public Keyword getMAEMean_absolute_errorKeyword_1_0() { return cMAEMean_absolute_errorKeyword_1_0; }
 		
-		//MAPE="mean_absolute_percentage_error"
-		public EnumLiteralDeclaration getMAPEEnumLiteralDeclaration_2() { return cMAPEEnumLiteralDeclaration_2; }
+		//MEAE="median_absolute_error"
+		public EnumLiteralDeclaration getMEAEEnumLiteralDeclaration_2() { return cMEAEEnumLiteralDeclaration_2; }
 		
-		//"mean_absolute_percentage_error"
-		public Keyword getMAPEMean_absolute_percentage_errorKeyword_2_0() { return cMAPEMean_absolute_percentage_errorKeyword_2_0; }
+		//"median_absolute_error"
+		public Keyword getMEAEMedian_absolute_errorKeyword_2_0() { return cMEAEMedian_absolute_errorKeyword_2_0; }
 	}
 	
 	private final MMLModelElements pMMLModel;
@@ -1154,7 +1154,7 @@ public class MmlGrammarAccess extends AbstractGrammarElementFinder {
 	}
 	
 	//enum ValidationMetric:
-	//	MSE='mean_squared_error' | MAE='mean_absolute_error' | MAPE="mean_absolute_percentage_error";
+	//	MSE='mean_squared_error' | MAE='mean_absolute_error' | MEAE="median_absolute_error";
 	public ValidationMetricElements getValidationMetricAccess() {
 		return eValidationMetric;
 	}

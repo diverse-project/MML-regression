@@ -1,0 +1,28 @@
+Program {
+    Framework {
+        language : Python
+    }
+
+    Input {
+        path : '../BostonHousing.csv'
+    }
+
+    Strategy {
+        CrossValidation {
+            nbiteration : 4
+        }
+    }
+
+    Algorithm {
+        selectedAlgo : LinearRegression
+    }
+
+    Variables {
+        predictives : [0,1,2,3,8,9,10,11,12,13]
+    }
+
+    Output {
+    	path : 'result',
+		metric : MSE
+    }
+}

@@ -1,0 +1,8 @@
+datainput "BostonHousing.csv" separator ,
+mlframework scikit-learn
+algorithm SVR kernel=linear
+formula 0+1+2+3+8+9+10+11+12+13
+CrossValidation {
+    numRepetitionCross 4
+}
+mean_squared_error mean_absolute_error median_absolute_error

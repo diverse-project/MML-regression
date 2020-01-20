@@ -82,6 +82,6 @@
   <eClassifiers xsi:type="ecore:EEnum" name="ValidationMetric">
     <eLiterals name="MSE" literal="mean_squared_error"/>
     <eLiterals name="MAE" value="1" literal="mean_absolute_error"/>
-    <eLiterals name="MAPE" value="2" literal="mean_absolute_percentage_error"/>
+    <eLiterals name="MEAE" value="2" literal="median_absolute_error"/>
   </eClassifiers>
 </ecore:EPackage>
