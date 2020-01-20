@@ -221,18 +221,18 @@ class MmlGenerator extends AbstractGenerator {
 			algoDeclaration = "clf = SVR("+ (algo.c!==null?"C="+algo.c+",":"") + (algo.kernel!==null?"kernel='"+algo.kernel+"'":"") +")\n";
 		}else if(algo instanceof DT) { //DecisionTree
 			pythonImport+="from sklearn import tree\n";
-			algoDeclaration = "clf = tree.DecisionTreeRegressor(max_depth="+algo.max_depth+")\n";
+			algoDeclaration = "clf = tree.DecisionTreeRegressor(max_depth="+(algo.max_depth==0?"None":algo.max_depth)+")\n";
 		}else if(algo instanceof SGD){
 			pythonImport+="from sklearn.linear_model import SGDClassifier\n";
-			algoDeclaration = "clf = tree.SGDClassifier()\n";
+			algoDeclaration = "clf = SGDClassifier()\n";
 		}else if(algo instanceof GTB){
 			pythonImport+="from sklearn import ensemble\n";
 			algoDeclaration = "clf = ensemble.GradientBoostingRegressor()\n";
 		}else if(algo instanceof RandomForest){
 			pythonImport+="from sklearn import ensemble\n";
 			algoDeclaration = "clf = ensemble.RandomForest"+(algo.type==TYPE.CLASSIFIER?"Classifier":"Regressor")
-						+ "(max_depth="+ algo.max_depth 
-						+ ", n_estimators=" + algo.n_estimators
+						+ "(max_depth="+ (algo.max_depth==0?"None":algo.max_depth) 
+						+ ", n_estimators=" + (algo.n_estimators==0?"100":algo.n_estimators)
 						+ ")\n";
 		}
 		
@@ -266,14 +266,14 @@ class MmlGenerator extends AbstractGenerator {
 				val metricName = validMetrics.get(i).name()
 				if(metricName=="MSE"){
 					metrics+="accuracyMSE"+i+"=scores['test_neg_mean_squared_error']\n"
-					metricsResult+="print(sum(accuracy"+i+")/split_size)\n"
+					metricsResult+="print(sum(accuracyMSE"+i+")/split_size)\n"
 				}else if(metricName=="MAE"){
 					metrics+="accuracyMAE"+i+"=scores['test_neg_mean_absolute_error']\n"
-					metricsResult+="print(sum(accuracy"+i+")/split_size)\n"
+					metricsResult+="print(sum(accuracyMAE"+i+")/split_size)\n"
 				}else if(metricName=="MAPE"){
 					//TODO
 					//metrics+="accuracyMAPE"+i+"=scores['test_neg_mean_squared_error']\n"
-					//metricsResult+="print(sum(accuracy"+i+")/split_size)\n"
+					//metricsResult+="print(sum(accuracyMAPE"+i+")/split_size)\n"
 					metrics+="#Not developed"
 				}
 			}
