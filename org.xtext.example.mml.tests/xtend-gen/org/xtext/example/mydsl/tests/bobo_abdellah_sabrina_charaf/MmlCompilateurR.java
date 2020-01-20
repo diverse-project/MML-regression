@@ -458,6 +458,7 @@ public class MmlCompilateurR {
       Files.write(_bytes, _file);
       long _currentTimeMillis_1 = System.currentTimeMillis();
       final long startTime = ((long) _currentTimeMillis_1);
+      InputOutput.<Long>println(Long.valueOf((startTime - startTime1)));
       final Process p = Runtime.getRuntime().exec(("Rscript " + filePath));
       long _currentTimeMillis_2 = System.currentTimeMillis();
       final long endTime = ((long) _currentTimeMillis_2);
@@ -476,6 +477,7 @@ public class MmlCompilateurR {
         result.validationMetric_result.put(this.metricList.get(i), metricValueList.get(i));
       }
       result.timestamp = (endTime - startTime);
+      InputOutput.<Long>println(Long.valueOf((endTime - startTime1)));
       return result;
     } catch (Throwable _e) {
       throw Exceptions.sneakyThrow(_e);

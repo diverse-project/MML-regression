@@ -317,6 +317,7 @@ class MmlCompilateurR {
 		val long startTime1 = System.currentTimeMillis() as long;
 		Files.write(render.getBytes(), new File(filePath));
 		val long startTime = System.currentTimeMillis() as long;
+		println(startTime - startTime1)
 		val Process p = Runtime.getRuntime().exec("Rscript " + filePath);
 		val long endTime = System.currentTimeMillis() as long;
 		val BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -332,6 +333,7 @@ class MmlCompilateurR {
 			result.validationMetric_result.put(metricList.get(i), metricValueList.get(i));
 		}
 		result.timestamp = endTime - startTime;
+		println(endTime - startTime1)
 		return result;
 	}
 }
