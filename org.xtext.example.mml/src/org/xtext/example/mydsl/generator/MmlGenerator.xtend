@@ -61,7 +61,7 @@ class MmlGenerator extends AbstractGenerator {
 			default:type=""
 		}
         fsa.generateFile(
-           'test.'+type, code
+           resource.URI.lastSegment.replace("mml",type), code
         )
         
 	}
@@ -205,73 +205,111 @@ class MmlGenerator extends AbstractGenerator {
 				csvSplit+="y = df[columns = [df.columns["+formuleItem.getColumn()+"]]]\n";
 			}else if(xformule instanceof AllVariables) {
 				csvSplit+="X = df.drop(columns = [df.columns[-1]])\n";
-				csvSplit+="y = df[columns = [df.columns[-1]]]\n";
+				csvSplit+="y = df[[df.columns[-1]]]\n";
 			}
 		}else {
 			//if formule is null, all the fields are used to predict the last one
 			csvSplit+="X = df.drop(columns = [df.columns[-1]])\n";
-			csvSplit+="y = df[columns = [df.columns[-1]]]\n";
+			csvSplit+="y = df[[df.columns[-1]]]\n";
 		}
 		
 		//algo
 		var algo = mlchoicealgo.getAlgorithm();
 		var algoDeclaration="";
 		if(algo instanceof SVR) {
-			//TODO complete with same template as DT below
+			pythonImport+="from sklearn.svm import SVR\n";
+			algoDeclaration = "clf = SVR("+ (algo.c!==null?"C="+algo.c+",":"") + (algo.kernel!==null?"kernel='"+algo.kernel+"'":"") +")\n";
 		}else if(algo instanceof DT) { //DecisionTree
 			pythonImport+="from sklearn import tree\n";
-			algoDeclaration = "clf = tree.DecisionTreeRegressor()\n";
-		}//TODO other algos
+			algoDeclaration = "clf = tree.DecisionTreeRegressor(max_depth="+algo.max_depth+")\n";
+		}else if(algo instanceof SGD){
+			pythonImport+="from sklearn.linear_model import SGDClassifier\n";
+			algoDeclaration = "clf = tree.SGDClassifier()\n";
+		}else if(algo instanceof GTB){
+			pythonImport+="from sklearn import ensemble\n";
+			algoDeclaration = "clf = ensemble.GradientBoostingRegressor()\n";
+		}else if(algo instanceof RandomForest){
+			pythonImport+="from sklearn import ensemble\n";
+			algoDeclaration = "clf = ensemble.RandomForest"+(algo.type==TYPE.CLASSIFIER?"Classifier":"Regressor")
+						+ "(max_depth="+ algo.max_depth 
+						+ ", n_estimators=" + algo.n_estimators
+						+ ")\n";
+		}
+		
+		//ValidationMetric
+		var metrics=""
+		var metricsResult=""
 		
 		//validation
 		var stratMethod = validation.getStratification()
 		var validMetrics = validation.getMetric()
 		var number = stratMethod.getNumber()
 		var validationPrint=""
-		validationPrint += "test_size = "+number+"\n"
+		validationPrint += "split_size = "+number+"\n"
+		
 		if(stratMethod instanceof CrossValidation){
-			//TODO equivalent à ci-dessous
-		}else if(stratMethod instanceof TrainingTest){
-			pythonImport+="from sklearn.model_selection import train_test_split\n"
-			validationPrint+="X_train, X_test, y_train, y_test = train_test_split(X, y, test_size="+number+")"
-		}
-		validationPrint+="\n"
-		
-		//ValidationMetric
-		var metrics=""
-		var metricsResult=""
-		for(var i=0;i<validMetrics.size();i++) {
-			var metric = "";
-			val metricName = validMetrics.get(i).name()
-			/*switch(validMetrics.get(i).name()) {
-				case "MSE":
-					pythonImport+="from sklearn.metrics import mean_squared_error\n"
-					metric+="accuracy"+i+"=mean_squared_error(y_test, clf.predict(X_test))"
-				case "MAE":
-					pythonImport+="from sklearn.metrics import mean_absolute_error\n"
-					metric+="accuracy"+i+"=mean_absolute_error(y_test, clf.predict(X_test))"
-				case "MAPE":
-					pythonImport+="from sklearn.utils import check_arrays\n"
-					metric+="y_test, y_pred = check_arrays(y_test, clf.predict(X_test))"
-					metric+="accuracy"+i+"=np.mean(np.abs((y_test - y_pred) / y_test)) * 100"
-				default:metric=''
-			}*/
-			if(metricName=="MSE"){
-				pythonImport+="from sklearn.metrics import mean_squared_error\n"
-				metric+="accuracy"+i+"=mean_squared_error(y_test, clf.predict(X_test))"
-			}else if(metricName=="MAE"){
-				pythonImport+="from sklearn.metrics import mean_absolute_error\n"
-				metric+="accuracy"+i+"=mean_absolute_error(y_test, clf.predict(X_test))"
-			}else if(metricName=="MAPE"){
-				pythonImport+="from sklearn.utils import check_arrays\n"
-				metric+="y_test, y_pred = check_arrays(y_test, clf.predict(X_test))"
-				metric+="accuracy"+i+"=np.mean(np.abs((y_test - y_pred) / y_test)) * 100"
+			pythonImport+="from sklearn.model_selection import cross_validate\n"
+			var metricList=""
+			for(var i=0;i<validMetrics.size();i++) {
+				val metricName = validMetrics.get(i).name()
+				if(metricName=="MSE"){
+					metricList+="'neg_mean_squared_error',"
+				}else if(metricName=="MAE"){
+					metricList+="'neg_mean_absolute_error',"
+				}else if(metricName=="MAPE"){
+					//metricList+="'neg_mean_absolute_error',"
+				}
 			}
-			metricsResult+="print(accuracy"+i+")\n"
-			metrics+=metric+"\n"
+			metricList = metricList.substring(0, metricList.length() - 1)
+			validationPrint+="scores = cross_validate(clf, X, y, scoring=("+metricList+") ,cv="+ number +")\n"
+			for(var i=0;i<validMetrics.size();i++) {
+				val metricName = validMetrics.get(i).name()
+				if(metricName=="MSE"){
+					metrics+="accuracyMSE"+i+"=scores['test_neg_mean_squared_error']\n"
+					metricsResult+="print(sum(accuracy"+i+")/split_size)\n"
+				}else if(metricName=="MAE"){
+					metrics+="accuracyMAE"+i+"=scores['test_neg_mean_absolute_error']\n"
+					metricsResult+="print(sum(accuracy"+i+")/split_size)\n"
+				}else if(metricName=="MAPE"){
+					//TODO
+					//metrics+="accuracyMAPE"+i+"=scores['test_neg_mean_squared_error']\n"
+					//metricsResult+="print(sum(accuracy"+i+")/split_size)\n"
+					metrics+="#Not developed"
+				}
+			}
+			if(validMetrics.size()==1){
+				metrics = metrics.replaceAll("'[a-z_]*'","'test_score'");
+			}
 		}
 		
-		var pandasCode = pythonImport + csvReading + csvSplit + algoDeclaration+ validationPrint+ metrics+metricsResult
+		else if(stratMethod instanceof TrainingTest){
+			pythonImport+="from sklearn.model_selection import train_test_split\n"
+			validationPrint+="X_train, X_test, y_train, y_test = train_test_split(X, y, test_size="+number+")\n"
+			//Fit
+			validationPrint+="clf.fit(X_train, y_train)\n"
+			//metrics
+			for(var i=0;i<validMetrics.size();i++) {
+				var metric = "";
+				val metricName = validMetrics.get(i).name()
+				if(metricName=="MSE"){
+					pythonImport+="from sklearn.metrics import mean_squared_error\n"
+					metric+="accuracyMSE"+i+"=mean_squared_error(y_test, clf.predict(X_test))"
+				}else if(metricName=="MAE"){
+					pythonImport+="from sklearn.metrics import mean_absolute_error\n"
+					metric+="accuracyMAE"+i+"=mean_absolute_error(y_test, clf.predict(X_test))"
+				}else if(metricName=="MAPE"){
+					pythonImport+="import numpy as np\n"
+					metric+="y_test, y_pred = np.array(y_true), np.array(clf.predict(X_test))\n"
+					metric+="accuracyMAPE"+i+"=np.mean(np.abs((y_test - y_pred) / y_test)) * 100"
+				}
+				metricsResult+="print(accuracy"+i+")\n"
+				metrics+=metric+"\n"
+			}
+		}
+		
+		validationPrint+="\n"
+
+		var pandasCode = pythonImport + csvReading + csvSplit + algoDeclaration+ validationPrint +metrics+metricsResult
 		return pandasCode
 	}
 	
