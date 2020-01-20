@@ -455,10 +455,10 @@ public class MmlCompilateurR {
       File _file = new File(filePath);
       Files.write(_bytes, _file);
       long _currentTimeMillis = System.currentTimeMillis();
-      final double startTime = ((double) _currentTimeMillis);
+      final long startTime = ((long) _currentTimeMillis);
       final Process p = Runtime.getRuntime().exec(("Rscript " + filePath));
       long _currentTimeMillis_1 = System.currentTimeMillis();
-      final double endTime = ((double) _currentTimeMillis_1);
+      final long endTime = ((long) _currentTimeMillis_1);
       InputStream _inputStream = p.getInputStream();
       InputStreamReader _inputStreamReader = new InputStreamReader(_inputStream);
       final BufferedReader in = new BufferedReader(_inputStreamReader);

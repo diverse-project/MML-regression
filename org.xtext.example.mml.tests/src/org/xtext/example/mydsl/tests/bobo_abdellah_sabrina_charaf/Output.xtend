@@ -10,7 +10,7 @@ class Output {
 	public MLAlgorithm mlAlgorithm;
 	public FrameworkLang frameworkLang;
 	public String fileLocation;
-	public double timestamp;
+	public long timestamp;
 	public Map<String, Double> validationMetric_result = new HashMap<String,Double>();
 	
 	override String toString(){

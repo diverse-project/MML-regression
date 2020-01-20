@@ -316,9 +316,9 @@ class MmlCompilateurR {
 		val String filePath = "mml.R";
 		Files.write(render.getBytes(), new File(filePath));
 
-		val double startTime = System.currentTimeMillis() as double;
+		val long startTime = System.currentTimeMillis() as long;
 		val Process p = Runtime.getRuntime().exec("Rscript " + filePath);
-		val double endTime = System.currentTimeMillis() as double;
+		val long endTime = System.currentTimeMillis() as long;
 		val BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
 		var String line;
 
