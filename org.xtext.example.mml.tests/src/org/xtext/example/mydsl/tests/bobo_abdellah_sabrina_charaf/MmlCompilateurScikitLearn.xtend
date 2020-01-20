@@ -216,7 +216,6 @@ class MmlCompilateurScikitLearn {
 			val String metricName = output.get(0).replace("(","").replace("'","");
 			val String value = output.get(1).replace(")","");
 			result.validationMetric_result.put(metricName,Double.valueOf(value));
-			
 	    }
 		result.timestamp = endTime - startTime;
 		return result;
