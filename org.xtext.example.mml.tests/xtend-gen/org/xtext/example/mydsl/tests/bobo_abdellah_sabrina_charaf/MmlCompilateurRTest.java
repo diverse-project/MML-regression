@@ -23,7 +23,48 @@ public class MmlCompilateurRTest {
   public void mmlcomp() {
     try {
       StringConcatenation _builder = new StringConcatenation();
-      _builder.append("datainput \"boston.csv\" separator ;");
+      _builder.append("datainput \"boston.csv\" separator ,");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("mlframework R");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("algorithm DT ");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("mlframework R");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("algorithm RandomForest");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("formula \"medv\" ~ .");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("TrainingTest { ");
+      _builder.newLine();
+      _builder.append("\t\t");
+      _builder.append("percentageTraining 70");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("}");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("mean_absolute_error mean_squared_error");
+      _builder.newLine();
+      final MMLModel result = this.parseHelper.parse(_builder);
+      final MmlCompilateur mmlcompilateur = new MmlCompilateur(result);
+      mmlcompilateur.render();
+    } catch (Throwable _e) {
+      throw Exceptions.sneakyThrow(_e);
+    }
+  }
+  
+  @Test
+  public void mmlcomp1() {
+    try {
+      StringConcatenation _builder = new StringConcatenation();
+      _builder.append("datainput \"boston.csv\" separator ,");
       _builder.newLine();
       _builder.append("\t");
       _builder.append("mlframework Scikit-Learn");

@@ -170,7 +170,7 @@ class MmlCompilateurR {
 
 	def void algorithmCode(String predictors) {
 
-		rasCode += "df %>% select(-c(" + predictiveColName + "))->X" + "\n";
+		rasCode += "df %>% select(-c("+predictiveColName+"))->X" + "\n";
 		rasCode += "df %>% select(c(" + predictiveColName + "))->Y" + "\n";
 		rasCode += "sample.split(df$" + predictiveColName + ",SplitRatio=" + split_ratio + ")->split_index" + "\n";
 		rasCode += "train<-subset(df,split_index==T)" + "\n";
@@ -286,7 +286,7 @@ class MmlCompilateurR {
 			}
 			TrainingTest: {
 				val TrainingTest trainingTest = stratificationMethod as TrainingTest;
-				split_ratio = trainingTest.number;
+				split_ratio =  trainingTest.number as double / 100.0;
 			}
 		}
 
