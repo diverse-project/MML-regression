@@ -26,13 +26,13 @@ public class MmlCompilateurRTest {
       _builder.append("datainput \"boston.csv\" separator ;");
       _builder.newLine();
       _builder.append("\t");
-      _builder.append("mlframework R");
+      _builder.append("mlframework Scikit-Learn");
       _builder.newLine();
       _builder.append("\t");
       _builder.append("algorithm DT");
       _builder.newLine();
       _builder.append("\t");
-      _builder.append("mlframework R");
+      _builder.append("mlframework Scikit-Learn");
       _builder.newLine();
       _builder.append("\t");
       _builder.append("algorithm RandomForest");
@@ -41,10 +41,10 @@ public class MmlCompilateurRTest {
       _builder.append("formula \"medv\" ~ .");
       _builder.newLine();
       _builder.append("\t");
-      _builder.append("TrainingTest { ");
+      _builder.append("CrossValidation { ");
       _builder.newLine();
       _builder.append("\t\t");
-      _builder.append("percentageTraining 70");
+      _builder.append("numRepetitionCross 8");
       _builder.newLine();
       _builder.append("\t");
       _builder.append("}");

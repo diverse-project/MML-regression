@@ -4,27 +4,26 @@ import com.google.common.io.Files
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
-import java.util.ArrayList
 import java.util.List
-import org.eclipse.emf.common.util.EList
-import org.eclipse.emf.common.util.UniqueEList
 import org.xtext.example.mydsl.mml.AllVariables
+import org.xtext.example.mydsl.mml.CrossValidation
 import org.xtext.example.mydsl.mml.DT
 import org.xtext.example.mydsl.mml.DataInput
 import org.xtext.example.mydsl.mml.FormulaItem
 import org.xtext.example.mydsl.mml.FrameworkLang
+import org.xtext.example.mydsl.mml.GTB
 import org.xtext.example.mydsl.mml.MLAlgorithm
-import org.xtext.example.mydsl.mml.MLChoiceAlgorithm
 import org.xtext.example.mydsl.mml.MMLModel
 import org.xtext.example.mydsl.mml.PredictorVariables
 import org.xtext.example.mydsl.mml.RFormula
 import org.xtext.example.mydsl.mml.RandomForest
+import org.xtext.example.mydsl.mml.SGD
+import org.xtext.example.mydsl.mml.SVR
 import org.xtext.example.mydsl.mml.StratificationMethod
+import org.xtext.example.mydsl.mml.TrainingTest
 import org.xtext.example.mydsl.mml.Validation
 import org.xtext.example.mydsl.mml.ValidationMetric
 import org.xtext.example.mydsl.mml.XFormula
-import java.util.stream.DoubleStream.Builder
-import org.xtext.example.mydsl.mml.SVR
 
 class MmlCompilateurScikitLearn {
 	
@@ -43,78 +42,84 @@ class MmlCompilateurScikitLearn {
 		this.mlAlgorithm = mlAlgorithm;
 	}	
 	
-	def EList<MLAlgorithm> removeDuplicate(EList<MLChoiceAlgorithm> input){
-		val EList<MLAlgorithm> result = new UniqueEList<MLAlgorithm>();
-		val List<String> list = new ArrayList<String>();
-		
-		for (MLChoiceAlgorithm item: input){
-			val MLAlgorithm MLA = item.algorithm;
-			if(!list.contains(MLA.class.simpleName)){
-				list.add(MLA.class.simpleName);
-				result.add(MLA);
-			}
-		}
-		return result;
-	}
-	
 	def String compileDataInput() {
 		
 		val DataInput dataInput = mmlModel.input;
 		val String fileLocation = dataInput.filelocation;
+		var int crossValidationNumber = 0
 		
 		//Algorithm
 		var String algorithmImport="";
 		var String algorithmBody="";
+		
+		val Validation validation = mmlModel.validation;
+		val StratificationMethod stratification = validation.stratification;
+		//Metric
+		val List<ValidationMetric> metrics = validation.metric;
+		var double percentageTest = 0.3
+		
+		
+		switch stratification {
+			CrossValidation: {
+				val CrossValidation crossValidation = stratification as CrossValidation;
+				crossValidationNumber = crossValidation.number ;
+				algorithmImport += "\nfrom sklearn.model_selection import cross_val_score";
+				
+			}
+			TrainingTest: {
+				val TrainingTest trainingTest = stratification as TrainingTest;
+				val double percentageTraining = trainingTest.number as double / 100.0;
+				percentageTest = 1.0 - percentageTraining;
+			}
+		}
 		
 		switch mlAlgorithm {
 			DT: {
 				algorithmImport += "\nfrom sklearn import tree";
 				algorithmBody += "\nclf = tree.DecisionTreeRegressor()";
 				algorithmBody += "\nclf.fit(X_train, y_train)";
-				algorithmBody += "\ny_pred =  clf.predict(X_test)"
-			
+				if(crossValidationNumber === 0){
+					algorithmBody += "\ny_pred =  clf.predict(X_test)"
+				}
 			}
-			
 			RandomForest: {
 				algorithmImport += "\nimport numpy as np";
 				algorithmImport += "\nfrom sklearn.ensemble import RandomForestRegressor";
-				algorithmBody += "\nregressor = RandomForestRegressor()";
-				algorithmBody += "\nregressor.fit(X_train, y_train)";
-				algorithmBody += "\ny_pred = regressor.predict(X_test)"
+				algorithmBody += "\nclf = RandomForestRegressor()";
+				algorithmBody += "\nclf.fit(X_train, y_train)";
+				if(crossValidationNumber === 0){
+					algorithmBody += "\ny_pred = clf.predict(X_test)"
+				}
 			}
 			SVR: {
 				algorithmImport += "\nimport numpy as np";
 				algorithmImport += "\nfrom sklearn.svm import SVR";
 				algorithmBody += "\nclf = SVR()";
 				algorithmBody += "\nclf.fit(X_train, y_train)";
-				algorithmBody += "\ny_pred = clf.predict(X_test)"
+				if(crossValidationNumber === 0){
+					algorithmBody += "\ny_pred = clf.predict(X_test)"
+				}
+			}
+			SGD: {
+				println("SGD")
+			}
+			GTB: {
+				println("GTB")
 			}
 			default : print("default")
 		
 		}
-		
-		
-		//TrainningTest
-		val Validation validation = mmlModel.validation;
-		val StratificationMethod stratification = validation.stratification;
-		//Metric
-		val List<ValidationMetric> metrics = validation.metric;
-		
-		//TrainningPercentage
-		val double percentageTraining = stratification.number as double / 100.0;
-		val double percentageTest = 1.0 - percentageTraining;
-		
 		val String trainning = "train_test_split";
 		
 		// start of Python generation
+		//Imports
 		var String pythonImport = "import pandas as pd\n";
 		pythonImport += algorithmImport+"\n";
-		
 		for(ValidationMetric validationMetric: metrics){
 			pythonImport += "from sklearn.metrics import "+validationMetric.literal.toString()+"\n";
 		}
 		pythonImport += "from sklearn.model_selection import "+trainning+"\n";
-		
+		//Code
 		val String	csvReading = "\nmml_data = pd.read_csv(\""+ fileLocation + "\")";
 		var String	pandasCode = pythonImport + csvReading;
 		
@@ -130,7 +135,6 @@ class MmlCompilateurScikitLearn {
 			var String predictiveColName
 			if (formula.predictive !== null) {
 				val FormulaItem predictive = formula.predictive;
-				
 				if(predictive.column !== 0 ){
 					predictiveColumn = predictive.column;
 					pandasCode += "y = mml_data.iloc[:, "+predictiveColumn+"].values";
@@ -139,7 +143,6 @@ class MmlCompilateurScikitLearn {
 					predictiveColName = formula.predictive.colName;
 					pandasCode += "\ny = mml_data['"+predictiveColName+"'] ";
 				}
-				
 			}
 			else{
 				var String column= "\ncolumn = mml_data.columns[-1]";
@@ -163,6 +166,8 @@ class MmlCompilateurScikitLearn {
 				PredictorVariables:{
 					var PredictorVariables	predictorsVariables =  formula.predictors as PredictorVariables;
 					val List<FormulaItem> predictorsList = predictorsVariables.vars
+					var String column= "\ncolumn = mml_data.columns[-1]";
+					pandasCode += "\n"+column+" \nX = mml_data.drop(columns=[column]) ";
 					//TODO
 				}	
 				default : print("default")	
@@ -173,22 +178,20 @@ class MmlCompilateurScikitLearn {
 		pandasCode += "\n"+algorithmBody;
 		
 		for(ValidationMetric validationMetric: metrics){
-			pandasCode += "\naccuracy = "+validationMetric.literal.toString()+"(y_test, y_pred)";
-			pandasCode += "\nprint('"+validationMetric.literal.toString()+"', accuracy)";
+			if(crossValidationNumber === 0){
+				pandasCode += "\naccuracy = "+validationMetric.literal.toString()+"(y_test, y_pred)";
+				pandasCode += "\nprint('"+validationMetric.literal.toString()+"', accuracy)";
+			}
+			else{
+				pandasCode += "\nscores = cross_val_score(estimator=clf,  X=X, y=y, cv="+crossValidationNumber+",scoring=('neg_"
+				+validationMetric.literal.toString()+"'))";
+				pandasCode += "\nprint('"+validationMetric.literal.toString()+"', abs(scores.mean()))";
+			}
+			
 		}
 				
 		Files.write(pandasCode.getBytes(), new File("mml.py"));
 		// end of Python generation
-		
-		/*
-		 * Calling generated Python script (basic solution through systems call)
-		 * we assume that "python" is in the path
-		 * 
-		 * virtualenv -p python3 venv
-		 * 
-		 * venv/bin/pip install -r requirements.txt
-		 */
-		
 		
 		return pandasCode;
 	}
