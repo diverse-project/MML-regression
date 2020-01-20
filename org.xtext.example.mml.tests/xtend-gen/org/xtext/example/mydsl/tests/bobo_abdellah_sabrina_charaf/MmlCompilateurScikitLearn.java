@@ -5,24 +5,25 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.List;
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.common.util.UniqueEList;
 import org.eclipse.xtext.xbase.lib.Exceptions;
 import org.eclipse.xtext.xbase.lib.InputOutput;
 import org.xtext.example.mydsl.mml.AllVariables;
+import org.xtext.example.mydsl.mml.CrossValidation;
 import org.xtext.example.mydsl.mml.DT;
 import org.xtext.example.mydsl.mml.DataInput;
 import org.xtext.example.mydsl.mml.FormulaItem;
 import org.xtext.example.mydsl.mml.FrameworkLang;
+import org.xtext.example.mydsl.mml.GTB;
 import org.xtext.example.mydsl.mml.MLAlgorithm;
-import org.xtext.example.mydsl.mml.MLChoiceAlgorithm;
 import org.xtext.example.mydsl.mml.MMLModel;
 import org.xtext.example.mydsl.mml.PredictorVariables;
 import org.xtext.example.mydsl.mml.RFormula;
 import org.xtext.example.mydsl.mml.RandomForest;
+import org.xtext.example.mydsl.mml.SGD;
+import org.xtext.example.mydsl.mml.SVR;
 import org.xtext.example.mydsl.mml.StratificationMethod;
+import org.xtext.example.mydsl.mml.TrainingTest;
 import org.xtext.example.mydsl.mml.Validation;
 import org.xtext.example.mydsl.mml.ValidationMetric;
 import org.xtext.example.mydsl.mml.XFormula;
@@ -47,66 +48,98 @@ public class MmlCompilateurScikitLearn {
     this.mlAlgorithm = mlAlgorithm;
   }
   
-  public EList<MLAlgorithm> removeDuplicate(final EList<MLChoiceAlgorithm> input) {
-    final EList<MLAlgorithm> result = new UniqueEList<MLAlgorithm>();
-    final List<String> list = new ArrayList<String>();
-    for (final MLChoiceAlgorithm item : input) {
-      {
-        final MLAlgorithm MLA = item.getAlgorithm();
-        boolean _contains = list.contains(MLA.getClass().getSimpleName());
-        boolean _not = (!_contains);
-        if (_not) {
-          list.add(MLA.getClass().getSimpleName());
-          result.add(MLA);
-        }
-      }
-    }
-    return result;
-  }
-  
   public String compileDataInput() {
     try {
       final DataInput dataInput = this.mmlModel.getInput();
       final String fileLocation = dataInput.getFilelocation();
+      int crossValidationNumber = 0;
       String algorithmImport = "";
       String algorithmBody = "";
-      final MLAlgorithm mlAlgorithm = this.mlAlgorithm;
+      final Validation validation = this.mmlModel.getValidation();
+      final StratificationMethod stratification = validation.getStratification();
+      final List<ValidationMetric> metrics = validation.getMetric();
+      double percentageTest = 0.3;
       boolean _matched = false;
-      if (mlAlgorithm instanceof DT) {
+      if (stratification instanceof CrossValidation) {
         _matched=true;
+        final CrossValidation crossValidation = ((CrossValidation) stratification);
+        crossValidationNumber = crossValidation.getNumber();
+        String _algorithmImport = algorithmImport;
+        algorithmImport = (_algorithmImport + "\nfrom sklearn.model_selection import cross_val_score");
+      }
+      if (!_matched) {
+        if (stratification instanceof TrainingTest) {
+          _matched=true;
+          final TrainingTest trainingTest = ((TrainingTest) stratification);
+          int _number = trainingTest.getNumber();
+          final double percentageTraining = (((double) _number) / 100.0);
+          percentageTest = (1.0 - percentageTraining);
+        }
+      }
+      final MLAlgorithm mlAlgorithm = this.mlAlgorithm;
+      boolean _matched_1 = false;
+      if (mlAlgorithm instanceof DT) {
+        _matched_1=true;
         String _algorithmImport = algorithmImport;
         algorithmImport = (_algorithmImport + "\nfrom sklearn import tree");
         String _algorithmBody = algorithmBody;
         algorithmBody = (_algorithmBody + "\nclf = tree.DecisionTreeRegressor()");
         String _algorithmBody_1 = algorithmBody;
         algorithmBody = (_algorithmBody_1 + "\nclf.fit(X_train, y_train)");
-        String _algorithmBody_2 = algorithmBody;
-        algorithmBody = (_algorithmBody_2 + "\ny_pred =  clf.predict(X_test)");
+        if ((crossValidationNumber == 0)) {
+          String _algorithmBody_2 = algorithmBody;
+          algorithmBody = (_algorithmBody_2 + "\ny_pred =  clf.predict(X_test)");
+        }
       }
-      if (!_matched) {
+      if (!_matched_1) {
         if (mlAlgorithm instanceof RandomForest) {
-          _matched=true;
+          _matched_1=true;
           String _algorithmImport = algorithmImport;
           algorithmImport = (_algorithmImport + "\nimport numpy as np");
           String _algorithmImport_1 = algorithmImport;
           algorithmImport = (_algorithmImport_1 + "\nfrom sklearn.ensemble import RandomForestRegressor");
           String _algorithmBody = algorithmBody;
-          algorithmBody = (_algorithmBody + "\nregressor = RandomForestRegressor()");
+          algorithmBody = (_algorithmBody + "\nclf = RandomForestRegressor()");
           String _algorithmBody_1 = algorithmBody;
-          algorithmBody = (_algorithmBody_1 + "\nregressor.fit(X_train, y_train)");
-          String _algorithmBody_2 = algorithmBody;
-          algorithmBody = (_algorithmBody_2 + "\ny_pred = regressor.predict(X_test)");
+          algorithmBody = (_algorithmBody_1 + "\nclf.fit(X_train, y_train)");
+          if ((crossValidationNumber == 0)) {
+            String _algorithmBody_2 = algorithmBody;
+            algorithmBody = (_algorithmBody_2 + "\ny_pred = clf.predict(X_test)");
+          }
         }
       }
-      if (!_matched) {
+      if (!_matched_1) {
+        if (mlAlgorithm instanceof SVR) {
+          _matched_1=true;
+          String _algorithmImport = algorithmImport;
+          algorithmImport = (_algorithmImport + "\nimport numpy as np");
+          String _algorithmImport_1 = algorithmImport;
+          algorithmImport = (_algorithmImport_1 + "\nfrom sklearn.svm import SVR");
+          String _algorithmBody = algorithmBody;
+          algorithmBody = (_algorithmBody + "\nclf = SVR()");
+          String _algorithmBody_1 = algorithmBody;
+          algorithmBody = (_algorithmBody_1 + "\nclf.fit(X_train, y_train)");
+          if ((crossValidationNumber == 0)) {
+            String _algorithmBody_2 = algorithmBody;
+            algorithmBody = (_algorithmBody_2 + "\ny_pred = clf.predict(X_test)");
+          }
+        }
+      }
+      if (!_matched_1) {
+        if (mlAlgorithm instanceof SGD) {
+          _matched_1=true;
+          InputOutput.<String>println("SGD");
+        }
+      }
+      if (!_matched_1) {
+        if (mlAlgorithm instanceof GTB) {
+          _matched_1=true;
+          InputOutput.<String>println("GTB");
+        }
+      }
+      if (!_matched_1) {
         InputOutput.<String>print("default");
       }
-      final Validation validation = this.mmlModel.getValidation();
-      final StratificationMethod stratification = validation.getStratification();
-      final List<ValidationMetric> metrics = validation.getMetric();
-      int _number = stratification.getNumber();
-      final double percentageTraining = (((double) _number) / 100.0);
-      final double percentageTest = (1.0 - percentageTraining);
       final String trainning = "train_test_split";
       String pythonImport = "import pandas as pd\n";
       String _pythonImport = pythonImport;
@@ -159,9 +192,9 @@ public class MmlCompilateurScikitLearn {
           pandasCode = (_pandasCode_5 + "\ny = mml_data[column] ");
         }
         final XFormula xformula = formula.getPredictors();
-        boolean _matched_1 = false;
+        boolean _matched_2 = false;
         if (xformula instanceof AllVariables) {
-          _matched_1=true;
+          _matched_2=true;
           if ((predictiveColumn != 0)) {
             String _pandasCode_6 = pandasCode;
             pandasCode = (_pandasCode_6 + (("X = mml_data.iloc[:, 0:" + Integer.valueOf(predictiveColumn)) + "].values"));
@@ -178,15 +211,18 @@ public class MmlCompilateurScikitLearn {
             }
           }
         }
-        if (!_matched_1) {
+        if (!_matched_2) {
           if (xformula instanceof PredictorVariables) {
-            _matched_1=true;
+            _matched_2=true;
             XFormula _predictors = formula.getPredictors();
             PredictorVariables predictorsVariables = ((PredictorVariables) _predictors);
             final List<FormulaItem> predictorsList = predictorsVariables.getVars();
+            String column_2 = "\ncolumn = mml_data.columns[-1]";
+            String _pandasCode_6 = pandasCode;
+            pandasCode = (_pandasCode_6 + (("\n" + column_2) + " \nX = mml_data.drop(columns=[column]) "));
           }
         }
-        if (!_matched_1) {
+        if (!_matched_2) {
           InputOutput.<String>print("default");
         }
       }
@@ -197,7 +233,7 @@ public class MmlCompilateurScikitLearn {
       String _pandasCode_8 = pandasCode;
       pandasCode = (_pandasCode_8 + ("\n" + algorithmBody));
       for (final ValidationMetric validationMetric_1 : metrics) {
-        {
+        if ((crossValidationNumber == 0)) {
           String _pandasCode_9 = pandasCode;
           String _string_1 = validationMetric_1.getLiteral().toString();
           String _plus_2 = ("\naccuracy = " + _string_1);
@@ -208,6 +244,17 @@ public class MmlCompilateurScikitLearn {
           String _plus_4 = ("\nprint(\'" + _string_2);
           String _plus_5 = (_plus_4 + "\', accuracy)");
           pandasCode = (_pandasCode_10 + _plus_5);
+        } else {
+          String _pandasCode_11 = pandasCode;
+          String _string_3 = validationMetric_1.getLiteral().toString();
+          String _plus_6 = ((("\nscores = cross_val_score(estimator=clf,  X=X, y=y, cv=" + Integer.valueOf(crossValidationNumber)) + ",scoring=(\'neg_") + _string_3);
+          String _plus_7 = (_plus_6 + "\'))");
+          pandasCode = (_pandasCode_11 + _plus_7);
+          String _pandasCode_12 = pandasCode;
+          String _string_4 = validationMetric_1.getLiteral().toString();
+          String _plus_8 = ("\nprint(\'" + _string_4);
+          String _plus_9 = (_plus_8 + "\', abs(scores.mean()))");
+          pandasCode = (_pandasCode_12 + _plus_9);
         }
       }
       byte[] _bytes = pandasCode.getBytes();
