@@ -1,7 +1,7 @@
 datainput "https://raw.githubusercontent.com/acherm/teaching-MDE1920/master/boston/boston.csv"
-mlframework scikit-learn
+mlframework xgboost
 algorithm DT
-TrainingTest {
-	percentageTraining 30
+CrossValidation {
+	numRepetitionCross 5
 }
 mean_squared_error

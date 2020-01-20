@@ -18,12 +18,17 @@ import org.xtext.example.mydsl.mml.DT;
 import org.xtext.example.mydsl.mml.DataInput;
 import org.xtext.example.mydsl.mml.FormulaItem;
 import org.xtext.example.mydsl.mml.FrameworkLang;
+import org.xtext.example.mydsl.mml.GTB;
 import org.xtext.example.mydsl.mml.MLAlgorithm;
 import org.xtext.example.mydsl.mml.MLChoiceAlgorithm;
 import org.xtext.example.mydsl.mml.PredictorVariables;
 import org.xtext.example.mydsl.mml.RFormula;
+import org.xtext.example.mydsl.mml.RandomForest;
+import org.xtext.example.mydsl.mml.SGD;
+import org.xtext.example.mydsl.mml.SVMKernel;
 import org.xtext.example.mydsl.mml.SVR;
 import org.xtext.example.mydsl.mml.StratificationMethod;
+import org.xtext.example.mydsl.mml.TYPE;
 import org.xtext.example.mydsl.mml.TrainingTest;
 import org.xtext.example.mydsl.mml.Validation;
 import org.xtext.example.mydsl.mml.ValidationMetric;
@@ -98,7 +103,7 @@ public class MmlGenerator extends AbstractGenerator {
         break;
     }
     fsa.generateFile(
-      ("test." + type), code);
+      resource.getURI().lastSegment().replace("mml", type), code);
   }
   
   public String compileWeka(final RFormula formule, final String fileLocation, final MLChoiceAlgorithm mlchoicealgo, final Validation validation, final String csv_separator) {
@@ -106,7 +111,275 @@ public class MmlGenerator extends AbstractGenerator {
   }
   
   public String compileXG(final RFormula formule, final String fileLocation, final MLChoiceAlgorithm mlchoicealgo, final Validation validation, final String csv_separator) {
-    return null;
+    String pythonImport = "import pandas as pd\n";
+    String _pythonImport = pythonImport;
+    pythonImport = (_pythonImport + "import xgboost as xgb\n");
+    String _mkValueInSingleQuote = this.mkValueInSingleQuote(fileLocation);
+    String _plus = ("df = pd.read_csv(" + _mkValueInSingleQuote);
+    String _plus_1 = (_plus + ", sep=");
+    String _mkValueInSingleQuote_1 = this.mkValueInSingleQuote(csv_separator);
+    String _plus_2 = (_plus_1 + _mkValueInSingleQuote_1);
+    String csvReading = (_plus_2 + ")\n");
+    String csvSplit = "";
+    if ((formule != null)) {
+      XFormula xformule = formule.getPredictors();
+      FormulaItem formuleItem = formule.getPredictive();
+      String items = "";
+      if ((xformule instanceof PredictorVariables)) {
+        EList<FormulaItem> predictorItems = ((PredictorVariables)xformule).getVars();
+        StringBuilder sb = new StringBuilder();
+        if (((predictorItems != null) && (!predictorItems.isEmpty()))) {
+          String _colName = predictorItems.get(0).getColName();
+          boolean _tripleNotEquals = (_colName != null);
+          if (_tripleNotEquals) {
+            for (final FormulaItem item : predictorItems) {
+              {
+                FormulaItem _get = predictorItems.get(0);
+                boolean _notEquals = (!Objects.equal(_get, item));
+                if (_notEquals) {
+                  sb.append(",");
+                }
+                String _colName_1 = item.getColName();
+                String _plus_3 = ("\'" + _colName_1);
+                String _plus_4 = (_plus_3 + "\'");
+                sb.append(_plus_4);
+              }
+            }
+          } else {
+            for (final FormulaItem item_1 : predictorItems) {
+              {
+                FormulaItem _get = predictorItems.get(0);
+                boolean _notEquals = (!Objects.equal(_get, item_1));
+                if (_notEquals) {
+                  sb.append(",");
+                }
+                sb.append(item_1.getColumn());
+              }
+            }
+          }
+        }
+        items = sb.toString();
+        String _csvSplit = csvSplit;
+        csvSplit = (_csvSplit + (("X = df[df.columns.difference([" + items) + "])]\n"));
+        String _csvSplit_1 = csvSplit;
+        int _column = formuleItem.getColumn();
+        String _plus_3 = ("y = df[columns = [df.columns[" + Integer.valueOf(_column));
+        String _plus_4 = (_plus_3 + "]]]\n");
+        csvSplit = (_csvSplit_1 + _plus_4);
+      } else {
+        if ((xformule instanceof AllVariables)) {
+          String _csvSplit_2 = csvSplit;
+          csvSplit = (_csvSplit_2 + "X = df.drop(columns = [df.columns[-1]])\n");
+          String _csvSplit_3 = csvSplit;
+          csvSplit = (_csvSplit_3 + "y = df[[df.columns[-1]]]\n");
+        }
+      }
+    } else {
+      String _csvSplit_4 = csvSplit;
+      csvSplit = (_csvSplit_4 + "X = df.drop(columns = [df.columns[-1]])\n");
+      String _csvSplit_5 = csvSplit;
+      csvSplit = (_csvSplit_5 + "y = df[[df.columns[-1]]]\n");
+    }
+    MLAlgorithm algo = mlchoicealgo.getAlgorithm();
+    String algoDeclaration = "";
+    if ((algo instanceof SVR)) {
+      String _pythonImport_1 = pythonImport;
+      pythonImport = (_pythonImport_1 + "from sklearn.svm import SVR\n");
+      String _xifexpression = null;
+      String _c = ((SVR)algo).getC();
+      boolean _tripleNotEquals_1 = (_c != null);
+      if (_tripleNotEquals_1) {
+        String _c_1 = ((SVR)algo).getC();
+        String _plus_5 = ("C=" + _c_1);
+        _xifexpression = (_plus_5 + ",");
+      } else {
+        _xifexpression = "";
+      }
+      String _plus_6 = ("clf = SVR(" + _xifexpression);
+      String _xifexpression_1 = null;
+      SVMKernel _kernel = ((SVR)algo).getKernel();
+      boolean _tripleNotEquals_2 = (_kernel != null);
+      if (_tripleNotEquals_2) {
+        SVMKernel _kernel_1 = ((SVR)algo).getKernel();
+        String _plus_7 = ("kernel=\'" + _kernel_1);
+        _xifexpression_1 = (_plus_7 + "\'");
+      } else {
+        _xifexpression_1 = "";
+      }
+      String _plus_8 = (_plus_6 + _xifexpression_1);
+      String _plus_9 = (_plus_8 + ")\n");
+      algoDeclaration = _plus_9;
+    } else {
+      if ((algo instanceof DT)) {
+        String _pythonImport_2 = pythonImport;
+        pythonImport = (_pythonImport_2 + "from xgb import XGBClassifier\n");
+        int _max_depth = ((DT)algo).getMax_depth();
+        String _plus_10 = ("clf = tree.DecisionTreeRegressor(max_depth=" + Integer.valueOf(_max_depth));
+        String _plus_11 = (_plus_10 + ")\n");
+        algoDeclaration = _plus_11;
+      } else {
+        if ((algo instanceof SGD)) {
+          String _pythonImport_3 = pythonImport;
+          pythonImport = (_pythonImport_3 + "from sklearn.linear_model import SGDClassifier\n");
+          algoDeclaration = "clf = tree.SGDClassifier()\n";
+        } else {
+          if ((algo instanceof GTB)) {
+            String _pythonImport_4 = pythonImport;
+            pythonImport = (_pythonImport_4 + "from sklearn import ensemble\n");
+            algoDeclaration = "clf = ensemble.GradientBoostingRegressor()\n";
+          } else {
+            if ((algo instanceof RandomForest)) {
+              String _pythonImport_5 = pythonImport;
+              String _xifexpression_2 = null;
+              TYPE _type = ((RandomForest)algo).getType();
+              boolean _equals = Objects.equal(_type, TYPE.CLASSIFIER);
+              if (_equals) {
+                _xifexpression_2 = "Classifier";
+              } else {
+                _xifexpression_2 = "Regressor";
+              }
+              String _plus_12 = ("from xgb import XGBRF" + _xifexpression_2);
+              String _plus_13 = (_plus_12 + "\n");
+              pythonImport = (_pythonImport_5 + _plus_13);
+              String _xifexpression_3 = null;
+              TYPE _type_1 = ((RandomForest)algo).getType();
+              boolean _equals_1 = Objects.equal(_type_1, TYPE.CLASSIFIER);
+              if (_equals_1) {
+                _xifexpression_3 = "Classifier";
+              } else {
+                _xifexpression_3 = "Regressor";
+              }
+              String _plus_14 = ("clf = xgb.XGBRF" + _xifexpression_3);
+              String _plus_15 = (_plus_14 + "(max_depth=");
+              int _max_depth_1 = ((RandomForest)algo).getMax_depth();
+              String _plus_16 = (_plus_15 + Integer.valueOf(_max_depth_1));
+              String _plus_17 = (_plus_16 + ", n_estimators=");
+              int _n_estimators = ((RandomForest)algo).getN_estimators();
+              String _plus_18 = (_plus_17 + Integer.valueOf(_n_estimators));
+              String _plus_19 = (_plus_18 + ")\n");
+              algoDeclaration = _plus_19;
+            }
+          }
+        }
+      }
+    }
+    String metrics = "";
+    String metricsResult = "";
+    StratificationMethod stratMethod = validation.getStratification();
+    EList<ValidationMetric> validMetrics = validation.getMetric();
+    int number = stratMethod.getNumber();
+    String validationPrint = "";
+    String _validationPrint = validationPrint;
+    validationPrint = (_validationPrint + (("split_size = " + Integer.valueOf(number)) + "\n"));
+    if ((stratMethod instanceof CrossValidation)) {
+      String _pythonImport_6 = pythonImport;
+      pythonImport = (_pythonImport_6 + "from sklearn.model_selection import cross_validate\n");
+      String metricList = "";
+      for (int i = 0; (i < validMetrics.size()); i++) {
+        {
+          final String metricName = validMetrics.get(i).name();
+          boolean _equals_2 = Objects.equal(metricName, "MSE");
+          if (_equals_2) {
+            String _metricList = metricList;
+            metricList = (_metricList + "\'neg_mean_squared_error\',");
+          } else {
+            boolean _equals_3 = Objects.equal(metricName, "MAE");
+            if (_equals_3) {
+              String _metricList_1 = metricList;
+              metricList = (_metricList_1 + "\'neg_mean_absolute_error\',");
+            } else {
+              boolean _equals_4 = Objects.equal(metricName, "MAPE");
+              if (_equals_4) {
+              }
+            }
+          }
+        }
+      }
+      int _length = metricList.length();
+      int _minus = (_length - 1);
+      metricList = metricList.substring(0, _minus);
+      String _validationPrint_1 = validationPrint;
+      validationPrint = (_validationPrint_1 + (((("scores = cross_validate(clf, X, y, scoring=(" + metricList) + ") ,cv=") + Integer.valueOf(number)) + ")\n"));
+      for (int i = 0; (i < validMetrics.size()); i++) {
+        {
+          final String metricName = validMetrics.get(i).name();
+          boolean _equals_2 = Objects.equal(metricName, "MSE");
+          if (_equals_2) {
+            String _metrics = metrics;
+            metrics = (_metrics + (("accuracyMSE" + Integer.valueOf(i)) + "=scores[\'test_neg_mean_squared_error\']\n"));
+            String _metricsResult = metricsResult;
+            metricsResult = (_metricsResult + (("print(sum(accuracy" + Integer.valueOf(i)) + ")/split_size)\n"));
+          } else {
+            boolean _equals_3 = Objects.equal(metricName, "MAE");
+            if (_equals_3) {
+              String _metrics_1 = metrics;
+              metrics = (_metrics_1 + (("accuracyMAE" + Integer.valueOf(i)) + "=scores[\'test_neg_mean_absolute_error\']\n"));
+              String _metricsResult_1 = metricsResult;
+              metricsResult = (_metricsResult_1 + (("print(sum(accuracy" + Integer.valueOf(i)) + ")/split_size)\n"));
+            } else {
+              boolean _equals_4 = Objects.equal(metricName, "MAPE");
+              if (_equals_4) {
+                String _metrics_2 = metrics;
+                metrics = (_metrics_2 + "#Not developed");
+              }
+            }
+          }
+        }
+      }
+      int _size = validMetrics.size();
+      boolean _equals_2 = (_size == 1);
+      if (_equals_2) {
+        metrics = metrics.replaceAll("\'[a-z_]*\'", "\'test_score\'");
+      }
+    } else {
+      if ((stratMethod instanceof TrainingTest)) {
+        String _pythonImport_7 = pythonImport;
+        pythonImport = (_pythonImport_7 + "from sklearn.model_selection import train_test_split\n");
+        String _validationPrint_2 = validationPrint;
+        validationPrint = (_validationPrint_2 + (("X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=" + Integer.valueOf(number)) + ")\n"));
+        String _validationPrint_3 = validationPrint;
+        validationPrint = (_validationPrint_3 + "clf.fit(X_train, y_train)\n");
+        for (int i = 0; (i < validMetrics.size()); i++) {
+          {
+            String metric = "";
+            final String metricName = validMetrics.get(i).name();
+            boolean _equals_3 = Objects.equal(metricName, "MSE");
+            if (_equals_3) {
+              String _pythonImport_8 = pythonImport;
+              pythonImport = (_pythonImport_8 + "from sklearn.metrics import mean_squared_error\n");
+              String _metric = metric;
+              metric = (_metric + (("accuracyMSE" + Integer.valueOf(i)) + "=mean_squared_error(y_test, clf.predict(X_test))"));
+            } else {
+              boolean _equals_4 = Objects.equal(metricName, "MAE");
+              if (_equals_4) {
+                String _pythonImport_9 = pythonImport;
+                pythonImport = (_pythonImport_9 + "from sklearn.metrics import mean_absolute_error\n");
+                String _metric_1 = metric;
+                metric = (_metric_1 + (("accuracyMAE" + Integer.valueOf(i)) + "=mean_absolute_error(y_test, clf.predict(X_test))"));
+              } else {
+                boolean _equals_5 = Objects.equal(metricName, "MAPE");
+                if (_equals_5) {
+                  String _pythonImport_10 = pythonImport;
+                  pythonImport = (_pythonImport_10 + "import numpy as np\n");
+                  String _metric_2 = metric;
+                  metric = (_metric_2 + "y_test, y_pred = np.array(y_true), np.array(clf.predict(X_test))\n");
+                  String _metric_3 = metric;
+                  metric = (_metric_3 + (("accuracyMAPE" + Integer.valueOf(i)) + "=np.mean(np.abs((y_test - y_pred) / y_test)) * 100"));
+                }
+              }
+            }
+            String _metricsResult = metricsResult;
+            metricsResult = (_metricsResult + (("print(accuracy" + Integer.valueOf(i)) + ")\n"));
+            String _metrics = metrics;
+            metrics = (_metrics + (metric + "\n"));
+          }
+        }
+      }
+    }
+    String _validationPrint_4 = validationPrint;
+    validationPrint = (_validationPrint_4 + "\n");
+    String pandasCode = ((((((pythonImport + csvReading) + csvSplit) + algoDeclaration) + validationPrint) + metrics) + metricsResult);
+    return pandasCode;
   }
   
   public String compileR(final RFormula formule, final String fileLocation, final MLChoiceAlgorithm mlchoicealgo, final Validation validation, final String csv_separator) {
@@ -331,79 +604,203 @@ public class MmlGenerator extends AbstractGenerator {
           String _csvSplit_2 = csvSplit;
           csvSplit = (_csvSplit_2 + "X = df.drop(columns = [df.columns[-1]])\n");
           String _csvSplit_3 = csvSplit;
-          csvSplit = (_csvSplit_3 + "y = df[columns = [df.columns[-1]]]\n");
+          csvSplit = (_csvSplit_3 + "y = df[[df.columns[-1]]]\n");
         }
       }
     } else {
       String _csvSplit_4 = csvSplit;
       csvSplit = (_csvSplit_4 + "X = df.drop(columns = [df.columns[-1]])\n");
       String _csvSplit_5 = csvSplit;
-      csvSplit = (_csvSplit_5 + "y = df[columns = [df.columns[-1]]]\n");
+      csvSplit = (_csvSplit_5 + "y = df[[df.columns[-1]]]\n");
     }
     MLAlgorithm algo = mlchoicealgo.getAlgorithm();
     String algoDeclaration = "";
     if ((algo instanceof SVR)) {
+      String _pythonImport = pythonImport;
+      pythonImport = (_pythonImport + "from sklearn.svm import SVR\n");
+      String _xifexpression = null;
+      String _c = ((SVR)algo).getC();
+      boolean _tripleNotEquals_1 = (_c != null);
+      if (_tripleNotEquals_1) {
+        String _c_1 = ((SVR)algo).getC();
+        String _plus_5 = ("C=" + _c_1);
+        _xifexpression = (_plus_5 + ",");
+      } else {
+        _xifexpression = "";
+      }
+      String _plus_6 = ("clf = SVR(" + _xifexpression);
+      String _xifexpression_1 = null;
+      SVMKernel _kernel = ((SVR)algo).getKernel();
+      boolean _tripleNotEquals_2 = (_kernel != null);
+      if (_tripleNotEquals_2) {
+        SVMKernel _kernel_1 = ((SVR)algo).getKernel();
+        String _plus_7 = ("kernel=\'" + _kernel_1);
+        _xifexpression_1 = (_plus_7 + "\'");
+      } else {
+        _xifexpression_1 = "";
+      }
+      String _plus_8 = (_plus_6 + _xifexpression_1);
+      String _plus_9 = (_plus_8 + ")\n");
+      algoDeclaration = _plus_9;
     } else {
       if ((algo instanceof DT)) {
-        String _pythonImport = pythonImport;
-        pythonImport = (_pythonImport + "from sklearn import tree\n");
-        algoDeclaration = "clf = tree.DecisionTreeRegressor()\n";
+        String _pythonImport_1 = pythonImport;
+        pythonImport = (_pythonImport_1 + "from sklearn import tree\n");
+        int _max_depth = ((DT)algo).getMax_depth();
+        String _plus_10 = ("clf = tree.DecisionTreeRegressor(max_depth=" + Integer.valueOf(_max_depth));
+        String _plus_11 = (_plus_10 + ")\n");
+        algoDeclaration = _plus_11;
+      } else {
+        if ((algo instanceof SGD)) {
+          String _pythonImport_2 = pythonImport;
+          pythonImport = (_pythonImport_2 + "from sklearn.linear_model import SGDClassifier\n");
+          algoDeclaration = "clf = tree.SGDClassifier()\n";
+        } else {
+          if ((algo instanceof GTB)) {
+            String _pythonImport_3 = pythonImport;
+            pythonImport = (_pythonImport_3 + "from sklearn import ensemble\n");
+            algoDeclaration = "clf = ensemble.GradientBoostingRegressor()\n";
+          } else {
+            if ((algo instanceof RandomForest)) {
+              String _pythonImport_4 = pythonImport;
+              pythonImport = (_pythonImport_4 + "from sklearn import ensemble\n");
+              String _xifexpression_2 = null;
+              TYPE _type = ((RandomForest)algo).getType();
+              boolean _equals = Objects.equal(_type, TYPE.CLASSIFIER);
+              if (_equals) {
+                _xifexpression_2 = "Classifier";
+              } else {
+                _xifexpression_2 = "Regressor";
+              }
+              String _plus_12 = ("clf = ensemble.RandomForest" + _xifexpression_2);
+              String _plus_13 = (_plus_12 + "(max_depth=");
+              int _max_depth_1 = ((RandomForest)algo).getMax_depth();
+              String _plus_14 = (_plus_13 + Integer.valueOf(_max_depth_1));
+              String _plus_15 = (_plus_14 + ", n_estimators=");
+              int _n_estimators = ((RandomForest)algo).getN_estimators();
+              String _plus_16 = (_plus_15 + Integer.valueOf(_n_estimators));
+              String _plus_17 = (_plus_16 + ")\n");
+              algoDeclaration = _plus_17;
+            }
+          }
+        }
       }
     }
+    String metrics = "";
+    String metricsResult = "";
     StratificationMethod stratMethod = validation.getStratification();
     EList<ValidationMetric> validMetrics = validation.getMetric();
     int number = stratMethod.getNumber();
     String validationPrint = "";
     String _validationPrint = validationPrint;
-    validationPrint = (_validationPrint + (("test_size = " + Integer.valueOf(number)) + "\n"));
+    validationPrint = (_validationPrint + (("split_size = " + Integer.valueOf(number)) + "\n"));
     if ((stratMethod instanceof CrossValidation)) {
-    } else {
-      if ((stratMethod instanceof TrainingTest)) {
-        String _pythonImport_1 = pythonImport;
-        pythonImport = (_pythonImport_1 + "from sklearn.model_selection import train_test_split\n");
-        String _validationPrint_1 = validationPrint;
-        validationPrint = (_validationPrint_1 + (("X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=" + Integer.valueOf(number)) + ")"));
-      }
-    }
-    String _validationPrint_2 = validationPrint;
-    validationPrint = (_validationPrint_2 + "\n");
-    String metrics = "";
-    String metricsResult = "";
-    for (int i = 0; (i < validMetrics.size()); i++) {
-      {
-        String metric = "";
-        final String metricName = validMetrics.get(i).name();
-        boolean _equals = Objects.equal(metricName, "MSE");
-        if (_equals) {
-          String _pythonImport_2 = pythonImport;
-          pythonImport = (_pythonImport_2 + "from sklearn.metrics import mean_squared_error\n");
-          String _metric = metric;
-          metric = (_metric + (("accuracy" + Integer.valueOf(i)) + "=mean_squared_error(y_test, clf.predict(X_test))"));
-        } else {
-          boolean _equals_1 = Objects.equal(metricName, "MAE");
+      String _pythonImport_5 = pythonImport;
+      pythonImport = (_pythonImport_5 + "from sklearn.model_selection import cross_validate\n");
+      String metricList = "";
+      for (int i = 0; (i < validMetrics.size()); i++) {
+        {
+          final String metricName = validMetrics.get(i).name();
+          boolean _equals_1 = Objects.equal(metricName, "MSE");
           if (_equals_1) {
-            String _pythonImport_3 = pythonImport;
-            pythonImport = (_pythonImport_3 + "from sklearn.metrics import mean_absolute_error\n");
-            String _metric_1 = metric;
-            metric = (_metric_1 + (("accuracy" + Integer.valueOf(i)) + "=mean_absolute_error(y_test, clf.predict(X_test))"));
+            String _metricList = metricList;
+            metricList = (_metricList + "\'neg_mean_squared_error\',");
           } else {
-            boolean _equals_2 = Objects.equal(metricName, "MAPE");
+            boolean _equals_2 = Objects.equal(metricName, "MAE");
             if (_equals_2) {
-              String _pythonImport_4 = pythonImport;
-              pythonImport = (_pythonImport_4 + "from sklearn.utils import check_arrays\n");
-              String _metric_2 = metric;
-              metric = (_metric_2 + "y_test, y_pred = check_arrays(y_test, clf.predict(X_test))");
-              String _metric_3 = metric;
-              metric = (_metric_3 + (("accuracy" + Integer.valueOf(i)) + "=np.mean(np.abs((y_test - y_pred) / y_test)) * 100"));
+              String _metricList_1 = metricList;
+              metricList = (_metricList_1 + "\'neg_mean_absolute_error\',");
+            } else {
+              boolean _equals_3 = Objects.equal(metricName, "MAPE");
+              if (_equals_3) {
+              }
             }
           }
         }
-        String _metricsResult = metricsResult;
-        metricsResult = (_metricsResult + (("print(accuracy" + Integer.valueOf(i)) + ")\n"));
-        String _metrics = metrics;
-        metrics = (_metrics + (metric + "\n"));
+      }
+      int _length = metricList.length();
+      int _minus = (_length - 1);
+      metricList = metricList.substring(0, _minus);
+      String _validationPrint_1 = validationPrint;
+      validationPrint = (_validationPrint_1 + (((("scores = cross_validate(clf, X, y, scoring=(" + metricList) + ") ,cv=") + Integer.valueOf(number)) + ")\n"));
+      for (int i = 0; (i < validMetrics.size()); i++) {
+        {
+          final String metricName = validMetrics.get(i).name();
+          boolean _equals_1 = Objects.equal(metricName, "MSE");
+          if (_equals_1) {
+            String _metrics = metrics;
+            metrics = (_metrics + (("accuracyMSE" + Integer.valueOf(i)) + "=scores[\'test_neg_mean_squared_error\']\n"));
+            String _metricsResult = metricsResult;
+            metricsResult = (_metricsResult + (("print(sum(accuracy" + Integer.valueOf(i)) + ")/split_size)\n"));
+          } else {
+            boolean _equals_2 = Objects.equal(metricName, "MAE");
+            if (_equals_2) {
+              String _metrics_1 = metrics;
+              metrics = (_metrics_1 + (("accuracyMAE" + Integer.valueOf(i)) + "=scores[\'test_neg_mean_absolute_error\']\n"));
+              String _metricsResult_1 = metricsResult;
+              metricsResult = (_metricsResult_1 + (("print(sum(accuracy" + Integer.valueOf(i)) + ")/split_size)\n"));
+            } else {
+              boolean _equals_3 = Objects.equal(metricName, "MAPE");
+              if (_equals_3) {
+                String _metrics_2 = metrics;
+                metrics = (_metrics_2 + "#Not developed");
+              }
+            }
+          }
+        }
+      }
+      int _size = validMetrics.size();
+      boolean _equals_1 = (_size == 1);
+      if (_equals_1) {
+        metrics = metrics.replaceAll("\'[a-z_]*\'", "\'test_score\'");
+      }
+    } else {
+      if ((stratMethod instanceof TrainingTest)) {
+        String _pythonImport_6 = pythonImport;
+        pythonImport = (_pythonImport_6 + "from sklearn.model_selection import train_test_split\n");
+        String _validationPrint_2 = validationPrint;
+        validationPrint = (_validationPrint_2 + (("X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=" + Integer.valueOf(number)) + ")\n"));
+        String _validationPrint_3 = validationPrint;
+        validationPrint = (_validationPrint_3 + "clf.fit(X_train, y_train)\n");
+        for (int i = 0; (i < validMetrics.size()); i++) {
+          {
+            String metric = "";
+            final String metricName = validMetrics.get(i).name();
+            boolean _equals_2 = Objects.equal(metricName, "MSE");
+            if (_equals_2) {
+              String _pythonImport_7 = pythonImport;
+              pythonImport = (_pythonImport_7 + "from sklearn.metrics import mean_squared_error\n");
+              String _metric = metric;
+              metric = (_metric + (("accuracyMSE" + Integer.valueOf(i)) + "=mean_squared_error(y_test, clf.predict(X_test))"));
+            } else {
+              boolean _equals_3 = Objects.equal(metricName, "MAE");
+              if (_equals_3) {
+                String _pythonImport_8 = pythonImport;
+                pythonImport = (_pythonImport_8 + "from sklearn.metrics import mean_absolute_error\n");
+                String _metric_1 = metric;
+                metric = (_metric_1 + (("accuracyMAE" + Integer.valueOf(i)) + "=mean_absolute_error(y_test, clf.predict(X_test))"));
+              } else {
+                boolean _equals_4 = Objects.equal(metricName, "MAPE");
+                if (_equals_4) {
+                  String _pythonImport_9 = pythonImport;
+                  pythonImport = (_pythonImport_9 + "import numpy as np\n");
+                  String _metric_2 = metric;
+                  metric = (_metric_2 + "y_test, y_pred = np.array(y_true), np.array(clf.predict(X_test))\n");
+                  String _metric_3 = metric;
+                  metric = (_metric_3 + (("accuracyMAPE" + Integer.valueOf(i)) + "=np.mean(np.abs((y_test - y_pred) / y_test)) * 100"));
+                }
+              }
+            }
+            String _metricsResult = metricsResult;
+            metricsResult = (_metricsResult + (("print(accuracy" + Integer.valueOf(i)) + ")\n"));
+            String _metrics = metrics;
+            metrics = (_metrics + (metric + "\n"));
+          }
+        }
       }
     }
+    String _validationPrint_4 = validationPrint;
+    validationPrint = (_validationPrint_4 + "\n");
     String pandasCode = ((((((pythonImport + csvReading) + csvSplit) + algoDeclaration) + validationPrint) + metrics) + metricsResult);
     return pandasCode;
   }

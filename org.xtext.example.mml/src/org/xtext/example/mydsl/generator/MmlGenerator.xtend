@@ -67,11 +67,150 @@ class MmlGenerator extends AbstractGenerator {
 	}
 	
 	def String compileWeka(RFormula formule, String fileLocation, MLChoiceAlgorithm mlchoicealgo, Validation validation, String csv_separator) {
-
+		//TODO
 	}
 	
 	def String compileXG(RFormula formule, String fileLocation, MLChoiceAlgorithm mlchoicealgo, Validation validation, String csv_separator) {
+		//TODO
+		var pythonImport = "import pandas as pd\n"
+		pythonImport+= "import xgboost as xgb\n"
 		
+		var csvReading = "df = pd.read_csv(" + mkValueInSingleQuote(fileLocation) + ", sep=" + mkValueInSingleQuote(csv_separator) + ")\n";						
+		
+		//formule : recuperation des champs du csv à garder
+		var csvSplit="";
+		if(formule!==null) {
+			var xformule = formule.getPredictors();
+			var formuleItem = formule.getPredictive();
+			var items="";
+			if(xformule instanceof PredictorVariables) {
+				var predictorItems = xformule.getVars();
+				var sb = new StringBuilder();
+				if(predictorItems!==null && !predictorItems.isEmpty()) {
+					if(predictorItems.get(0).getColName() !== null) {
+						for(FormulaItem item : predictorItems) {
+							if(predictorItems.get(0)!=item)sb.append(',');
+							sb.append("'"+item.getColName()+"'");
+						}
+					}else {
+						for(FormulaItem item : predictorItems) {
+							if(predictorItems.get(0)!=item)sb.append(',');
+							sb.append(item.getColumn());
+						}
+					}
+						
+				}
+				items = sb.toString();
+				csvSplit+="X = df[df.columns.difference(["+items+"])]\n";
+				csvSplit+="y = df[columns = [df.columns["+formuleItem.getColumn()+"]]]\n";
+			}else if(xformule instanceof AllVariables) {
+				csvSplit+="X = df.drop(columns = [df.columns[-1]])\n";
+				csvSplit+="y = df[[df.columns[-1]]]\n";
+			}
+		}else {
+			//if formule is null, all the fields are used to predict the last one
+			csvSplit+="X = df.drop(columns = [df.columns[-1]])\n";
+			csvSplit+="y = df[[df.columns[-1]]]\n";
+		}
+		
+		//algo
+		var algo = mlchoicealgo.getAlgorithm();
+		var algoDeclaration="";
+		if(algo instanceof SVR) {
+			pythonImport+="from sklearn.svm import SVR\n";
+			algoDeclaration = "clf = SVR("+ (algo.c!==null?"C="+algo.c+",":"") + (algo.kernel!==null?"kernel='"+algo.kernel+"'":"") +")\n";
+		}else if(algo instanceof DT) { //DecisionTree
+			pythonImport+="from xgb import XGBClassifier\n";
+			algoDeclaration = "clf = tree.DecisionTreeRegressor(max_depth="+algo.max_depth+")\n";
+		}else if(algo instanceof SGD){
+			pythonImport+="from sklearn.linear_model import SGDClassifier\n";
+			algoDeclaration = "clf = tree.SGDClassifier()\n";
+		}else if(algo instanceof GTB){
+			pythonImport+="from sklearn import ensemble\n";
+			algoDeclaration = "clf = ensemble.GradientBoostingRegressor()\n";
+		}else if(algo instanceof RandomForest){
+			pythonImport+="from xgb import XGBRF"+ (algo.type==TYPE.CLASSIFIER?"Classifier":"Regressor") +"\n";
+			algoDeclaration = "clf = xgb.XGBRF"+(algo.type==TYPE.CLASSIFIER?"Classifier":"Regressor")
+						+ "(max_depth="+ algo.max_depth 
+						+ ", n_estimators=" + algo.n_estimators
+						+ ")\n";
+		}
+		
+		//ValidationMetric
+		var metrics=""
+		var metricsResult=""
+		
+		//validation
+		var stratMethod = validation.getStratification()
+		var validMetrics = validation.getMetric()
+		var number = stratMethod.getNumber()
+		var validationPrint=""
+		validationPrint += "split_size = "+number+"\n"
+		
+		if(stratMethod instanceof CrossValidation){
+			pythonImport+="from sklearn.model_selection import cross_validate\n"
+			var metricList=""
+			for(var i=0;i<validMetrics.size();i++) {
+				val metricName = validMetrics.get(i).name()
+				if(metricName=="MSE"){
+					metricList+="'neg_mean_squared_error',"
+				}else if(metricName=="MAE"){
+					metricList+="'neg_mean_absolute_error',"
+				}else if(metricName=="MAPE"){
+					//metricList+="'neg_mean_absolute_error',"
+				}
+			}
+			metricList = metricList.substring(0, metricList.length() - 1)
+			validationPrint+="scores = cross_validate(clf, X, y, scoring=("+metricList+") ,cv="+ number +")\n"
+			for(var i=0;i<validMetrics.size();i++) {
+				val metricName = validMetrics.get(i).name()
+				if(metricName=="MSE"){
+					metrics+="accuracyMSE"+i+"=scores['test_neg_mean_squared_error']\n"
+					metricsResult+="print(sum(accuracy"+i+")/split_size)\n"
+				}else if(metricName=="MAE"){
+					metrics+="accuracyMAE"+i+"=scores['test_neg_mean_absolute_error']\n"
+					metricsResult+="print(sum(accuracy"+i+")/split_size)\n"
+				}else if(metricName=="MAPE"){
+					//TODO
+					//metrics+="accuracyMAPE"+i+"=scores['test_neg_mean_squared_error']\n"
+					//metricsResult+="print(sum(accuracy"+i+")/split_size)\n"
+					metrics+="#Not developed"
+				}
+			}
+			if(validMetrics.size()==1){
+				metrics = metrics.replaceAll("'[a-z_]*'","'test_score'");
+			}
+		}
+		
+		else if(stratMethod instanceof TrainingTest){
+			pythonImport+="from sklearn.model_selection import train_test_split\n"
+			validationPrint+="X_train, X_test, y_train, y_test = train_test_split(X, y, test_size="+number+")\n"
+			//Fit
+			validationPrint+="clf.fit(X_train, y_train)\n"
+			//metrics
+			for(var i=0;i<validMetrics.size();i++) {
+				var metric = "";
+				val metricName = validMetrics.get(i).name()
+				if(metricName=="MSE"){
+					pythonImport+="from sklearn.metrics import mean_squared_error\n"
+					metric+="accuracyMSE"+i+"=mean_squared_error(y_test, clf.predict(X_test))"
+				}else if(metricName=="MAE"){
+					pythonImport+="from sklearn.metrics import mean_absolute_error\n"
+					metric+="accuracyMAE"+i+"=mean_absolute_error(y_test, clf.predict(X_test))"
+				}else if(metricName=="MAPE"){
+					pythonImport+="import numpy as np\n"
+					metric+="y_test, y_pred = np.array(y_true), np.array(clf.predict(X_test))\n"
+					metric+="accuracyMAPE"+i+"=np.mean(np.abs((y_test - y_pred) / y_test)) * 100"
+				}
+				metricsResult+="print(accuracy"+i+")\n"
+				metrics+=metric+"\n"
+			}
+		}
+		
+		validationPrint+="\n"
+
+		var pandasCode = pythonImport + csvReading + csvSplit + algoDeclaration+ validationPrint +metrics+metricsResult
+		return pandasCode
 	}
 	
 	def String compileR(RFormula formule, String fileLocation, MLChoiceAlgorithm mlchoicealgo, Validation validation, String csv_separator) {
