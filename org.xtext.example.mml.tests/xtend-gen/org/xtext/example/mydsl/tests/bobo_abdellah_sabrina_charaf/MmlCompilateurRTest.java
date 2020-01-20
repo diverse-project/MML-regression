@@ -23,16 +23,16 @@ public class MmlCompilateurRTest {
   public void mmlcomp() {
     try {
       StringConcatenation _builder = new StringConcatenation();
-      _builder.append("datainput \"boston.csv\" separator ;");
+      _builder.append("datainput \"boston.csv\" separator ,");
       _builder.newLine();
       _builder.append("\t");
-      _builder.append("mlframework Scikit-Learn");
+      _builder.append("mlframework R");
       _builder.newLine();
       _builder.append("\t");
       _builder.append("algorithm DT");
       _builder.newLine();
       _builder.append("\t");
-      _builder.append("mlframework Scikit-Learn");
+      _builder.append("mlframework R");
       _builder.newLine();
       _builder.append("\t");
       _builder.append("algorithm RandomForest");

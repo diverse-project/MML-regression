@@ -136,10 +136,11 @@ public class MmlCompilateurR {
   }
   
   public void algorithmCodeCrossValid(final String predictors) {
+    final String metricCodeCrossV = this.metricCodeCrossV();
     String _rasCode = this.rasCode;
     this.rasCode = (_rasCode + ("n <- nrow(df)" + "\n"));
     String _rasCode_1 = this.rasCode;
-    this.rasCode = (_rasCode_1 + ("K <- " + Integer.valueOf(this.numRepetitionCross)));
+    this.rasCode = (_rasCode_1 + (("K <- " + Integer.valueOf(this.numRepetitionCross)) + "\n"));
     String _rasCode_2 = this.rasCode;
     this.rasCode = (_rasCode_2 + ("taille <- n%/%K" + "\n"));
     String _rasCode_3 = this.rasCode;
@@ -153,9 +154,11 @@ public class MmlCompilateurR {
     String _rasCode_7 = this.rasCode;
     this.rasCode = (_rasCode_7 + ("bloc <- as.factor(bloc)" + "\n"));
     String _rasCode_8 = this.rasCode;
-    this.rasCode = (_rasCode_8 + ((("my_array <- array(0,dim=c(K," + Integer.valueOf(this.numberOfMetric)) + ")) ") + "\n"));
+    this.rasCode = (_rasCode_8 + (("numberOfMetric <-" + Integer.valueOf(this.numberOfMetric)) + "\n"));
     String _rasCode_9 = this.rasCode;
-    this.rasCode = (_rasCode_9 + ("for (k in 1:K) {" + "\n"));
+    this.rasCode = (_rasCode_9 + ((("my_array <- array(0,dim=c(K," + Integer.valueOf(this.numberOfMetric)) + ")) ") + "\n"));
+    String _rasCode_10 = this.rasCode;
+    this.rasCode = (_rasCode_10 + ("for (k in 1:K) {" + "\n"));
     final MLAlgorithm _switchValue = this.MLA;
     boolean _matched = false;
     if (_switchValue instanceof DT) {
@@ -163,34 +166,34 @@ public class MmlCompilateurR {
       String _imports = this.imports;
       this.imports = (_imports + "library(rpart)\n");
       final DTImpl dtImpl = ((DTImpl) this.MLA);
-      String _rasCode_10 = this.rasCode;
-      this.rasCode = (_rasCode_10 + (((("fit <- rpart(" + this.predictiveColName) + "~") + predictors) + 
+      String _rasCode_11 = this.rasCode;
+      this.rasCode = (_rasCode_11 + (((("fit <- rpart(" + this.predictiveColName) + "~") + predictors) + 
         ", data = df[bloc!=k,], method = \'class\', control = rpart.control(cp = 0"));
       int _max_depth = dtImpl.getMax_depth();
       boolean _tripleNotEquals = (_max_depth != 0);
       if (_tripleNotEquals) {
-        String _rasCode_11 = this.rasCode;
+        String _rasCode_12 = this.rasCode;
         int _max_depth_1 = dtImpl.getMax_depth();
         String _plus = (",maxdepth = " + Integer.valueOf(_max_depth_1));
-        this.rasCode = (_rasCode_11 + _plus);
+        this.rasCode = (_rasCode_12 + _plus);
       }
-      String _rasCode_12 = this.rasCode;
-      this.rasCode = (_rasCode_12 + ("))" + "\n"));
       String _rasCode_13 = this.rasCode;
-      this.rasCode = (_rasCode_13 + ("result <-predict(fit, test, type = \'class\')" + "\n"));
+      this.rasCode = (_rasCode_13 + ("))" + "\n"));
       String _rasCode_14 = this.rasCode;
-      this.rasCode = (_rasCode_14 + ("result <- as.numeric(levels(result))[result]" + "\n"));
+      this.rasCode = (_rasCode_14 + ("result <-predict(fit, df[bloc == k,], type = \'class\')" + "\n"));
+      String _rasCode_15 = this.rasCode;
+      this.rasCode = (_rasCode_15 + ("result <- as.numeric(levels(result))[result]" + "\n"));
     }
     if (!_matched) {
       if (_switchValue instanceof SVR) {
         _matched=true;
         String _imports = this.imports;
         this.imports = (_imports + "library(e1071)\n");
-        String _rasCode_10 = this.rasCode;
-        this.rasCode = (_rasCode_10 + 
-          ((((("fit <- svm(" + this.predictiveColName) + "~") + predictors) + ", data = train, method = \'class\')") + "\n"));
         String _rasCode_11 = this.rasCode;
-        this.rasCode = (_rasCode_11 + ("result<-predict(fit, test, type = \'class\')" + "\n"));
+        this.rasCode = (_rasCode_11 + 
+          ((((("fit <- svm(" + this.predictiveColName) + "~") + predictors) + ", data = df[bloc!=k,], method = \'class\')") + "\n"));
+        String _rasCode_12 = this.rasCode;
+        this.rasCode = (_rasCode_12 + ("result<-predict(fit, df[bloc == k,], type = \'class\')" + "\n"));
       }
     }
     if (!_matched) {
@@ -204,12 +207,12 @@ public class MmlCompilateurR {
         _matched=true;
         String _imports = this.imports;
         this.imports = (_imports + "library(randomForest)\n");
-        String _rasCode_10 = this.rasCode;
-        this.rasCode = (_rasCode_10 + 
-          ((((("fit <- randomForest(" + this.predictiveColName) + "~") + predictors) + 
-            ", data = train, method = \'class\')") + "\n"));
         String _rasCode_11 = this.rasCode;
-        this.rasCode = (_rasCode_11 + ("result<-predict(fit, test, type = \'class\')" + "\n"));
+        this.rasCode = (_rasCode_11 + 
+          ((((("fit <- randomForest(" + this.predictiveColName) + "~") + predictors) + 
+            ", data = df[bloc!=k,], method = \'class\')") + "\n"));
+        String _rasCode_12 = this.rasCode;
+        this.rasCode = (_rasCode_12 + ("result<-predict(fit, df[bloc == k,], type = \'class\')" + "\n"));
       }
     }
     if (!_matched) {
@@ -217,29 +220,28 @@ public class MmlCompilateurR {
         _matched=true;
         String _imports = this.imports;
         this.imports = (_imports + "library(sgd)\n");
-        String _rasCode_10 = this.rasCode;
-        this.rasCode = (_rasCode_10 + 
-          ((((("fit <- sgd(" + this.predictiveColName) + "~") + predictors) + ", data = train, method = \'class\')") + "\n"));
         String _rasCode_11 = this.rasCode;
-        this.rasCode = (_rasCode_11 + ("result<-predict(fit, test, type = \'class\')" + "\n"));
+        this.rasCode = (_rasCode_11 + 
+          ((((("fit <- sgd(" + this.predictiveColName) + "~") + predictors) + ", data = df[bloc!=k,], method = \'class\')") + "\n"));
+        String _rasCode_12 = this.rasCode;
+        this.rasCode = (_rasCode_12 + ("result<-predict(fit, df[bloc == k,], type = \'class\')" + "\n"));
       }
     }
     if (!_matched) {
       InputOutput.<String>println("default");
     }
-    String _rasCode_10 = this.rasCode;
-    String _metricCodeCrossV = this.metricCodeCrossV();
-    this.rasCode = (_rasCode_10 + _metricCodeCrossV);
     String _rasCode_11 = this.rasCode;
-    this.rasCode = (_rasCode_11 + ("}" + "\n"));
+    this.rasCode = (_rasCode_11 + metricCodeCrossV);
     String _rasCode_12 = this.rasCode;
-    this.rasCode = (_rasCode_12 + ("for (i in 1:numberOfMetric) {" + "\n"));
+    this.rasCode = (_rasCode_12 + ("}" + "\n"));
     String _rasCode_13 = this.rasCode;
-    this.rasCode = (_rasCode_13 + ("value <- mean(my_array[,i])" + "\n"));
+    this.rasCode = (_rasCode_13 + ("for (i in 1:numberOfMetric) {" + "\n"));
     String _rasCode_14 = this.rasCode;
-    this.rasCode = (_rasCode_14 + ("print(value)" + "\n"));
+    this.rasCode = (_rasCode_14 + ("value <- mean(my_array[,i])" + "\n"));
     String _rasCode_15 = this.rasCode;
-    this.rasCode = (_rasCode_15 + ("}" + "\n"));
+    this.rasCode = (_rasCode_15 + ("print(value)" + "\n"));
+    String _rasCode_16 = this.rasCode;
+    this.rasCode = (_rasCode_16 + ("}" + "\n"));
   }
   
   public void algorithmCode(final String predictors) {

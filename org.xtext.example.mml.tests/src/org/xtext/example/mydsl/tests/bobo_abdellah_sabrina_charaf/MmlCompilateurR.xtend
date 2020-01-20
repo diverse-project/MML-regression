@@ -84,7 +84,7 @@ class MmlCompilateurR {
 	def String metricCodeCrossV() {
 		var String result = "";
 		numberOfMetric = VMList.size();
-
+		
 		for (var i = 0; i < VMList.size(); i++) {
 			switch VMList.get(i) {
 				case ValidationMetric.MSE: {
@@ -108,14 +108,16 @@ class MmlCompilateurR {
 	}
 
 	def void algorithmCodeCrossValid(String predictors) {
+		val String metricCodeCrossV = metricCodeCrossV();
 		rasCode += "n <- nrow(df)" + "\n";
-		rasCode += "K <- " + numRepetitionCross;
+		rasCode += "K <- " + numRepetitionCross+"\n";
 		rasCode += "taille <- n%/%K" + "\n";
 		rasCode += "set.seed(5)" + "\n";
 		rasCode += "alea <- runif(n)" + "\n";
 		rasCode += "rang <- rank(alea)" + "\n";
 		rasCode += "bloc <- (rang-1)%/%taille + 1" + "\n";
 		rasCode += "bloc <- as.factor(bloc)" + "\n";
+		rasCode += "numberOfMetric <-"+numberOfMetric+ "\n";
 		rasCode += "my_array <- array(0,dim=c(K," + numberOfMetric + ")) " + "\n";
 		rasCode += "for (k in 1:K) {" + "\n";
 
@@ -129,15 +131,15 @@ class MmlCompilateurR {
 					rasCode += ",maxdepth = " + dtImpl.max_depth;
 				}
 				rasCode += "))" + "\n";
-				rasCode += "result <-predict(fit, test, type = 'class')" + "\n";
+				rasCode += "result <-predict(fit, df[bloc == k,], type = 'class')" + "\n";
 				rasCode += "result <- as.numeric(levels(result))[result]" + "\n";
 
 			}
 			SVR: {
 				imports += "library(e1071)\n";
 				rasCode +=
-					"fit <- svm(" + predictiveColName + "~" + predictors + ", data = train, method = 'class')" + "\n";
-				rasCode += "result<-predict(fit, test, type = 'class')" + "\n";
+					"fit <- svm(" + predictiveColName + "~" + predictors + ", data = df[bloc!=k,], method = 'class')" + "\n";
+				rasCode += "result<-predict(fit, df[bloc == k,], type = 'class')" + "\n";
 			}
 			GTB: {
 				println("GTB")
@@ -146,20 +148,20 @@ class MmlCompilateurR {
 				imports += "library(randomForest)\n";
 				rasCode +=
 					"fit <- randomForest(" + predictiveColName + "~" + predictors +
-						", data = train, method = 'class')" + "\n";
-				rasCode += "result<-predict(fit, test, type = 'class')" + "\n";
+						", data = df[bloc!=k,], method = 'class')" + "\n";
+				rasCode += "result<-predict(fit, df[bloc == k,], type = 'class')" + "\n";
 			}
 			SGD: {
 				imports += "library(sgd)\n";
 				rasCode +=
-					"fit <- sgd(" + predictiveColName + "~" + predictors + ", data = train, method = 'class')" + "\n";
-				rasCode += "result<-predict(fit, test, type = 'class')" + "\n";
+					"fit <- sgd(" + predictiveColName + "~" + predictors + ", data = df[bloc!=k,], method = 'class')" + "\n";
+				rasCode += "result<-predict(fit, df[bloc == k,], type = 'class')" + "\n";
 			}
 			default: {
 				println("default")
 			}
 		}
-		rasCode += metricCodeCrossV();
+		rasCode += metricCodeCrossV;
 		rasCode += "}" + "\n";
 
 		rasCode += "for (i in 1:numberOfMetric) {" + "\n";

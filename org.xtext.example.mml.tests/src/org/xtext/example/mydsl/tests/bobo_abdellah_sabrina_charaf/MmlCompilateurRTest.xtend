@@ -20,10 +20,10 @@ class MmlCompilateurRTest {
 	def void mmlcomp() {
 
 		val MMLModel result = parseHelper.parse('''
-			datainput "boston.csv" separator ;
-				mlframework Scikit-Learn
+			datainput "boston.csv" separator ,
+				mlframework R
 				algorithm DT
-				mlframework Scikit-Learn
+				mlframework R
 				algorithm RandomForest
 				formula "medv" ~ .
 				CrossValidation { 
