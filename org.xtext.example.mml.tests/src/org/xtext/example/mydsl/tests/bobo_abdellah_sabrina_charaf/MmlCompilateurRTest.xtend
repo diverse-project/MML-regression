@@ -22,7 +22,7 @@ class MmlCompilateurRTest {
 		val MMLModel result = parseHelper.parse('''
 			datainput "boston.csv" separator ;
 				mlframework R
-				algorithm DT 
+				algorithm DT
 				mlframework R
 				algorithm RandomForest
 				formula "medv" ~ .

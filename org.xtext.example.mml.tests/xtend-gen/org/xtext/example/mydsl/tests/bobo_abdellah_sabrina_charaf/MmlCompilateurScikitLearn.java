@@ -22,6 +22,7 @@ import org.xtext.example.mydsl.mml.MMLModel;
 import org.xtext.example.mydsl.mml.PredictorVariables;
 import org.xtext.example.mydsl.mml.RFormula;
 import org.xtext.example.mydsl.mml.RandomForest;
+import org.xtext.example.mydsl.mml.SVR;
 import org.xtext.example.mydsl.mml.StratificationMethod;
 import org.xtext.example.mydsl.mml.Validation;
 import org.xtext.example.mydsl.mml.ValidationMetric;
@@ -96,6 +97,21 @@ public class MmlCompilateurScikitLearn {
           algorithmBody = (_algorithmBody_1 + "\nregressor.fit(X_train, y_train)");
           String _algorithmBody_2 = algorithmBody;
           algorithmBody = (_algorithmBody_2 + "\ny_pred = regressor.predict(X_test)");
+        }
+      }
+      if (!_matched) {
+        if (mlAlgorithm instanceof SVR) {
+          _matched=true;
+          String _algorithmImport = algorithmImport;
+          algorithmImport = (_algorithmImport + "\nimport numpy as np");
+          String _algorithmImport_1 = algorithmImport;
+          algorithmImport = (_algorithmImport_1 + "\nfrom sklearn.svm import SVR");
+          String _algorithmBody = algorithmBody;
+          algorithmBody = (_algorithmBody + "\nclf = SVR()");
+          String _algorithmBody_1 = algorithmBody;
+          algorithmBody = (_algorithmBody_1 + "\nclf.fit(X_train, y_train)");
+          String _algorithmBody_2 = algorithmBody;
+          algorithmBody = (_algorithmBody_2 + "\ny_pred = clf.predict(X_test)");
         }
       }
       if (!_matched) {

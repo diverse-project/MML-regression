@@ -24,6 +24,7 @@ import org.xtext.example.mydsl.mml.Validation
 import org.xtext.example.mydsl.mml.ValidationMetric
 import org.xtext.example.mydsl.mml.XFormula
 import java.util.stream.DoubleStream.Builder
+import org.xtext.example.mydsl.mml.SVR
 
 class MmlCompilateurScikitLearn {
 	
@@ -80,6 +81,13 @@ class MmlCompilateurScikitLearn {
 				algorithmBody += "\nregressor = RandomForestRegressor()";
 				algorithmBody += "\nregressor.fit(X_train, y_train)";
 				algorithmBody += "\ny_pred = regressor.predict(X_test)"
+			}
+			SVR: {
+				algorithmImport += "\nimport numpy as np";
+				algorithmImport += "\nfrom sklearn.svm import SVR";
+				algorithmBody += "\nclf = SVR()";
+				algorithmBody += "\nclf.fit(X_train, y_train)";
+				algorithmBody += "\ny_pred = clf.predict(X_test)"
 			}
 			default : print("default")
 		

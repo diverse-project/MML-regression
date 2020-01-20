@@ -29,7 +29,7 @@ public class MmlCompilateurRTest {
       _builder.append("mlframework R");
       _builder.newLine();
       _builder.append("\t");
-      _builder.append("algorithm DT ");
+      _builder.append("algorithm DT");
       _builder.newLine();
       _builder.append("\t");
       _builder.append("mlframework R");
