@@ -420,7 +420,9 @@ public class MmlCompilateurR {
       if (stratificationMethod instanceof TrainingTest) {
         _matched=true;
         final TrainingTest trainingTest = ((TrainingTest) stratificationMethod);
-        this.split_ratio = trainingTest.getNumber();
+        int _number = trainingTest.getNumber();
+        double _divide = (((double) _number) / 100.0);
+        this.split_ratio = _divide;
       }
     }
     String _imports = this.imports;
