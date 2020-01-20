@@ -26,14 +26,14 @@ The **Weka** compiler is complete and running, but lacks one feature. `SVR` kern
 
 The **R** compiler is complete and running, but lacks the cross validation on SGD, since we couldn't find a satisfying implementation. You need to install the system package `r-base` and `r-base-dev` (for ubuntu), along with the following R libraries : `caret`, `rpart`, `gbm`, `randomForest`, `e1071`, `kernlab` and `sgd`.
 
-The **XGBoost** compiler (with **Python**) is particulary difficult to work with. Indeed, XGBoost selects automatically the best algorithm depending on your dataset. It was then not really possible to adapt our language to XGBoost. Thus, the calls to XGBoost are made almost regardless of the algorithm chosen in mml. You need the same dependencies as **Scikit-Learn** compiler with also `xgboost` python package.
+The **XGBoost** compiler (with **Python**) is particulary difficult to work with. Indeed, XGBoost selects automatically the best algorithm depending on your dataset. It was then not really possible to adapt our language to XGBoost. Thus, calls to XGBoost are made almost regardless of the algorithm chosen in mml. You need the same dependencies as **Scikit-Learn** compiler with also `xgboost` python package.
 
 ### Testing and experiment
 
 We have implemented 12 programs in mml that test an algorithm and a training method using the 3 frameworks, in order to ensure that our compilers work flawlessly.
 Each program is compiled, and run, regardless of the result or the encountered errors, and the result (or the absence of result) is displayed.
 
-For the experiment, we created a collection which collects the result and the execution time for each run. This result is then displayed conveniently for us to work with.
+For the experiment, we have created a collection which collects the result and the execution time for each run. This result is then displayed conveniently for us to work with.
 
 ## Experiment
 ### How
@@ -253,5 +253,5 @@ Overall, we advise to use either Python's frameworks or R's, because of how natu
 ## Feedback
 
 Although the project can be quite interesting, the lack of context or knowledge of machine learning held us back from making a really accurate implementation and from optimizing it.
-The poor efficiency of SVR and SGD is maybe due to the fact that we didn't choose the correct implementation or didn't tune it the good way? We don't have the elements to answer that question.
+The poor efficiency of SVR and SGD may be due to the fact that we did not choose the correct implementation or did not tune it the good way? We do not have the elements to answer that question.
 Also, it was quite a huge project to work on, and the workload on other projects prevented us from improving our work the way we wanted.
