@@ -43,10 +43,10 @@ class MmlCompilateurRTest {
 	def void mmlcompP() {
 
 		val MMLModel result = parseHelper.parse('''
-			datainput "boston.csv" separator ,
-				mlframework R
+			datainput "boston.csv" separator ;
+				mlframework Scikit-Learn
 				algorithm DT
-				mlframework R
+				mlframework Scikit-Learn
 				algorithm RandomForest
 				formula "medv" ~ .
 				CrossValidation { 
@@ -86,10 +86,10 @@ class MmlCompilateurRTest {
 	def void mmlcompP2() {
 	
 		val MMLModel result = parseHelper.parse('''
-			datainput "boston.csv" separator ,
-				mlframework R
+			datainput "boston.csv" separator ;
+				mlframework Scikit-Learn
 				algorithm DT
-				mlframework R
+				mlframework Scikit-Learn
 				algorithm RandomForest
 				formula "medv" ~ .
 				TrainingTest { 
@@ -131,7 +131,7 @@ class MmlCompilateurRTest {
 			datainput "boston.csv" separator ;
 				mlframework Scikit-Learn
 				algorithm DT
-				mlframework R
+				mlframework Scikit-Learn
 				algorithm SVR
 				CrossValidation { 
 					numRepetitionCross 8
@@ -167,13 +167,11 @@ class MmlCompilateurRTest {
 		val MMLModel result = parseHelper.parse('''
 			datainput "boston.csv" separator ;
 				mlframework Scikit-Learn
-				algorithm DT
-				mlframework R
-				algorithm DT
+				algorithm RandomForest
 				mlframework Scikit-Learn
 				algorithm SVR
 				mlframework Scikit-Learn
-				algorithm RandomForest
+				algorithm DT
 				CrossValidation { 
 					numRepetitionCross 8
 				}

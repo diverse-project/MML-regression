@@ -64,16 +64,16 @@ public class MmlCompilateurRTest {
   public void mmlcompP() {
     try {
       StringConcatenation _builder = new StringConcatenation();
-      _builder.append("datainput \"boston.csv\" separator ,");
+      _builder.append("datainput \"boston.csv\" separator ;");
       _builder.newLine();
       _builder.append("\t");
-      _builder.append("mlframework R");
+      _builder.append("mlframework Scikit-Learn");
       _builder.newLine();
       _builder.append("\t");
       _builder.append("algorithm DT");
       _builder.newLine();
       _builder.append("\t");
-      _builder.append("mlframework R");
+      _builder.append("mlframework Scikit-Learn");
       _builder.newLine();
       _builder.append("\t");
       _builder.append("algorithm RandomForest");
@@ -146,16 +146,16 @@ public class MmlCompilateurRTest {
   public void mmlcompP2() {
     try {
       StringConcatenation _builder = new StringConcatenation();
-      _builder.append("datainput \"boston.csv\" separator ,");
+      _builder.append("datainput \"boston.csv\" separator ;");
       _builder.newLine();
       _builder.append("\t");
-      _builder.append("mlframework R");
+      _builder.append("mlframework Scikit-Learn");
       _builder.newLine();
       _builder.append("\t");
       _builder.append("algorithm DT");
       _builder.newLine();
       _builder.append("\t");
-      _builder.append("mlframework R");
+      _builder.append("mlframework Scikit-Learn");
       _builder.newLine();
       _builder.append("\t");
       _builder.append("algorithm RandomForest");
@@ -234,7 +234,7 @@ public class MmlCompilateurRTest {
       _builder.append("algorithm DT");
       _builder.newLine();
       _builder.append("\t");
-      _builder.append("mlframework R");
+      _builder.append("mlframework Scikit-Learn");
       _builder.newLine();
       _builder.append("\t");
       _builder.append("algorithm SVR");
@@ -307,13 +307,7 @@ public class MmlCompilateurRTest {
       _builder.append("mlframework Scikit-Learn");
       _builder.newLine();
       _builder.append("\t");
-      _builder.append("algorithm DT");
-      _builder.newLine();
-      _builder.append("\t");
-      _builder.append("mlframework R");
-      _builder.newLine();
-      _builder.append("\t");
-      _builder.append("algorithm DT");
+      _builder.append("algorithm RandomForest");
       _builder.newLine();
       _builder.append("\t");
       _builder.append("mlframework Scikit-Learn");
@@ -325,7 +319,7 @@ public class MmlCompilateurRTest {
       _builder.append("mlframework Scikit-Learn");
       _builder.newLine();
       _builder.append("\t");
-      _builder.append("algorithm RandomForest");
+      _builder.append("algorithm DT");
       _builder.newLine();
       _builder.append("\t");
       _builder.append("CrossValidation { ");
