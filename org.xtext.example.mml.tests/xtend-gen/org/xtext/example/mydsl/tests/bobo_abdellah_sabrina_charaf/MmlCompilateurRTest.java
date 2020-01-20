@@ -20,7 +20,7 @@ public class MmlCompilateurRTest {
   private ParseHelper<MMLModel> parseHelper;
   
   @Test
-  public void mmlcomp() {
+  public void mmlcompR() {
     try {
       StringConcatenation _builder = new StringConcatenation();
       _builder.append("datainput \"boston.csv\" separator ,");
@@ -61,25 +61,25 @@ public class MmlCompilateurRTest {
   }
   
   @Test
-  public void mmlcomp2() {
+  public void mmlcompP() {
     try {
       StringConcatenation _builder = new StringConcatenation();
-      _builder.append("datainput \"boston.csv\" separator ;");
+      _builder.append("datainput \"boston.csv\" separator ,");
       _builder.newLine();
       _builder.append("\t");
-      _builder.append("mlframework Scikit-Learn");
+      _builder.append("mlframework R");
       _builder.newLine();
       _builder.append("\t");
       _builder.append("algorithm DT");
       _builder.newLine();
       _builder.append("\t");
-      _builder.append("mlframework Scikit-Learn");
+      _builder.append("mlframework R");
       _builder.newLine();
       _builder.append("\t");
       _builder.append("algorithm RandomForest");
       _builder.newLine();
       _builder.append("\t");
-      _builder.append("formula .");
+      _builder.append("formula \"medv\" ~ .");
       _builder.newLine();
       _builder.append("\t");
       _builder.append("CrossValidation { ");
@@ -102,7 +102,89 @@ public class MmlCompilateurRTest {
   }
   
   @Test
-  public void mmlcomp3() {
+  public void mmlcompR2() {
+    try {
+      StringConcatenation _builder = new StringConcatenation();
+      _builder.append("datainput \"boston.csv\" separator ,");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("mlframework R");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("algorithm DT");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("mlframework R");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("algorithm RandomForest");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("formula \"medv\" ~ .");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("TrainingTest { ");
+      _builder.newLine();
+      _builder.append("\t\t");
+      _builder.append("percentageTraining 70");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("}");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("mean_absolute_error mean_squared_error");
+      _builder.newLine();
+      final MMLModel result = this.parseHelper.parse(_builder);
+      final MmlCompilateur mmlcompilateur = new MmlCompilateur(result);
+      mmlcompilateur.render();
+    } catch (Throwable _e) {
+      throw Exceptions.sneakyThrow(_e);
+    }
+  }
+  
+  @Test
+  public void mmlcompP2() {
+    try {
+      StringConcatenation _builder = new StringConcatenation();
+      _builder.append("datainput \"boston.csv\" separator ,");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("mlframework R");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("algorithm DT");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("mlframework R");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("algorithm RandomForest");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("formula \"medv\" ~ .");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("TrainingTest { ");
+      _builder.newLine();
+      _builder.append("\t\t");
+      _builder.append("percentageTraining 70");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("}");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("mean_absolute_error mean_squared_error");
+      _builder.newLine();
+      final MMLModel result = this.parseHelper.parse(_builder);
+      final MmlCompilateur mmlcompilateur = new MmlCompilateur(result);
+      mmlcompilateur.render();
+    } catch (Throwable _e) {
+      throw Exceptions.sneakyThrow(_e);
+    }
+  }
+  
+  @Test
+  public void mmlcompR3() {
     try {
       StringConcatenation _builder = new StringConcatenation();
       _builder.append("datainput \"boston.csv\" separator ;");
@@ -140,7 +222,45 @@ public class MmlCompilateurRTest {
   }
   
   @Test
-  public void mmlcomp4() {
+  public void mmlcompP3() {
+    try {
+      StringConcatenation _builder = new StringConcatenation();
+      _builder.append("datainput \"boston.csv\" separator ;");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("mlframework Scikit-Learn");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("algorithm DT");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("mlframework R");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("algorithm SVR");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("CrossValidation { ");
+      _builder.newLine();
+      _builder.append("\t\t");
+      _builder.append("numRepetitionCross 8");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("}");
+      _builder.newLine();
+      _builder.append("\t");
+      _builder.append("mean_absolute_error mean_squared_error");
+      _builder.newLine();
+      final MMLModel result = this.parseHelper.parse(_builder);
+      final MmlCompilateur mmlcompilateur = new MmlCompilateur(result);
+      mmlcompilateur.render();
+    } catch (Throwable _e) {
+      throw Exceptions.sneakyThrow(_e);
+    }
+  }
+  
+  @Test
+  public void mmlcompR4() {
     try {
       StringConcatenation _builder = new StringConcatenation();
       _builder.append("datainput \"boston.csv\" separator ;");
@@ -178,7 +298,7 @@ public class MmlCompilateurRTest {
   }
   
   @Test
-  public void mmlcomp5() {
+  public void mmlcompR5() {
     try {
       StringConcatenation _builder = new StringConcatenation();
       _builder.append("datainput \"boston.csv\" separator ;");
