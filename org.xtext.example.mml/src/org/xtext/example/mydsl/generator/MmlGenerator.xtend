@@ -67,7 +67,7 @@ class MmlGenerator extends AbstractGenerator {
 	}
 	
 	def String compileWeka(RFormula formule, String fileLocation, MLChoiceAlgorithm mlchoicealgo, Validation validation, String csv_separator) {
-		
+
 	}
 	
 	def String compileXG(RFormula formule, String fileLocation, MLChoiceAlgorithm mlchoicealgo, Validation validation, String csv_separator) {

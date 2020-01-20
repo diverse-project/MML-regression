@@ -60,6 +60,7 @@ public class MmlGenerator extends AbstractGenerator {
     }
     final FrameworkLang framework = mlchoicealgo.getFramework();
     String code = "";
+    String type = "";
     int _value = framework.getValue();
     switch (_value) {
       case FrameworkLang.JAVA_WEKA_VALUE:
@@ -78,8 +79,26 @@ public class MmlGenerator extends AbstractGenerator {
         code = "";
         break;
     }
+    int _value_1 = framework.getValue();
+    switch (_value_1) {
+      case FrameworkLang.JAVA_WEKA_VALUE:
+        type = "java";
+        break;
+      case FrameworkLang.SCIKIT_VALUE:
+        type = "py";
+        break;
+      case FrameworkLang.R_VALUE:
+        type = "r";
+        break;
+      case FrameworkLang.XG_BOOST_VALUE:
+        type = "py";
+        break;
+      default:
+        type = "";
+        break;
+    }
     fsa.generateFile(
-      "test.txt", code);
+      ("test." + type), code);
   }
   
   public String compileWeka(final RFormula formule, final String fileLocation, final MLChoiceAlgorithm mlchoicealgo, final Validation validation, final String csv_separator) {
@@ -91,7 +110,166 @@ public class MmlGenerator extends AbstractGenerator {
   }
   
   public String compileR(final RFormula formule, final String fileLocation, final MLChoiceAlgorithm mlchoicealgo, final Validation validation, final String csv_separator) {
-    return null;
+    String rImport = "library(data.table)\n";
+    String csvSplit = "";
+    if ((formule != null)) {
+      XFormula xformule = formule.getPredictors();
+      FormulaItem formuleItem = formule.getPredictive();
+      String items = "";
+      if ((xformule instanceof PredictorVariables)) {
+        EList<FormulaItem> predictorItems = ((PredictorVariables)xformule).getVars();
+        StringBuilder sb = new StringBuilder();
+        if (((predictorItems != null) && (!predictorItems.isEmpty()))) {
+          String _colName = predictorItems.get(0).getColName();
+          boolean _tripleNotEquals = (_colName != null);
+          if (_tripleNotEquals) {
+            for (final FormulaItem item : predictorItems) {
+              {
+                FormulaItem _get = predictorItems.get(0);
+                boolean _notEquals = (!Objects.equal(_get, item));
+                if (_notEquals) {
+                  sb.append(",");
+                }
+                sb.append(this.mkValueInDoubleQuote(item.getColName()));
+              }
+            }
+          } else {
+            for (final FormulaItem item_1 : predictorItems) {
+              {
+                FormulaItem _get = predictorItems.get(0);
+                boolean _notEquals = (!Objects.equal(_get, item_1));
+                if (_notEquals) {
+                  sb.append(",");
+                }
+                sb.append(item_1.getColumn());
+              }
+            }
+          }
+        }
+        items = sb.toString();
+        String _csvSplit = csvSplit;
+        String _mkValueInDoubleQuote = this.mkValueInDoubleQuote(fileLocation);
+        String _plus = ("X <- read.csv(file=" + _mkValueInDoubleQuote);
+        String _plus_1 = (_plus + ", select=c(");
+        String _plus_2 = (_plus_1 + items);
+        String _plus_3 = (_plus_2 + ") ,header=TRUE, sep=");
+        String _mkValueInDoubleQuote_1 = this.mkValueInDoubleQuote(csv_separator);
+        String _plus_4 = (_plus_3 + _mkValueInDoubleQuote_1);
+        String _plus_5 = (_plus_4 + ")\n");
+        csvSplit = (_csvSplit + _plus_5);
+        String _csvSplit_1 = csvSplit;
+        String _mkValueInDoubleQuote_2 = this.mkValueInDoubleQuote(fileLocation);
+        String _plus_6 = ("y <- read.csv(file=" + _mkValueInDoubleQuote_2);
+        String _plus_7 = (_plus_6 + ", select=c(");
+        int _column = formuleItem.getColumn();
+        String _plus_8 = (_plus_7 + Integer.valueOf(_column));
+        String _plus_9 = (_plus_8 + ") ,header=TRUE, sep=");
+        String _mkValueInDoubleQuote_3 = this.mkValueInDoubleQuote(csv_separator);
+        String _plus_10 = (_plus_9 + _mkValueInDoubleQuote_3);
+        String _plus_11 = (_plus_10 + ")\\n");
+        csvSplit = (_csvSplit_1 + _plus_11);
+      } else {
+        if ((xformule instanceof AllVariables)) {
+          String _csvSplit_2 = csvSplit;
+          String _mkValueInDoubleQuote_4 = this.mkValueInDoubleQuote(fileLocation);
+          String _plus_12 = ("myFile <- read.csv(file=" + _mkValueInDoubleQuote_4);
+          String _plus_13 = (_plus_12 + ",header=TRUE, sep=");
+          String _mkValueInDoubleQuote_5 = this.mkValueInDoubleQuote(csv_separator);
+          String _plus_14 = (_plus_13 + _mkValueInDoubleQuote_5);
+          String _plus_15 = (_plus_14 + ")\n");
+          csvSplit = (_csvSplit_2 + _plus_15);
+          String _csvSplit_3 = csvSplit;
+          csvSplit = (_csvSplit_3 + "h<-head(myFile)\nlastcol <- tail(h, n=1)\n");
+          String _csvSplit_4 = csvSplit;
+          String _mkValueInDoubleQuote_6 = this.mkValueInDoubleQuote(fileLocation);
+          String _plus_16 = ("X <- read.csv(file=" + _mkValueInDoubleQuote_6);
+          String _plus_17 = (_plus_16 + ", drop=c(lastcol) ,header=TRUE, sep=");
+          String _mkValueInDoubleQuote_7 = this.mkValueInDoubleQuote(csv_separator);
+          String _plus_18 = (_plus_17 + _mkValueInDoubleQuote_7);
+          String _plus_19 = (_plus_18 + ")\n");
+          csvSplit = (_csvSplit_4 + _plus_19);
+          String _csvSplit_5 = csvSplit;
+          String _mkValueInDoubleQuote_8 = this.mkValueInDoubleQuote(fileLocation);
+          String _plus_20 = ("y <- read.csv(file=" + _mkValueInDoubleQuote_8);
+          String _plus_21 = (_plus_20 + ", select=c(lastcol) ,header=TRUE, sep=");
+          String _mkValueInDoubleQuote_9 = this.mkValueInDoubleQuote(csv_separator);
+          String _plus_22 = (_plus_21 + _mkValueInDoubleQuote_9);
+          String _plus_23 = (_plus_22 + ")\n");
+          csvSplit = (_csvSplit_5 + _plus_23);
+        }
+      }
+    } else {
+      String _csvSplit_6 = csvSplit;
+      String _mkValueInDoubleQuote_10 = this.mkValueInDoubleQuote(fileLocation);
+      String _plus_24 = ("myFile <- read.csv(file=" + _mkValueInDoubleQuote_10);
+      String _plus_25 = (_plus_24 + ",header=TRUE, sep=");
+      String _mkValueInDoubleQuote_11 = this.mkValueInDoubleQuote(csv_separator);
+      String _plus_26 = (_plus_25 + _mkValueInDoubleQuote_11);
+      String _plus_27 = (_plus_26 + ")\n");
+      csvSplit = (_csvSplit_6 + _plus_27);
+      String _csvSplit_7 = csvSplit;
+      csvSplit = (_csvSplit_7 + "h<-head(myFile)\nlastcol <- tail(h, n=1)\n");
+      String _csvSplit_8 = csvSplit;
+      String _mkValueInDoubleQuote_12 = this.mkValueInDoubleQuote(fileLocation);
+      String _plus_28 = ("X <- read.csv(file=" + _mkValueInDoubleQuote_12);
+      String _plus_29 = (_plus_28 + ", drop=c(lastcol) ,header=TRUE, sep=");
+      String _mkValueInDoubleQuote_13 = this.mkValueInDoubleQuote(csv_separator);
+      String _plus_30 = (_plus_29 + _mkValueInDoubleQuote_13);
+      String _plus_31 = (_plus_30 + ")\n");
+      csvSplit = (_csvSplit_8 + _plus_31);
+      String _csvSplit_9 = csvSplit;
+      String _mkValueInDoubleQuote_14 = this.mkValueInDoubleQuote(fileLocation);
+      String _plus_32 = ("y <- read.csv(file=" + _mkValueInDoubleQuote_14);
+      String _plus_33 = (_plus_32 + ", select=c(lastcol) ,header=TRUE, sep=");
+      String _mkValueInDoubleQuote_15 = this.mkValueInDoubleQuote(csv_separator);
+      String _plus_34 = (_plus_33 + _mkValueInDoubleQuote_15);
+      String _plus_35 = (_plus_34 + ")\n");
+      csvSplit = (_csvSplit_9 + _plus_35);
+    }
+    final MLAlgorithm algo = mlchoicealgo.getAlgorithm();
+    String algoDeclaration = "";
+    if ((algo instanceof SVR)) {
+    } else {
+      if ((algo instanceof DT)) {
+        String _rImport = rImport;
+        rImport = (_rImport + "library(rpart)\n");
+        algoDeclaration = "fit <- rpart(survived~., data= data_train, method=\'class\')\n";
+      }
+    }
+    final StratificationMethod stratMethod = validation.getStratification();
+    final EList<ValidationMetric> validMetrics = validation.getMetric();
+    final int number = stratMethod.getNumber();
+    String validationPrint = "";
+    String _validationPrint = validationPrint;
+    validationPrint = (_validationPrint + (("test_size = " + Integer.valueOf(number)) + "\n"));
+    String _validationPrint_1 = validationPrint;
+    validationPrint = (_validationPrint_1 + "n_row = nrow(X)\n");
+    String _validationPrint_2 = validationPrint;
+    validationPrint = (_validationPrint_2 + "total_row = test_size * n_row\n");
+    if ((stratMethod instanceof CrossValidation)) {
+    } else {
+      if ((stratMethod instanceof TrainingTest)) {
+        String _validationPrint_3 = validationPrint;
+        validationPrint = (_validationPrint_3 + "X_train <- 1:total_row\n");
+        String _validationPrint_4 = validationPrint;
+        validationPrint = (_validationPrint_4 + (("X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=" + Integer.valueOf(number)) + ")"));
+      }
+    }
+    String _validationPrint_5 = validationPrint;
+    validationPrint = (_validationPrint_5 + "\n");
+    String metrics = "";
+    String metricsResult = "";
+    for (int i = 0; (i < validMetrics.size()); i++) {
+      {
+        String metric = "";
+        String _metricsResult = metricsResult;
+        metricsResult = (_metricsResult + (("print(accuracy" + Integer.valueOf(i)) + ")\n"));
+        String _metrics = metrics;
+        metrics = (_metrics + (metric + "\n"));
+      }
+    }
+    final String pandasCode = (((((rImport + csvSplit) + algoDeclaration) + validationPrint) + metrics) + metricsResult);
+    return pandasCode;
   }
   
   public String compileScikit(final RFormula formule, final String fileLocation, final MLChoiceAlgorithm mlchoicealgo, final Validation validation, final String csv_separator) {
@@ -194,27 +372,31 @@ public class MmlGenerator extends AbstractGenerator {
     for (int i = 0; (i < validMetrics.size()); i++) {
       {
         String metric = "";
-        String _name = validMetrics.get(i).name();
-        if (_name != null) {
-          switch (_name) {
-            case "MSE":
-              String _metric = metric;
-              metric = (_metric + (("accuracy" + Integer.valueOf(i)) + "=mean_squared_error(y_test, clf.predict(X_test))"));
-              break;
-            case "MAE":
-              String _pythonImport_2 = pythonImport;
-              pythonImport = (_pythonImport_2 + "from sklearn.metrics import mean_absolute_error\n");
-              break;
-            case "MAPE":
-              String _metric_1 = metric;
-              metric = (_metric_1 + "y_test, y_pred = check_arrays(y_test, clf.predict(X_test))");
-              break;
-            default:
-              metric = "";
-              break;
-          }
+        final String metricName = validMetrics.get(i).name();
+        boolean _equals = Objects.equal(metricName, "MSE");
+        if (_equals) {
+          String _pythonImport_2 = pythonImport;
+          pythonImport = (_pythonImport_2 + "from sklearn.metrics import mean_squared_error\n");
+          String _metric = metric;
+          metric = (_metric + (("accuracy" + Integer.valueOf(i)) + "=mean_squared_error(y_test, clf.predict(X_test))"));
         } else {
-          metric = "";
+          boolean _equals_1 = Objects.equal(metricName, "MAE");
+          if (_equals_1) {
+            String _pythonImport_3 = pythonImport;
+            pythonImport = (_pythonImport_3 + "from sklearn.metrics import mean_absolute_error\n");
+            String _metric_1 = metric;
+            metric = (_metric_1 + (("accuracy" + Integer.valueOf(i)) + "=mean_absolute_error(y_test, clf.predict(X_test))"));
+          } else {
+            boolean _equals_2 = Objects.equal(metricName, "MAPE");
+            if (_equals_2) {
+              String _pythonImport_4 = pythonImport;
+              pythonImport = (_pythonImport_4 + "from sklearn.utils import check_arrays\n");
+              String _metric_2 = metric;
+              metric = (_metric_2 + "y_test, y_pred = check_arrays(y_test, clf.predict(X_test))");
+              String _metric_3 = metric;
+              metric = (_metric_3 + (("accuracy" + Integer.valueOf(i)) + "=np.mean(np.abs((y_test - y_pred) / y_test)) * 100"));
+            }
+          }
         }
         String _metricsResult = metricsResult;
         metricsResult = (_metricsResult + (("print(accuracy" + Integer.valueOf(i)) + ")\n"));
