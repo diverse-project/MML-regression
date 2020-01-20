@@ -25,17 +25,27 @@ import org.xtext.example.mydsl.mml.TrainingTest
 import org.xtext.example.mydsl.mml.Validation
 import org.xtext.example.mydsl.mml.ValidationMetric
 import org.xtext.example.mydsl.mml.impl.DTImpl
+import org.xtext.example.mydsl.mml.CSVParsingConfiguration
+import org.xtext.example.mydsl.mml.CSVSeparator
 
 class MmlCompilateurR {
 
 	var MMLModel mmlModel;
 	var MLAlgorithm MLA;
 	val String name = "MmlCompilateurR";
+
+	// default value
 	var String imports = "";
 	var String rasCode = "";
 	val EList<String> metricList = new UniqueEList<String>();
 	var String fileLocation = "";
 	var int numRepetitionCross = 0;
+	var String predictiveColName = "colnames(df)[ncol(df)-1]";
+	var int numberOfMetric = 0;
+	EList<ValidationMetric> VMList = new UniqueEList<ValidationMetric>();
+	var double split_ratio = 0.7;
+	var String predictors = ".";
+	var String csv_separator;
 
 	private new() {
 	}
@@ -48,7 +58,7 @@ class MmlCompilateurR {
 		this.MLA = MLA;
 	}
 
-	def String metricCode(EList<ValidationMetric> VMList) {
+	def String metricCode() {
 		var String result = "";
 		for (ValidationMetric item : VMList) {
 			switch item {
@@ -71,7 +81,33 @@ class MmlCompilateurR {
 		return result;
 	}
 
-	def void algorithmCodeCrossValid(String predictiveColName, String predictors) {
+	def String metricCodeCrossV() {
+		var String result = "";
+		numberOfMetric = VMList.size();
+
+		for (var i = 0; i < VMList.size(); i++) {
+			switch VMList.get(i) {
+				case ValidationMetric.MSE: {
+					result += "my_array[k," + (i + 1) + "] <- mse(df$" + predictiveColName + "[bloc==k],result)" + "\n";
+					metricList.add("mse");
+				}
+				case ValidationMetric.MAE: {
+					result += "my_array[k," + (i + 1) + "] <- mae(df$" + predictiveColName + "[bloc==k],result)" + "\n";
+					metricList.add("mae");
+				}
+				case ValidationMetric.MAPE: {
+					result +=
+						"my_array[k," + (i + 1) + "] <- mape(df$" + predictiveColName + "[bloc==k],result)" + "\n";
+					metricList.add("mape");
+				}
+				default: {
+				}
+			}
+		}
+		return result;
+	}
+
+	def void algorithmCodeCrossValid(String predictors) {
 		rasCode += "n <- nrow(df)" + "\n";
 		rasCode += "K <- " + numRepetitionCross;
 		rasCode += "taille <- n%/%K" + "\n";
@@ -80,17 +116,65 @@ class MmlCompilateurR {
 		rasCode += "rang <- rank(alea)" + "\n";
 		rasCode += "bloc <- (rang-1)%/%taille + 1" + "\n";
 		rasCode += "bloc <- as.factor(bloc)" + "\n";
-		rasCode += "my_array <- array(0,dim=c(K)) " + "\n";
+		rasCode += "my_array <- array(0,dim=c(K," + numberOfMetric + ")) " + "\n";
 		rasCode += "for (k in 1:K) {" + "\n";
-		rasCode += "  fit <- rpart(medv ~. , data = df[bloc!=k,], method = 'class')" + "\n";
-		rasCode += "  result <- predict(fit,df[bloc == k,], type ='class')" + "\n";
 
-		rasCode += "  result <- as.numeric(levels(result))[result]" + "\n";
-		rasCode += "  my_array[k] <- mae(df$medv[bloc==k],result)" + "\n";
+		switch this.MLA {
+			DT: {
+				imports += "library(rpart)\n";
+				val DTImpl dtImpl = MLA as DTImpl;
+				rasCode += "fit <- rpart(" + predictiveColName + "~" + predictors +
+					", data = df[bloc!=k,], method = 'class', control = rpart.control(cp = 0";
+				if (dtImpl.max_depth !== 0) {
+					rasCode += ",maxdepth = " + dtImpl.max_depth;
+				}
+				rasCode += "))" + "\n";
+				rasCode += "result <-predict(fit, test, type = 'class')" + "\n";
+				rasCode += "result <- as.numeric(levels(result))[result]" + "\n";
+
+			}
+			SVR: {
+				imports += "library(e1071)\n";
+				rasCode +=
+					"fit <- svm(" + predictiveColName + "~" + predictors + ", data = train, method = 'class')" + "\n";
+				rasCode += "result<-predict(fit, test, type = 'class')" + "\n";
+			}
+			GTB: {
+				println("GTB")
+			}
+			RandomForest: {
+				imports += "library(randomForest)\n";
+				rasCode +=
+					"fit <- randomForest(" + predictiveColName + "~" + predictors +
+						", data = train, method = 'class')" + "\n";
+				rasCode += "result<-predict(fit, test, type = 'class')" + "\n";
+			}
+			SGD: {
+				imports += "library(sgd)\n";
+				rasCode +=
+					"fit <- sgd(" + predictiveColName + "~" + predictors + ", data = train, method = 'class')" + "\n";
+				rasCode += "result<-predict(fit, test, type = 'class')" + "\n";
+			}
+			default: {
+				println("default")
+			}
+		}
+		rasCode += metricCodeCrossV();
 		rasCode += "}" + "\n";
 
-		rasCode += "value <- mean(my_array)" + "\n";
-		rasCode += "value" + "\n";
+		rasCode += "for (i in 1:numberOfMetric) {" + "\n";
+		rasCode += "value <- mean(my_array[,i])" + "\n";
+		rasCode += "print(value)" + "\n";
+		rasCode += "}" + "\n";
+	}
+
+	def void algorithmCode(String predictors) {
+
+		rasCode += "df %>% select(-c(" + predictiveColName + "))->X" + "\n";
+		rasCode += "df %>% select(c(" + predictiveColName + "))->Y" + "\n";
+		rasCode += "sample.split(df$" + predictiveColName + ",SplitRatio=" + split_ratio + ")->split_index" + "\n";
+		rasCode += "train<-subset(df,split_index==T)" + "\n";
+		rasCode += "test<-subset(df,split_index==F)" + "\n";
 		switch this.MLA {
 			DT: {
 				imports += "library(rpart)\n";
@@ -101,8 +185,8 @@ class MmlCompilateurR {
 					rasCode += ",maxdepth = " + dtImpl.max_depth;
 				}
 				rasCode += "))" + "\n";
-				rasCode += "result1<-predict(fit, test, type = 'class')" + "\n";
-				rasCode += "result <- as.numeric(levels(result1))[result1]" + "\n";
+				rasCode += "result<-predict(fit, test, type = 'class')" + "\n";
+				rasCode += "result <- as.numeric(levels(result))[result]" + "\n";
 
 			}
 			SVR: {
@@ -131,95 +215,41 @@ class MmlCompilateurR {
 				println("default")
 			}
 		}
+
+		rasCode += "test %>% select(c(" + predictiveColName + "))->testY" + "\n";
+		rasCode += "testY2 <- testY[,1:length(testY)]" + "\n";
+		rasCode += metricCode();
 	}
 
-	def void algorithmCode(String predictiveColName, String predictors) {
-		switch this.MLA {
-			DT: {
-				imports += "library(rpart)\n";
-				val DTImpl dtImpl = MLA as DTImpl;
-				rasCode += "fit <- rpart(" + predictiveColName + "~" + predictors +
-					", data = train, method = 'class', control = rpart.control(cp = 0";
-				if (dtImpl.max_depth !== 0) {
-					rasCode += ",maxdepth = " + dtImpl.max_depth;
-				}
-				rasCode += "))" + "\n";
-				rasCode += "result1<-predict(fit, test, type = 'class')" + "\n";
-				rasCode += "result <- as.numeric(levels(result1))[result1]" + "\n";
-
-			}
-			SVR: {
-				imports += "library(e1071)\n";
-				rasCode +=
-					"fit <- svm(" + predictiveColName + "~" + predictors + ", data = train, method = 'class')" + "\n";
-				rasCode += "result<-predict(fit, test, type = 'class')" + "\n";
-			}
-			GTB: {
-				println("GTB")
-			}
-			RandomForest: {
-				imports += "library(randomForest)\n";
-				rasCode +=
-					"fit <- randomForest(" + predictiveColName + "~" + predictors +
-						", data = train, method = 'class')" + "\n";
-				rasCode += "result<-predict(fit, test, type = 'class')" + "\n";
-			}
-			SGD: {
-				imports += "library(sgd)\n";
-				rasCode +=
-					"fit <- sgd(" + predictiveColName + "~" + predictors + ", data = train, method = 'class')" + "\n";
-				rasCode += "result<-predict(fit, test, type = 'class')" + "\n";
-			}
-			default: {
-				println("default")
-			}
-		}
+	def String requiredImports() {
+		var String result = "";
+		result += "library(dplyr)" + "\n";
+		result += "library(caTools)" + "\n";
+		result += "library(Metrics)" + "\n";
+		return result;
 	}
 
-	def String render() {
-		val DataInput dataInput = mmlModel.input;
-		val RFormula formula = mmlModel.formula;
-		val Validation validation = mmlModel.validation;
-
-		val StratificationMethod stratificationMethod = validation.stratification;
-		val EList<ValidationMetric> VMList = validation.metric;
-		fileLocation = dataInput.filelocation;
-		var double split_ratio = 0.7;
-		var int numRepetitionCross = 0;
-
-		switch stratificationMethod {
-			CrossValidation: {
-				val CrossValidation crossValidation = stratificationMethod as CrossValidation;
-				numRepetitionCross = crossValidation.number;
-			}
-			TrainingTest: {
-				val TrainingTest trainingTest = stratificationMethod as TrainingTest;
-				split_ratio = trainingTest.number;
+	def String getCsvSeparator(CSVParsingConfiguration csv_separator) {
+		if (csv_separator !== null) {
+			if (csv_separator.sep === CSVSeparator.SEMI_COLON) {
+				return ";";
 			}
 		}
+		return ",";
+	}
 
-		imports += "library(dplyr)" + "\n";
-		imports += "library(caTools)" + "\n";
-		imports += "library(Metrics)" + "\n";
-		var String predictiveColName = "colnames(df)[ncol(df)-1]";
+	def void setPredictiveAndPredictors(RFormula formula) {
 		var int predictiveColumn;
-		var String predictors = "."; // by default
-		val String DEFAULT_COLUMN_SEPARATOR = ","; // by default
-		val String csv_separator = DEFAULT_COLUMN_SEPARATOR;
-		rasCode += "read.csv(\"" + fileLocation + "\",head = TRUE, sep=\"" + csv_separator + "\")->df" + "\n";
-
-		var String selectX = "df %>% select(-c())->X" + "\n";
-		var String selectY = "df %>% select(c())->Y" + "\n";
 		if (formula !== null) {
+
 			if (formula.predictive !== null) {
 				predictiveColName = formula.predictive.colName;
 				predictiveColumn = formula.predictive.column;
 
-				if (predictiveColName !== null) {
-					selectX = "df %>% select(-c(" + predictiveColName + "))->X" + "\n";
-				} else {
-					selectY = "df %>% select(-c(colnames(df)[" + predictiveColumn + "]))->X" + "\n";
+				if (predictiveColName === null) {
+					predictiveColName = "colnames(df)[" + predictiveColumn + "]";
 				}
+
 			}
 			switch formula.predictors {
 				AllVariables: {
@@ -238,19 +268,37 @@ class MmlCompilateurR {
 				}
 			}
 		}
+	}
 
-		rasCode += selectX + selectY;
-		rasCode += "sample.split(df$" + predictiveColName + ",SplitRatio=" + split_ratio + ")->split_index" + "\n";
-		rasCode += "train<-subset(df,split_index==T)" + "\n";
-		rasCode += "test<-subset(df,split_index==F)" + "\n";
+	def String render() {
+		// initialise value
+		val DataInput dataInput = mmlModel.input;
+		val RFormula formula = mmlModel.formula;
+		val Validation validation = mmlModel.validation;
+		val StratificationMethod stratificationMethod = validation.stratification;
+		VMList = validation.metric;
+		fileLocation = dataInput.filelocation;
+
+		switch stratificationMethod {
+			CrossValidation: {
+				val CrossValidation crossValidation = stratificationMethod as CrossValidation;
+				numRepetitionCross = crossValidation.number;
+			}
+			TrainingTest: {
+				val TrainingTest trainingTest = stratificationMethod as TrainingTest;
+				split_ratio = trainingTest.number;
+			}
+		}
+
+		imports += requiredImports();
+		csv_separator = getCsvSeparator(dataInput.parsingInstruction);
+		rasCode += "read.csv(\"" + fileLocation + "\",head = TRUE, sep=\"" + csv_separator + "\")->df" + "\n";
+		setPredictiveAndPredictors(formula);
 
 		if (numRepetitionCross > 0) {
-			algorithmCodeCrossValid(predictiveColName, predictors);
+			algorithmCodeCrossValid(predictors);
 		} else {
-			algorithmCode(predictiveColName, predictors);
-			rasCode += "test %>% select(c(" + predictiveColName + "))->testY" + "\n";
-			rasCode += "testY2 <- testY[,1:length(testY)]" + "\n";
-			rasCode += metricCode(VMList);
+			algorithmCode(predictors);
 		}
 
 		rasCode = imports + rasCode;

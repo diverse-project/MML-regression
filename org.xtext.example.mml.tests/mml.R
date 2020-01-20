@@ -2,9 +2,9 @@ library(dplyr)
 library(caTools)
 library(Metrics)
 library(randomForest)
-read.csv("boston.csv",head = TRUE, sep=",")->df
+read.csv("boston.csv",head = TRUE, sep=";")->df
 df %>% select(-c(medv))->X
-df %>% select(c())->Y
+df %>% select(c(medv))->Y
 sample.split(df$medv,SplitRatio=70.0)->split_index
 train<-subset(df,split_index==T)
 test<-subset(df,split_index==F)
