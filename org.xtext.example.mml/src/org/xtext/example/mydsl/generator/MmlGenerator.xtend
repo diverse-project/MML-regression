@@ -68,6 +68,7 @@ class MmlGenerator extends AbstractGenerator {
 	
 	def String compileWeka(RFormula formule, String fileLocation, MLChoiceAlgorithm mlchoicealgo, Validation validation, String csv_separator) {
 		//TODO
+		
 	}
 	
 	def String compileXG(RFormula formule, String fileLocation, MLChoiceAlgorithm mlchoicealgo, Validation validation, String csv_separator) {
@@ -132,8 +133,8 @@ class MmlGenerator extends AbstractGenerator {
 		}else if(algo instanceof RandomForest){
 			pythonImport+="from xgboost import XGB"+ (algo.type==TYPE.CLASSIFIER?"Classifier":"Regressor") +"\n";
 			algoDeclaration = "clf = xgb.XGBRF"+(algo.type==TYPE.CLASSIFIER?"Classifier":"Regressor")
-						+ "(max_depth="+ algo.max_depth 
-						+ ", n_estimators=" + algo.n_estimators
+						+ "(max_depth="+ (algo.max_depth==0?"None":algo.max_depth) 
+						+ ", n_estimators=" + (algo.n_estimators==0?"100":algo.n_estimators)
 						+ ")\n";
 		}
 		

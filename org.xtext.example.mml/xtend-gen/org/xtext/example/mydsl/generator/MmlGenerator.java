@@ -253,11 +253,25 @@ public class MmlGenerator extends AbstractGenerator {
               }
               String _plus_14 = ("clf = xgb.XGBRF" + _xifexpression_3);
               String _plus_15 = (_plus_14 + "(max_depth=");
+              Object _xifexpression_4 = null;
               int _max_depth_1 = ((RandomForest)algo).getMax_depth();
-              String _plus_16 = (_plus_15 + Integer.valueOf(_max_depth_1));
+              boolean _equals_2 = (_max_depth_1 == 0);
+              if (_equals_2) {
+                _xifexpression_4 = "None";
+              } else {
+                _xifexpression_4 = Integer.valueOf(((RandomForest)algo).getMax_depth());
+              }
+              String _plus_16 = (_plus_15 + _xifexpression_4);
               String _plus_17 = (_plus_16 + ", n_estimators=");
+              Object _xifexpression_5 = null;
               int _n_estimators = ((RandomForest)algo).getN_estimators();
-              String _plus_18 = (_plus_17 + Integer.valueOf(_n_estimators));
+              boolean _equals_3 = (_n_estimators == 0);
+              if (_equals_3) {
+                _xifexpression_5 = "100";
+              } else {
+                _xifexpression_5 = Integer.valueOf(((RandomForest)algo).getN_estimators());
+              }
+              String _plus_18 = (_plus_17 + _xifexpression_5);
               String _plus_19 = (_plus_18 + ")\n");
               algoDeclaration = _plus_19;
             }
@@ -280,18 +294,18 @@ public class MmlGenerator extends AbstractGenerator {
       for (int i = 0; (i < validMetrics.size()); i++) {
         {
           final String metricName = validMetrics.get(i).name();
-          boolean _equals_2 = Objects.equal(metricName, "MSE");
-          if (_equals_2) {
+          boolean _equals_4 = Objects.equal(metricName, "MSE");
+          if (_equals_4) {
             String _metricList = metricList;
             metricList = (_metricList + "\'neg_mean_squared_error\',");
           } else {
-            boolean _equals_3 = Objects.equal(metricName, "MAE");
-            if (_equals_3) {
+            boolean _equals_5 = Objects.equal(metricName, "MAE");
+            if (_equals_5) {
               String _metricList_1 = metricList;
               metricList = (_metricList_1 + "\'neg_mean_absolute_error\',");
             } else {
-              boolean _equals_4 = Objects.equal(metricName, "MAPE");
-              if (_equals_4) {
+              boolean _equals_6 = Objects.equal(metricName, "MAPE");
+              if (_equals_6) {
               }
             }
           }
@@ -305,22 +319,22 @@ public class MmlGenerator extends AbstractGenerator {
       for (int i = 0; (i < validMetrics.size()); i++) {
         {
           final String metricName = validMetrics.get(i).name();
-          boolean _equals_2 = Objects.equal(metricName, "MSE");
-          if (_equals_2) {
+          boolean _equals_4 = Objects.equal(metricName, "MSE");
+          if (_equals_4) {
             String _metrics = metrics;
             metrics = (_metrics + (("accuracyMSE" + Integer.valueOf(i)) + "=scores[\'test_neg_mean_squared_error\']\n"));
             String _metricsResult = metricsResult;
             metricsResult = (_metricsResult + (("print(sum(accuracy" + Integer.valueOf(i)) + ")/split_size)\n"));
           } else {
-            boolean _equals_3 = Objects.equal(metricName, "MAE");
-            if (_equals_3) {
+            boolean _equals_5 = Objects.equal(metricName, "MAE");
+            if (_equals_5) {
               String _metrics_1 = metrics;
               metrics = (_metrics_1 + (("accuracyMAE" + Integer.valueOf(i)) + "=scores[\'test_neg_mean_absolute_error\']\n"));
               String _metricsResult_1 = metricsResult;
               metricsResult = (_metricsResult_1 + (("print(sum(accuracy" + Integer.valueOf(i)) + ")/split_size)\n"));
             } else {
-              boolean _equals_4 = Objects.equal(metricName, "MAPE");
-              if (_equals_4) {
+              boolean _equals_6 = Objects.equal(metricName, "MAPE");
+              if (_equals_6) {
                 String _metrics_2 = metrics;
                 metrics = (_metrics_2 + "#Not developed");
               }
@@ -329,8 +343,8 @@ public class MmlGenerator extends AbstractGenerator {
         }
       }
       int _size = validMetrics.size();
-      boolean _equals_2 = (_size == 1);
-      if (_equals_2) {
+      boolean _equals_4 = (_size == 1);
+      if (_equals_4) {
         metrics = metrics.replaceAll("\'[a-z_]*\'", "\'test_score\'");
       }
     } else {
@@ -345,22 +359,22 @@ public class MmlGenerator extends AbstractGenerator {
           {
             String metric = "";
             final String metricName = validMetrics.get(i).name();
-            boolean _equals_3 = Objects.equal(metricName, "MSE");
-            if (_equals_3) {
+            boolean _equals_5 = Objects.equal(metricName, "MSE");
+            if (_equals_5) {
               String _pythonImport_9 = pythonImport;
               pythonImport = (_pythonImport_9 + "from sklearn.metrics import mean_squared_error\n");
               String _metric = metric;
               metric = (_metric + (("accuracyMSE" + Integer.valueOf(i)) + "=mean_squared_error(y_test, clf.predict(X_test))"));
             } else {
-              boolean _equals_4 = Objects.equal(metricName, "MAE");
-              if (_equals_4) {
+              boolean _equals_6 = Objects.equal(metricName, "MAE");
+              if (_equals_6) {
                 String _pythonImport_10 = pythonImport;
                 pythonImport = (_pythonImport_10 + "from sklearn.metrics import mean_absolute_error\n");
                 String _metric_1 = metric;
                 metric = (_metric_1 + (("accuracyMAE" + Integer.valueOf(i)) + "=mean_absolute_error(y_test, clf.predict(X_test))"));
               } else {
-                boolean _equals_5 = Objects.equal(metricName, "MAPE");
-                if (_equals_5) {
+                boolean _equals_7 = Objects.equal(metricName, "MAPE");
+                if (_equals_7) {
                   String _pythonImport_11 = pythonImport;
                   pythonImport = (_pythonImport_11 + "import numpy as np\n");
                   String _metric_2 = metric;
