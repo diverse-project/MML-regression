@@ -120,7 +120,8 @@ class MmlGenerator extends AbstractGenerator {
 			pythonImport+="from sklearn.svm import SVR\n";
 			algoDeclaration = "clf = SVR("+ (algo.c!==null?"C="+algo.c+",":"") + (algo.kernel!==null?"kernel='"+algo.kernel+"'":"") +")\n";
 		}else if(algo instanceof DT) { //DecisionTree
-			pythonImport+="from xgb import XGBClassifier\n";
+			pythonImport+="from xgboost import plot_tree\n";
+			pythonImport+="from xgboost import XGBFClassifier\n";
 			algoDeclaration = "clf = tree.DecisionTreeRegressor(max_depth="+algo.max_depth+")\n";
 		}else if(algo instanceof SGD){
 			pythonImport+="from sklearn.linear_model import SGDClassifier\n";
@@ -129,7 +130,7 @@ class MmlGenerator extends AbstractGenerator {
 			pythonImport+="from sklearn import ensemble\n";
 			algoDeclaration = "clf = ensemble.GradientBoostingRegressor()\n";
 		}else if(algo instanceof RandomForest){
-			pythonImport+="from xgb import XGBRF"+ (algo.type==TYPE.CLASSIFIER?"Classifier":"Regressor") +"\n";
+			pythonImport+="from xgboost import XGB"+ (algo.type==TYPE.CLASSIFIER?"Classifier":"Regressor") +"\n";
 			algoDeclaration = "clf = xgb.XGBRF"+(algo.type==TYPE.CLASSIFIER?"Classifier":"Regressor")
 						+ "(max_depth="+ algo.max_depth 
 						+ ", n_estimators=" + algo.n_estimators

@@ -212,24 +212,26 @@ public class MmlGenerator extends AbstractGenerator {
     } else {
       if ((algo instanceof DT)) {
         String _pythonImport_2 = pythonImport;
-        pythonImport = (_pythonImport_2 + "from xgb import XGBClassifier\n");
+        pythonImport = (_pythonImport_2 + "from xgboost import plot_tree\n");
+        String _pythonImport_3 = pythonImport;
+        pythonImport = (_pythonImport_3 + "from xgboost import XGBFClassifier\n");
         int _max_depth = ((DT)algo).getMax_depth();
         String _plus_10 = ("clf = tree.DecisionTreeRegressor(max_depth=" + Integer.valueOf(_max_depth));
         String _plus_11 = (_plus_10 + ")\n");
         algoDeclaration = _plus_11;
       } else {
         if ((algo instanceof SGD)) {
-          String _pythonImport_3 = pythonImport;
-          pythonImport = (_pythonImport_3 + "from sklearn.linear_model import SGDClassifier\n");
+          String _pythonImport_4 = pythonImport;
+          pythonImport = (_pythonImport_4 + "from sklearn.linear_model import SGDClassifier\n");
           algoDeclaration = "clf = tree.SGDClassifier()\n";
         } else {
           if ((algo instanceof GTB)) {
-            String _pythonImport_4 = pythonImport;
-            pythonImport = (_pythonImport_4 + "from sklearn import ensemble\n");
+            String _pythonImport_5 = pythonImport;
+            pythonImport = (_pythonImport_5 + "from sklearn import ensemble\n");
             algoDeclaration = "clf = ensemble.GradientBoostingRegressor()\n";
           } else {
             if ((algo instanceof RandomForest)) {
-              String _pythonImport_5 = pythonImport;
+              String _pythonImport_6 = pythonImport;
               String _xifexpression_2 = null;
               TYPE _type = ((RandomForest)algo).getType();
               boolean _equals = Objects.equal(_type, TYPE.CLASSIFIER);
@@ -238,9 +240,9 @@ public class MmlGenerator extends AbstractGenerator {
               } else {
                 _xifexpression_2 = "Regressor";
               }
-              String _plus_12 = ("from xgb import XGBRF" + _xifexpression_2);
+              String _plus_12 = ("from xgboost import XGB" + _xifexpression_2);
               String _plus_13 = (_plus_12 + "\n");
-              pythonImport = (_pythonImport_5 + _plus_13);
+              pythonImport = (_pythonImport_6 + _plus_13);
               String _xifexpression_3 = null;
               TYPE _type_1 = ((RandomForest)algo).getType();
               boolean _equals_1 = Objects.equal(_type_1, TYPE.CLASSIFIER);
@@ -272,8 +274,8 @@ public class MmlGenerator extends AbstractGenerator {
     String _validationPrint = validationPrint;
     validationPrint = (_validationPrint + (("split_size = " + Integer.valueOf(number)) + "\n"));
     if ((stratMethod instanceof CrossValidation)) {
-      String _pythonImport_6 = pythonImport;
-      pythonImport = (_pythonImport_6 + "from sklearn.model_selection import cross_validate\n");
+      String _pythonImport_7 = pythonImport;
+      pythonImport = (_pythonImport_7 + "from sklearn.model_selection import cross_validate\n");
       String metricList = "";
       for (int i = 0; (i < validMetrics.size()); i++) {
         {
@@ -333,8 +335,8 @@ public class MmlGenerator extends AbstractGenerator {
       }
     } else {
       if ((stratMethod instanceof TrainingTest)) {
-        String _pythonImport_7 = pythonImport;
-        pythonImport = (_pythonImport_7 + "from sklearn.model_selection import train_test_split\n");
+        String _pythonImport_8 = pythonImport;
+        pythonImport = (_pythonImport_8 + "from sklearn.model_selection import train_test_split\n");
         String _validationPrint_2 = validationPrint;
         validationPrint = (_validationPrint_2 + (("X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=" + Integer.valueOf(number)) + ")\n"));
         String _validationPrint_3 = validationPrint;
@@ -345,22 +347,22 @@ public class MmlGenerator extends AbstractGenerator {
             final String metricName = validMetrics.get(i).name();
             boolean _equals_3 = Objects.equal(metricName, "MSE");
             if (_equals_3) {
-              String _pythonImport_8 = pythonImport;
-              pythonImport = (_pythonImport_8 + "from sklearn.metrics import mean_squared_error\n");
+              String _pythonImport_9 = pythonImport;
+              pythonImport = (_pythonImport_9 + "from sklearn.metrics import mean_squared_error\n");
               String _metric = metric;
               metric = (_metric + (("accuracyMSE" + Integer.valueOf(i)) + "=mean_squared_error(y_test, clf.predict(X_test))"));
             } else {
               boolean _equals_4 = Objects.equal(metricName, "MAE");
               if (_equals_4) {
-                String _pythonImport_9 = pythonImport;
-                pythonImport = (_pythonImport_9 + "from sklearn.metrics import mean_absolute_error\n");
+                String _pythonImport_10 = pythonImport;
+                pythonImport = (_pythonImport_10 + "from sklearn.metrics import mean_absolute_error\n");
                 String _metric_1 = metric;
                 metric = (_metric_1 + (("accuracyMAE" + Integer.valueOf(i)) + "=mean_absolute_error(y_test, clf.predict(X_test))"));
               } else {
                 boolean _equals_5 = Objects.equal(metricName, "MAPE");
                 if (_equals_5) {
-                  String _pythonImport_10 = pythonImport;
-                  pythonImport = (_pythonImport_10 + "import numpy as np\n");
+                  String _pythonImport_11 = pythonImport;
+                  pythonImport = (_pythonImport_11 + "import numpy as np\n");
                   String _metric_2 = metric;
                   metric = (_metric_2 + "y_test, y_pred = np.array(y_true), np.array(clf.predict(X_test))\n");
                   String _metric_3 = metric;

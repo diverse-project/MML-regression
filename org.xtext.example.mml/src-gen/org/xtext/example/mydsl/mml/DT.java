@@ -44,4 +44,6 @@ public interface DT extends MLAlgorithm
    */
   void setMax_depth(int value);
 
+public abstract void type();
+
 } // DT
