@@ -133,7 +133,7 @@ class MmlGenerator extends AbstractGenerator {
 		if(algo instanceof RandomForest){
 			pythonImport+="from xgboost import XGB"+ (algo.type==TYPE.CLASSIFIER?"Classifier":"Regressor") +"\n";
 			algoDeclaration = "clf = xgb.XGBRF"+(algo.type==TYPE.CLASSIFIER?"Classifier":"Regressor")
-						+ "(max_depth="+ (algo.max_depth==0?"None":algo.max_depth) 
+						+ "(max_depth="+ (algo.max_depth==0?"3":algo.max_depth) 
 						+ ", n_estimators=" + (algo.n_estimators==0?"100":algo.n_estimators)
 						+ ")\n";
 		}
@@ -168,10 +168,10 @@ class MmlGenerator extends AbstractGenerator {
 				val metricName = validMetrics.get(i).name()
 				if(metricName=="MSE"){
 					metrics+="accuracyMSE"+i+"=scores['test_neg_mean_squared_error']\n"
-					metricsResult+="print(sum(accuracy"+i+")/split_size)\n"
+					metricsResult+="print(sum(accuracyMSE"+i+")/split_size)\n"
 				}else if(metricName=="MAE"){
 					metrics+="accuracyMAE"+i+"=scores['test_neg_mean_absolute_error']\n"
-					metricsResult+="print(sum(accuracy"+i+")/split_size)\n"
+					metricsResult+="print(sum(accuracyMAE"+i+")/split_size)\n"
 				}else if(metricName=="MAPE"){
 					//TODO
 					//metrics+="accuracyMAPE"+i+"=scores['test_neg_mean_squared_error']\n"
