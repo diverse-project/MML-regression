@@ -7,8 +7,22 @@ import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
+import org.xtext.example.mydsl.mml.AllVariables
+import org.xtext.example.mydsl.mml.CrossValidation
+import org.xtext.example.mydsl.mml.DT
+import org.xtext.example.mydsl.mml.DataInput
+import org.xtext.example.mydsl.mml.FormulaItem
 import org.xtext.example.mydsl.mml.FrameworkLang
-import org.xtext.example.mydsl.mml.*
+import org.xtext.example.mydsl.mml.GTB
+import org.xtext.example.mydsl.mml.MLChoiceAlgorithm
+import org.xtext.example.mydsl.mml.PredictorVariables
+import org.xtext.example.mydsl.mml.RFormula
+import org.xtext.example.mydsl.mml.RandomForest
+import org.xtext.example.mydsl.mml.SGD
+import org.xtext.example.mydsl.mml.SVR
+import org.xtext.example.mydsl.mml.TYPE
+import org.xtext.example.mydsl.mml.TrainingTest
+import org.xtext.example.mydsl.mml.Validation
 
 /**
  * Generates code from your model files on save.
@@ -68,7 +82,6 @@ class MmlGenerator extends AbstractGenerator {
 	
 	def String compileWeka(RFormula formule, String fileLocation, MLChoiceAlgorithm mlchoicealgo, Validation validation, String csv_separator) {
 		//TODO
-		
 	}
 	
 	def String compileXG(RFormula formule, String fileLocation, MLChoiceAlgorithm mlchoicealgo, Validation validation, String csv_separator) {
@@ -117,20 +130,7 @@ class MmlGenerator extends AbstractGenerator {
 		//algo
 		var algo = mlchoicealgo.getAlgorithm();
 		var algoDeclaration="";
-		if(algo instanceof SVR) {
-			pythonImport+="from sklearn.svm import SVR\n";
-			algoDeclaration = "clf = SVR("+ (algo.c!==null?"C="+algo.c+",":"") + (algo.kernel!==null?"kernel='"+algo.kernel+"'":"") +")\n";
-		}else if(algo instanceof DT) { //DecisionTree
-			pythonImport+="from xgboost import plot_tree\n";
-			pythonImport+="from xgboost import XGBFClassifier\n";
-			algoDeclaration = "clf = tree.DecisionTreeRegressor(max_depth="+algo.max_depth+")\n";
-		}else if(algo instanceof SGD){
-			pythonImport+="from sklearn.linear_model import SGDClassifier\n";
-			algoDeclaration = "clf = tree.SGDClassifier()\n";
-		}else if(algo instanceof GTB){
-			pythonImport+="from sklearn import ensemble\n";
-			algoDeclaration = "clf = ensemble.GradientBoostingRegressor()\n";
-		}else if(algo instanceof RandomForest){
+		if(algo instanceof RandomForest){
 			pythonImport+="from xgboost import XGB"+ (algo.type==TYPE.CLASSIFIER?"Classifier":"Regressor") +"\n";
 			algoDeclaration = "clf = xgb.XGBRF"+(algo.type==TYPE.CLASSIFIER?"Classifier":"Regressor")
 						+ "(max_depth="+ (algo.max_depth==0?"None":algo.max_depth) 
