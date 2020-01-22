@@ -19,7 +19,7 @@ The following results are gathered using cross-validation with a file split in 5
 | Boston |       GTB        |    Weka   |                |          |     |     |
 | Boston |       SGD        |    Weka   |                |          |     |     |
 | Boston |       DT         |    Weka   |                |          |     |     |
-| Boston |   RandomForest   |  XGBoost  |                |          |     |     |
+| Boston |   RandomForest   |  XGBoost  |                |          | 3.5 |26.9 |
 | Boston |       SVR        |  XGBoost  |                |          |     |     |
 | Boston |       GTB        |  XGBoost  |                |          |     |     |
 | Boston |       SGD        |  XGBoost  |                |          |     |     |
@@ -29,27 +29,6 @@ The following results are gathered using cross-validation with a file split in 5
 | Boston |       GTB        |     R     |                |          |     |     |
 | Boston |       SGD        |     R     |                |          |     |     |
 | Boston |       DT         |     R     |                |          |     |     |
-|  x264  |   RandomForest   |  sklearn  |                |          |     |     |
-|  x264  |       SVR        |  sklearn  |                |          |     |     |
-|  x264  |       GTB        |  sklearn  |                |          |     |     |
-|  x264  |       SGD        |  sklearn  |                |          |     |     |
-|  x264  |       DT         |  sklearn  |                |          |     |     |
-|  x264  |   RandomForest   |    Weka   |                |          |     |     |
-|  x264  |       SVR        |    Weka   |                |          |     |     |
-|  x264  |       GTB        |    Weka   |                |          |     |     |
-|  x264  |       SGD        |    Weka   |                |          |     |     |
-|  x264  |       DT         |    Weka   |                |          |     |     |
-|  x264  |   RandomForest   |  XGBoost  |                |          |     |     |
-|  x264  |       SVR        |  XGBoost  |                |          |     |     |
-|  x264  |       GTB        |  XGBoost  |                |          |     |     |
-|  x264  |       SGD        |  XGBoost  |                |          |     |     |
-|  x264  |       DT         |  XGBoost  |                |          |     |     |
-|  x264  |   RandomForest   |     R     |                |          |     |     |
-|  x264  |       SVR        |     R     |                |          |     |     |
-|  x264  |       GTB        |     R     |                |          |     |     |
-|  x264  |       SGD        |     R     |                |          |     |     |
-|  x264  |       DT         |     R     |                |          |     |     |
-
 
 The "?" algorithm tends to be faster but it's the "?" algorithm that is the most accurate
 The framework ? seems to be faster in general
